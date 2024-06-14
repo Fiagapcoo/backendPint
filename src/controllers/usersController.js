@@ -59,26 +59,23 @@ userController.getUserById = async (req, res) => {
 };
 
 /**
- * @description Creates a new user record in the database.
+ * @description Creates a new user along with their account details and password dictionary entry in the database.
  * 
- * This function uses Sequelize's `create` method to add a new user 
- * to the 'USERS' table. It takes the user data from the request body. 
- * If the operation is successful, the newly created user data is returned 
- * as a JSON response with HTTP status 201. In case of an error, 
- * an error message is returned with HTTP status 500.
+ * This function uses Sequelize transactions to ensure atomicity when creating a new user, their account details, 
+ * and password dictionary entry. It takes user data from the request body, and if all operations are successful, 
+ * it commits the transaction and returns the newly created records as a JSON response. If any operation fails, 
+ * it rolls back the transaction and returns an error message.
  * 
  * @async
  * @function createUser
- * @route {POST} /user/create
+ * @route {POST} /users
  * @param {Object} req - The HTTP request object.
  * @param {Object} req.body - The body of the request containing user data.
  * @param {string} req.body.firstNAME - The first name of the user.
  * @param {string} req.body.lastNAME - The last name of the user.
  * @param {string} req.body.EMAIL - The email address of the user.
  * @param {string} req.body.HASHED_PASSWORD - The hashed password of the user.
- * @param {string} req.body.PROFILE_PIC - The profile picture URL of the user.
- * @param {number} req.body.RoleID - The role ID of the user.
- * @param {boolean} req.body.VALIDATION - The validation status of the user.
+ * @param {string} [req.body.PROFILE_PIC] - The profile picture URL of the user.
  * @param {Object} res - The HTTP response object.
  * @returns {Promise<void>} A promise that resolves with no return value.
  */
