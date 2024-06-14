@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: usersController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: usersController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const User = require('../models/users');
+const UserAccountDetails = require('../models/user_account_details');
+const user_passwords_dictionary = require('../models/user_passwords_dictionary');
+const sequelize = require('../models/db');
+const userController = {};
+
+/**
+ * @description Retrieves all user records from the database.
+ * 
+ * This function uses Sequelize's `findAll` method to fetch all users 
+ * stored in the 'USERS' table. If the operation is successful, the user 
+ * data is returned as a JSON response. In case of an error, an error 
+ * message is returned with HTTP status 500.
+ * 
+ * @async
+ * @function getAllUsers
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise&lt;void>} A promise that resolves with no return value.
+ * @route {GET} /user/list
+ */
+userController.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.findAll();
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * @description Retrieves a user record from the database by its primary key (ID).
+ * 
+ * This function uses Sequelize's `findByPk` method to fetch a user 
+ * by its primary key. If the user is found, the user data is returned as a JSON response.
+ * If the user is not found, a 404 error message is returned. In case of an error, 
+ * an error message is returned with HTTP status 500.
+ * 
+ * @async
+ * @function getUserById
+ * @route {GET} /user/get/:id
+ * @param {Object} req - The HTTP request object.
+ * @param {string} req.params.id - The ID of the user to retrieve.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise&lt;void>} A promise that resolves with no return value.
+ * 
+ */
+userController.getUserById = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.id);
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * @description Creates a new user along with their account details and password dictionary entry in the database.
+ * 
+ * This function uses Sequelize transactions to ensure atomicity when creating a new user, their account details, 
+ * and password dictionary entry. It takes user data from the request body, and if all operations are successful, 
+ * it commits the transaction and returns the newly created records as a JSON response. If any operation fails, 
+ * it rolls back the transaction and returns an error message.
+ * 
+ * @async
+ * @function createUser
+ * @route {POST} /users
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} req.body - The body of the request containing user data.
+ * @param {string} req.body.firstNAME - The first name of the user.
+ * @param {string} req.body.lastNAME - The last name of the user.
+ * @param {string} req.body.EMAIL - The email address of the user.
+ * @param {string} req.body.HASHED_PASSWORD - The hashed password of the user.
+ * @param {string} [req.body.PROFILE_PIC] - The profile picture URL of the user.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise&lt;void>} A promise that resolves with no return value.
+ */
+userController.createUser = async (req, res) => {
+    const t = await sequelize.transaction(); // Start a transaction
+    try {
+        const { firstNAME, lastNAME, EMAIL, HASHED_PASSWORD, PROFILE_PIC } = req.body;
+        
+        const newUser = await User.create({
+            firstNAME,
+            lastNAME,
+            EMAIL,
+            HASHED_PASSWORD,
+            PROFILE_PIC,
+        }, { transaction: t });
+        
+        const newUserAccountDetails = await UserAccountDetails.create({
+            USER_ID: newUser.USER_ID,
+            ACCOUNT_STATUS: false,
+            ACCOUNT_RESTRICTION: false
+        }, { transaction: t });
+
+        const newUserPasswordDictionary = await user_passwords_dictionary.create({
+            USER_ID: newUser.USER_ID,
+            HASHED_PASSWD: HASHED_PASSWORD,
+            SALT : 'SALT'  // This is a placeholder for the salt value
+        }, { transaction: t });
+        
+        await t.commit(); // Commit the transaction if all queries are successful
+        
+        res.status(201).json({ newUser, newUserAccountDetails, newUserPasswordDictionary });
+    } catch (error) {
+        await t.rollback(); // Rollback the transaction if any query fails
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * @description Authenticates a user by checking their email and hashed password.
+ * 
+ * This function uses Sequelize's `findOne` method to fetch a user 
+ * by their email and hashed password from the 'USERS' table. If the user 
+ * is found, the user data is returned as a JSON response. If the user is 
+ * not found, a 404 error message is returned. In case of an error, 
+ * an error message is returned with HTTP status 500.
+ * 
+ * @async
+ * @function login
+ * @route {POST} /user/login
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} req.body - The body of the request containing user credentials.
+ * @param {string} req.body.EMAIL - The email address of the user.
+ * @param {string} req.body.HASHED_PASSWORD - The hashed password of the user.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise&lt;void>} A promise that resolves with no return value.
+ */
+userController.login = async (req, res) => {
+    try {
+        const { EMAIL, HASHED_PASSWORD } = req.body;
+        const user = await User.findOne({
+            where: {
+                EMAIL,
+                HASHED_PASSWORD
+            }
+        });
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * @description Updates an existing user record in the database.
+ * 
+ * This function uses Sequelize's `findByPk` method to fetch a user 
+ * by its primary key. If the user is found, the user data is updated with 
+ * the values provided in the request body. If a value is not provided, 
+ * the existing value is retained. The updated user data is then saved and 
+ * returned as a JSON response. If the user is not found, a 404 error message 
+ * is returned. In case of an error, an error message is returned with HTTP status 500.
+ * 
+ * @async
+ * @function updateUser
+ * @route {PUT} /user/update/:id
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} req.body - The body of the request containing user data to update.
+ * @param {string} req.body.EMPLOYEE_ID - The employee ID.
+ * @param {string} req.body.firstNAME - The first name of the user.
+ * @param {string} req.body.lastNAME - The last name of the user.
+ * @param {string} req.body.EMAIL - The email address of the user.
+ * @param {string} req.body.HASHED_PASSWORD - The hashed password of the user.
+ * @param {string} req.body.PROFILE_PIC - The profile picture URL of the user.
+ * @param {number} req.body.RoleID - The role ID of the user.
+ * @param {boolean} req.body.VALIDATION - The validation status of the user.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise&lt;void>} A promise that resolves with no return value.
+ */
+userController.updateUser = async (req, res) => {
+    try {
+        const { EMPLOYEE_ID, firstNAME, lastNAME, EMAIL, HASHED_PASSWORD, PROFILE_PIC, RoleID } = req.body;
+        const user = await User.findByPk(req.params.id);
+        if (user) {
+            user.EMPLOYEE_ID = EMPLOYEE_ID || user.EMPLOYEE_ID;
+            user.firstNAME = firstNAME || user.firstNAME;
+            user.lastNAME = lastNAME || user.lastNAME;
+            user.EMAIL = EMAIL || user.EMAIL;
+            user.HASHED_PASSWORD = HASHED_PASSWORD || user.HASHED_PASSWORD;
+            user.PROFILE_PIC = PROFILE_PIC || user.PROFILE_PIC;
+            user.RoleID = RoleID || user.RoleID;
+            await user.save();
+            res.json(user);
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+module.exports = userController;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#create">create</a></li><li><a href="global.html#createAccess">createAccess</a></li><li><a href="global.html#createActiveDiscussion">createActiveDiscussion</a></li><li><a href="global.html#createAlbum">createAlbum</a></li><li><a href="global.html#createAnswer">createAnswer</a></li><li><a href="global.html#createBookmark">createBookmark</a></li><li><a href="global.html#createComment">createComment</a></li><li><a href="global.html#createCommentPath">createCommentPath</a></li><li><a href="global.html#createContentValidationStatus">createContentValidationStatus</a></li><li><a href="global.html#createEvent">createEvent</a></li><li><a href="global.html#createField">createField</a></li><li><a href="global.html#createForum">createForum</a></li><li><a href="global.html#createLanguage">createLanguage</a></li><li><a href="global.html#createNotification">createNotification</a></li><li><a href="global.html#createParticipation">createParticipation</a></li><li><a href="global.html#createPhotograph">createPhotograph</a></li><li><a href="global.html#createPost">createPost</a></li><li><a href="global.html#createRating">createRating</a></li><li><a href="global.html#createReport">createReport</a></li><li><a href="global.html#createScore">createScore</a></li><li><a href="global.html#createSubArea">createSubArea</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#createWarning">createWarning</a></li><li><a href="global.html#delete">delete</a></li><li><a href="global.html#deleteAccess">deleteAccess</a></li><li><a href="global.html#deleteActiveDiscussion">deleteActiveDiscussion</a></li><li><a href="global.html#deleteAlbum">deleteAlbum</a></li><li><a href="global.html#deleteAnswer">deleteAnswer</a></li><li><a href="global.html#deleteBookmark">deleteBookmark</a></li><li><a href="global.html#deleteComment">deleteComment</a></li><li><a href="global.html#deleteCommentPath">deleteCommentPath</a></li><li><a href="global.html#deleteContentValidationStatus">deleteContentValidationStatus</a></li><li><a href="global.html#deleteEvent">deleteEvent</a></li><li><a href="global.html#deleteField">deleteField</a></li><li><a href="global.html#deleteForum">deleteForum</a></li><li><a href="global.html#deleteLanguage">deleteLanguage</a></li><li><a href="global.html#deleteNotification">deleteNotification</a></li><li><a href="global.html#deleteParticipation">deleteParticipation</a></li><li><a href="global.html#deletePhotograph">deletePhotograph</a></li><li><a href="global.html#deletePost">deletePost</a></li><li><a href="global.html#deleteRating">deleteRating</a></li><li><a href="global.html#deleteReport">deleteReport</a></li><li><a href="global.html#deleteScore">deleteScore</a></li><li><a href="global.html#deleteSubArea">deleteSubArea</a></li><li><a href="global.html#deleteWarning">deleteWarning</a></li><li><a href="global.html#findAll">findAll</a></li><li><a href="global.html#findOne">findOne</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccessById">getAccessById</a></li><li><a href="global.html#getActiveDiscussionById">getActiveDiscussionById</a></li><li><a href="global.html#getAlbumById">getAlbumById</a></li><li><a href="global.html#getAll">getAll</a></li><li><a href="global.html#getAllAccesses">getAllAccesses</a></li><li><a href="global.html#getAllActiveDiscussions">getAllActiveDiscussions</a></li><li><a href="global.html#getAllAlbums">getAllAlbums</a></li><li><a href="global.html#getAllAnswers">getAllAnswers</a></li><li><a href="global.html#getAllBookmarks">getAllBookmarks</a></li><li><a href="global.html#getAllCommentPaths">getAllCommentPaths</a></li><li><a href="global.html#getAllComments">getAllComments</a></li><li><a href="global.html#getAllContentValidationStatuses">getAllContentValidationStatuses</a></li><li><a href="global.html#getAllEvents">getAllEvents</a></li><li><a href="global.html#getAllFields">getAllFields</a></li><li><a href="global.html#getAllForums">getAllForums</a></li><li><a href="global.html#getAllNotifications">getAllNotifications</a></li><li><a href="global.html#getAllParticipations">getAllParticipations</a></li><li><a href="global.html#getAllPhotographs">getAllPhotographs</a></li><li><a href="global.html#getAllRatings">getAllRatings</a></li><li><a href="global.html#getAllReports">getAllReports</a></li><li><a href="global.html#getAllScores">getAllScores</a></li><li><a href="global.html#getAllSubAreas">getAllSubAreas</a></li><li><a href="global.html#getAllUsers">getAllUsers</a></li><li><a href="global.html#getAllWarnings">getAllWarnings</a></li><li><a href="global.html#getAnswerById">getAnswerById</a></li><li><a href="global.html#getBookmarkById">getBookmarkById</a></li><li><a href="global.html#getById">getById</a></li><li><a href="global.html#getCommentById">getCommentById</a></li><li><a href="global.html#getCommentPathById">getCommentPathById</a></li><li><a href="global.html#getContentValidationStatusById">getContentValidationStatusById</a></li><li><a href="global.html#getEventById">getEventById</a></li><li><a href="global.html#getFieldById">getFieldById</a></li><li><a href="global.html#getForumById">getForumById</a></li><li><a href="global.html#getLanguage">getLanguage</a></li><li><a href="global.html#getLanguages">getLanguages</a></li><li><a href="global.html#getNotificationById">getNotificationById</a></li><li><a href="global.html#getOne">getOne</a></li><li><a href="global.html#getParticipationById">getParticipationById</a></li><li><a href="global.html#getPhotographById">getPhotographById</a></li><li><a href="global.html#getPost">getPost</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getRatingById">getRatingById</a></li><li><a href="global.html#getReportById">getReportById</a></li><li><a href="global.html#getScoreById">getScoreById</a></li><li><a href="global.html#getSubArea">getSubArea</a></li><li><a href="global.html#getUserById">getUserById</a></li><li><a href="global.html#getWarningById">getWarningById</a></li><li><a href="global.html#list">list</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#sendEmail">sendEmail</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateActiveDiscussion">updateActiveDiscussion</a></li><li><a href="global.html#updateAlbum">updateAlbum</a></li><li><a href="global.html#updateAnswer">updateAnswer</a></li><li><a href="global.html#updateBookmark">updateBookmark</a></li><li><a href="global.html#updateComment">updateComment</a></li><li><a href="global.html#updateContentValidationStatus">updateContentValidationStatus</a></li><li><a href="global.html#updateEvent">updateEvent</a></li><li><a href="global.html#updateField">updateField</a></li><li><a href="global.html#updateForum">updateForum</a></li><li><a href="global.html#updateLanguage">updateLanguage</a></li><li><a href="global.html#updateNotification">updateNotification</a></li><li><a href="global.html#updatePhotograph">updatePhotograph</a></li><li><a href="global.html#updatePost">updatePost</a></li><li><a href="global.html#updateRating">updateRating</a></li><li><a href="global.html#updateReport">updateReport</a></li><li><a href="global.html#updateScore">updateScore</a></li><li><a href="global.html#updateSubArea">updateSubArea</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#updateWarning">updateWarning</a></li><li><a href="global.html#upload">upload</a></li><li><a href="global.html#upload_create">upload_create</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Fri Jun 14 2024 11:24:43 GMT+0100 (Western European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

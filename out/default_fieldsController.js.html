@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: default_fieldsController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: default_fieldsController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const DefaultFieldModel = require('../models/default_fields');
+
+const DefaultFieldController = {};
+
+/**
+ * @description Creates a new default field record in the database.
+ * 
+ * This function uses Sequelize's `create` method to add a new default field 
+ * to the 'DefaultFields' table. It takes the field data from the request body. 
+ * If the operation is successful, a success message and the newly created 
+ * field data are returned as a JSON response. In case of an error, 
+ * an error message is returned with HTTP status 500.
+ * 
+ * @async
+ * @function createField
+ * @route {POST} /default_fields/create
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} req.body - The body of the request containing field data.
+ * @param {string} req.body.FIELD_NAME - The name of the field.
+ * @param {string} req.body.FIELD_TYPE - The type of the field.
+ * @param {string} req.body.FIELD_VALUE - The value of the field.
+ * @param {number} [req.body.MAX_VALUE] - The maximum value of the field.
+ * @param {number} [req.body.MIN_VALUE] - The minimum value of the field.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise&lt;void>} A promise that resolves with no return value.
+ */
+DefaultFieldController.createField = async (req, res) => {
+    const { FIELD_NAME, FIELD_TYPE, FIELD_VALUE, MAX_VALUE, MIN_VALUE } = req.body;
+    try {
+        const newField = await DefaultFieldModel.create({
+            FIELD_NAME,
+            FIELD_TYPE,
+            FIELD_VALUE,
+            MAX_VALUE,
+            MIN_VALUE
+        });
+        res.status(201).json(newField);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+/**
+ * @description Retrieves all default fields from the database.
+ * 
+ * This function uses Sequelize's `findAll` method to fetch all default fields 
+ * from the 'DefaultFields' table. The result is returned as a JSON response. 
+ * In case of an error, an error message is returned with HTTP status 500.
+ * 
+ * @async
+ * @function getAllFields
+ * @route {GET} /default_fields/list
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise&lt;void>} A promise that resolves with no return value.
+ */
+DefaultFieldController.getAllFields = async (req, res) => {
+    try {
+        const fields = await DefaultFieldModel.findAll();
+        res.status(200).json(fields);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+/**
+ * @description Retrieves a specific default field by its ID from the database.
+ * 
+ * This function uses Sequelize's `findOne` method to fetch a specific default field 
+ * from the 'DefaultFields' table by its ID. The result is returned as a JSON response. 
+ * In case of an error, an error message is returned with HTTP status 500.
+ * 
+ * @async
+ * @function getFieldById
+ * @route {GET} /default_fields/get/:id
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} req.params - The URL parameters.
+ * @param {number} req.params.id - The ID of the field.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise&lt;void>} A promise that resolves with no return value.
+ */
+DefaultFieldController.getFieldById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const field = await DefaultFieldModel.findOne({
+            where: {
+                FIELD_ID: id
+            }
+        });
+        res.status(200).json(field);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+/**
+ * @description Updates an existing default field record in the database.
+ * 
+ * This function uses Sequelize's `update` method to modify an existing default field 
+ * in the 'DefaultFields' table. It takes the field data from the request body 
+ * and the ID of the field from the URL parameters. If the operation is successful, 
+ * a success message is returned as a JSON response. In case of an error, 
+ * an error message is returned with HTTP status 500.
+ * 
+ * @async
+ * @function updateField
+ * @route {PUT} /default_fields/update/:id
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} req.params - The URL parameters.
+ * @param {number} req.params.id - The ID of the field.
+ * @param {Object} req.body - The body of the request containing field data.
+ * @param {string} req.body.FIELD_NAME - The name of the field.
+ * @param {string} req.body.FIELD_TYPE - The type of the field.
+ * @param {string} req.body.FIELD_VALUE - The value of the field.
+ * @param {number} [req.body.MAX_VALUE] - The maximum value of the field.
+ * @param {number} [req.body.MIN_VALUE] - The minimum value of the field.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise&lt;void>} A promise that resolves with no return value.
+ */
+DefaultFieldController.updateField = async (req, res) => {
+    const { id } = req.params;
+    const { FIELD_NAME, FIELD_TYPE, FIELD_VALUE, MAX_VALUE, MIN_VALUE } = req.body;
+    try {
+        await DefaultFieldModel.update({
+            FIELD_NAME,
+            FIELD_TYPE,
+            FIELD_VALUE,
+            MAX_VALUE,
+            MIN_VALUE
+        }, {
+            where: {
+                FIELD_ID: id
+            }
+        });
+        res.status(200).json({ message: 'Field updated successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+/**
+ * @description Deletes a default field record from the database by its ID.
+ * 
+ * This function uses Sequelize's `destroy` method to remove a default field 
+ * from the 'DefaultFields' table by its ID. If the operation is successful, 
+ * a success message is returned as a JSON response. In case of an error, 
+ * an error message is returned with HTTP status 500.
+ * 
+ * @async
+ * @function deleteField
+ * @route {DELETE} /default_fields/delete/:id
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} req.params - The URL parameters.
+ * @param {number} req.params.id - The ID of the field.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise&lt;void>} A promise that resolves with no return value.
+ */
+DefaultFieldController.deleteField = async (req, res) => {
+    const { id } = req.params;
+    try {
+        await DefaultFieldModel.destroy({
+            where: {
+                FIELD_ID: id
+            }
+        });
+        res.status(200).json({ message: 'Field deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+module.exports = DefaultFieldController;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#create">create</a></li><li><a href="global.html#createAccess">createAccess</a></li><li><a href="global.html#createActiveDiscussion">createActiveDiscussion</a></li><li><a href="global.html#createAlbum">createAlbum</a></li><li><a href="global.html#createAnswer">createAnswer</a></li><li><a href="global.html#createBookmark">createBookmark</a></li><li><a href="global.html#createComment">createComment</a></li><li><a href="global.html#createCommentPath">createCommentPath</a></li><li><a href="global.html#createContentValidationStatus">createContentValidationStatus</a></li><li><a href="global.html#createEvent">createEvent</a></li><li><a href="global.html#createField">createField</a></li><li><a href="global.html#createForum">createForum</a></li><li><a href="global.html#createLanguage">createLanguage</a></li><li><a href="global.html#createNotification">createNotification</a></li><li><a href="global.html#createParticipation">createParticipation</a></li><li><a href="global.html#createPhotograph">createPhotograph</a></li><li><a href="global.html#createPost">createPost</a></li><li><a href="global.html#createRating">createRating</a></li><li><a href="global.html#createReport">createReport</a></li><li><a href="global.html#createScore">createScore</a></li><li><a href="global.html#createSubArea">createSubArea</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#createWarning">createWarning</a></li><li><a href="global.html#delete">delete</a></li><li><a href="global.html#deleteAccess">deleteAccess</a></li><li><a href="global.html#deleteActiveDiscussion">deleteActiveDiscussion</a></li><li><a href="global.html#deleteAlbum">deleteAlbum</a></li><li><a href="global.html#deleteAnswer">deleteAnswer</a></li><li><a href="global.html#deleteBookmark">deleteBookmark</a></li><li><a href="global.html#deleteComment">deleteComment</a></li><li><a href="global.html#deleteCommentPath">deleteCommentPath</a></li><li><a href="global.html#deleteContentValidationStatus">deleteContentValidationStatus</a></li><li><a href="global.html#deleteEvent">deleteEvent</a></li><li><a href="global.html#deleteField">deleteField</a></li><li><a href="global.html#deleteForum">deleteForum</a></li><li><a href="global.html#deleteLanguage">deleteLanguage</a></li><li><a href="global.html#deleteNotification">deleteNotification</a></li><li><a href="global.html#deleteParticipation">deleteParticipation</a></li><li><a href="global.html#deletePhotograph">deletePhotograph</a></li><li><a href="global.html#deletePost">deletePost</a></li><li><a href="global.html#deleteRating">deleteRating</a></li><li><a href="global.html#deleteReport">deleteReport</a></li><li><a href="global.html#deleteScore">deleteScore</a></li><li><a href="global.html#deleteSubArea">deleteSubArea</a></li><li><a href="global.html#deleteWarning">deleteWarning</a></li><li><a href="global.html#findAll">findAll</a></li><li><a href="global.html#findOne">findOne</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAccessById">getAccessById</a></li><li><a href="global.html#getActiveDiscussionById">getActiveDiscussionById</a></li><li><a href="global.html#getAlbumById">getAlbumById</a></li><li><a href="global.html#getAll">getAll</a></li><li><a href="global.html#getAllAccesses">getAllAccesses</a></li><li><a href="global.html#getAllActiveDiscussions">getAllActiveDiscussions</a></li><li><a href="global.html#getAllAlbums">getAllAlbums</a></li><li><a href="global.html#getAllAnswers">getAllAnswers</a></li><li><a href="global.html#getAllBookmarks">getAllBookmarks</a></li><li><a href="global.html#getAllCommentPaths">getAllCommentPaths</a></li><li><a href="global.html#getAllComments">getAllComments</a></li><li><a href="global.html#getAllContentValidationStatuses">getAllContentValidationStatuses</a></li><li><a href="global.html#getAllEvents">getAllEvents</a></li><li><a href="global.html#getAllFields">getAllFields</a></li><li><a href="global.html#getAllForums">getAllForums</a></li><li><a href="global.html#getAllNotifications">getAllNotifications</a></li><li><a href="global.html#getAllParticipations">getAllParticipations</a></li><li><a href="global.html#getAllPhotographs">getAllPhotographs</a></li><li><a href="global.html#getAllRatings">getAllRatings</a></li><li><a href="global.html#getAllReports">getAllReports</a></li><li><a href="global.html#getAllScores">getAllScores</a></li><li><a href="global.html#getAllSubAreas">getAllSubAreas</a></li><li><a href="global.html#getAllUsers">getAllUsers</a></li><li><a href="global.html#getAllWarnings">getAllWarnings</a></li><li><a href="global.html#getAnswerById">getAnswerById</a></li><li><a href="global.html#getBookmarkById">getBookmarkById</a></li><li><a href="global.html#getById">getById</a></li><li><a href="global.html#getCommentById">getCommentById</a></li><li><a href="global.html#getCommentPathById">getCommentPathById</a></li><li><a href="global.html#getContentValidationStatusById">getContentValidationStatusById</a></li><li><a href="global.html#getEventById">getEventById</a></li><li><a href="global.html#getFieldById">getFieldById</a></li><li><a href="global.html#getForumById">getForumById</a></li><li><a href="global.html#getLanguage">getLanguage</a></li><li><a href="global.html#getLanguages">getLanguages</a></li><li><a href="global.html#getNotificationById">getNotificationById</a></li><li><a href="global.html#getOne">getOne</a></li><li><a href="global.html#getParticipationById">getParticipationById</a></li><li><a href="global.html#getPhotographById">getPhotographById</a></li><li><a href="global.html#getPost">getPost</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getRatingById">getRatingById</a></li><li><a href="global.html#getReportById">getReportById</a></li><li><a href="global.html#getScoreById">getScoreById</a></li><li><a href="global.html#getSubArea">getSubArea</a></li><li><a href="global.html#getUserById">getUserById</a></li><li><a href="global.html#getWarningById">getWarningById</a></li><li><a href="global.html#list">list</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#sendEmail">sendEmail</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateActiveDiscussion">updateActiveDiscussion</a></li><li><a href="global.html#updateAlbum">updateAlbum</a></li><li><a href="global.html#updateAnswer">updateAnswer</a></li><li><a href="global.html#updateBookmark">updateBookmark</a></li><li><a href="global.html#updateComment">updateComment</a></li><li><a href="global.html#updateContentValidationStatus">updateContentValidationStatus</a></li><li><a href="global.html#updateEvent">updateEvent</a></li><li><a href="global.html#updateField">updateField</a></li><li><a href="global.html#updateForum">updateForum</a></li><li><a href="global.html#updateLanguage">updateLanguage</a></li><li><a href="global.html#updateNotification">updateNotification</a></li><li><a href="global.html#updatePhotograph">updatePhotograph</a></li><li><a href="global.html#updatePost">updatePost</a></li><li><a href="global.html#updateRating">updateRating</a></li><li><a href="global.html#updateReport">updateReport</a></li><li><a href="global.html#updateScore">updateScore</a></li><li><a href="global.html#updateSubArea">updateSubArea</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#updateWarning">updateWarning</a></li><li><a href="global.html#upload">upload</a></li><li><a href="global.html#upload_create">upload_create</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Fri Jun 14 2024 11:24:43 GMT+0100 (Western European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
