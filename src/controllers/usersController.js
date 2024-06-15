@@ -141,16 +141,23 @@ userController.login = async (req, res) => {
                 HASHED_PASSWORD
             }
         });
-        if (user) {
-            res.json(user);
-        } else {
-            res.status(404).json({ message: 'User not found' });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
-    }
-    catch (error) {
+
+        if (user.RoleID == 1) {
+            res.json({ admin: false, user });
+        } else if (user.RoleID == 2 || user.RoleID == 3) {
+            res.json({ admin: true, user });
+        } else {
+            res.status(404).json({ message: 'User role not recognized' });
+        }
+    } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 /**
  * @description Updates an existing user record in the database.
