@@ -146,6 +146,14 @@ userController.login = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
+        const userAccountDetails = await UserAccountDetails.findOne({
+            where: { USER_ID: user.USER_ID }
+        });
+
+        if (userAccountDetails.ACCOUNT_STATUS === false) {
+            return res.status(401).json({message: 'Account not validated' });
+        }
+
         if (user.RoleID == 1) {
             res.json({ admin: false, user });
         } else if (user.RoleID == 2 || user.RoleID == 3) {
@@ -206,6 +214,8 @@ userController.updateUser = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+
 
 
 

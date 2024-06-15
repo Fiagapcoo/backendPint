@@ -29,7 +29,7 @@ user_account_detailsController.getAllUserAccountDetails = async (req, res) => {
 user_account_detailsController.getUserAccountDetailsById = async (req, res) => {
     try {
         const userAccountDetails = await UserAccountDetails.findOne({
-            where: { USER_ID: req.params.userId },
+            where: { USER_ID: req.params.id },
             include: [{ model: User }]
         });
         if (!userAccountDetails) {
@@ -48,6 +48,7 @@ user_account_detailsController.getUserAccountDetailsById = async (req, res) => {
  * Validate user account (set ACCOUNT_STATUS to true)
  * @param {object} req - Express request object
  * @param {object} res - Express response object
+ * @route PUT /user_account_details/validate/:id
  * @returns {Promise<void>}
  */
 user_account_detailsController.validateUserAccount = async (req, res) => {
@@ -71,6 +72,7 @@ user_account_detailsController.validateUserAccount = async (req, res) => {
  * Invalidate user account (set ACCOUNT_STATUS to false)
  * @param {object} req - Express request object
  * @param {object} res - Express response object
+ * @route PUT /user_account_details/restrict/:id
  * @returns {Promise<void>}
  */
 user_account_detailsController.invalidate = async (req, res) => {
