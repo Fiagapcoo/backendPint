@@ -68,7 +68,7 @@ userController.getUserById = async (req, res) => {
  * 
  * @async
  * @function createUser
- * @route {POST} /users
+ * @route {POST} /users/create
  * @param {Object} req - The HTTP request object.
  * @param {Object} req.body - The body of the request containing user data.
  * @param {string} req.body.firstNAME - The first name of the user.

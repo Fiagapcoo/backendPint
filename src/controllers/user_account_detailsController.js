@@ -6,6 +6,7 @@ const user_account_detailsController = {};
  * Get all user account details
  * @param {object} req - Express request object
  * @param {object} res - Express response object
+ * @route GET /user_account_details/list
  * @returns {Promise<void>}
  */
 user_account_detailsController.getAllUserAccountDetails = async (req, res) => {
