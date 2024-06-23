@@ -16,6 +16,7 @@ const transporter = nodemailer.createTransport({
  *
  * @param {object} req - Express request object.
  * @param {object} res - Express response object.
+ * @route POST /email/send
  * @returns {void}
  */
 const sendEmail = (req, res) => {
