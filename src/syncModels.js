@@ -1,6 +1,6 @@
 const db = require('./models');
 
-async function createSchemas() {
+ function createSchemas() {
     const schemas = [
         'admin',
         'centers',
@@ -13,12 +13,14 @@ async function createSchemas() {
         'static_content',
         'user_interactions'
     ];
-
+    //explicar no relatorio o pq de não usar o await
     for (const schema of schemas) {
-        await db.sequelize.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`);
+        db.sequelize.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`); 
         console.log(`Schema ${schema} ensured`);
     }
 }
+
+createSchemas();
 
 async function syncModels() {
     try {
@@ -101,21 +103,6 @@ async function syncModels() {
             ALTER TABLE "hr"."users"
             ALTER COLUMN "role_id" SET DEFAULT 1;
         `);
-/*
-        await db.sequelize.query(`
-            CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-        `);
-        */
-        /*
-        await db.sequelize.query(`
-            ALTER TABLE "hr"."users"
-            ADD CONSTRAINT "fk_users_role_id"
-            FOREIGN KEY ("role_id")
-            REFERENCES "security"."acc_permissions" ("role_id")
-            ON DELETE NO ACTION
-            ON UPDATE CASCADE;
-        `);
-        */
 
         console.log('All models were synchronized successfully.');
     } catch (error) {
@@ -127,4 +114,4 @@ async function syncModels() {
 
 syncModels();
 
-//module.exports = syncModels;
+module.exports = syncModels;
