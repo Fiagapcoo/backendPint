@@ -20,7 +20,6 @@ const db = require('./models');
     }
 }
 
-createSchemas();
 
 async function syncModels() {
     try {
