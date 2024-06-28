@@ -192,7 +192,7 @@ async function bulkInsert() {
         (2, 3),
         (3, 4),
         (4, 5),
-        (5, 8);
+        (5, 8)
         ON CONFLICT ("office_id", "manager_id") DO NOTHING;    
     `);
     await db.sequelize.query(`
