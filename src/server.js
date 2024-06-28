@@ -2,14 +2,28 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const app = express();
-require('dotenv').config();
+//require('dotenv').config();
+
+// correr antes de tudo o src/syncModels
+//seguido do src/database/logic_objects/insertData
 
 
+//por a correr 1 vez unica
+const insertData = require('./database/logic_objects/insertData');
+
+
+
+
+
+
+const emailRoute = require('./routes/emailRoute');
+const uploadRoute = require('./routes/uploadRoute');
+/*
 const error_logRoute = require('./routes/error_logRoute');
 const acc_permissionsRoute = require('./routes/acc_permissionsRoute');
 const user = require('./routes/userRoute');
 const user_actions_logRoute = require('./routes/user_actions_logRoute');
-const uploadRoute = require('./routes/uploadRoute');
+
 const user_account_detailsRoute = require('./routes/user_account_detailsRoute');
 const user_passwords_dictionaryRoute = require('./routes/user_passwords_dictionaryRoute');
 const passwd_expiring_notificationsRoute = require('./routes/passwd_expiring_notificationsRoute');
@@ -42,9 +56,23 @@ const reportsRoute = require('./routes/reportsRoute');
 const warningsRoute = require('./routes/warningsRoute');
 const content_validation_statusRoute = require('./routes/content_validation_statusRoute');
 const active_discussionsRoute = require('./routes/active_discussionsRoute');
+*/
+const categoryRoutes = require('./routes/static_contentController');
+const forumRoutes = require('./routes/forumRoutes');
+const postRoutes = require('./routes/postRoutes');
+const eventRoutes = require('./routes/eventRoutes');
+const mediaRoutes = require('./routes/mediaRoutes');
+const ratingRoutes = require('./routes/ratingRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const formsRoutes = require('./routes/formsRoutes');
+const commentsRoutes = require('./routes/commentsRoutes');
+const userRoutes = require('./routes/userRoutes');
+const dynamicRoutes = require('./routes/dynamic_contentRoutes');
+const notificationsRoutes = require('./routes/notificationRoutes');
 
 
-const emailRoute = require('./routes/emailRoute');
+
+
 
 app.set('port', process.env.PORT || 8000);
 
@@ -59,44 +87,21 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use('/error_log', error_logRoute);
-app.use('/acc_permissions', acc_permissionsRoute);
-app.use('/user', user);
-app.use('/user_actions_log', user_actions_logRoute);
-app.use('/user_account_details', user_account_detailsRoute);
-app.use('/user_passwords_dictionary', user_passwords_dictionaryRoute);
-app.use('/passwd_expiring_notifications', passwd_expiring_notificationsRoute);
-app.use('/offices', officesRoute);
-app.use('/office_admins', office_adminsRoute);
-app.use('/office_workers', office_workersRoute);
-app.use('/area', areaRoute);
-app.use('/sub_area', subareaRoute);
-app.use('/language', languageRoute);
-app.use('/area_content', area_contentRoute);
-app.use('/subarea_content', subarea_contentRoute);
-app.use('/userpref', userprefRoute);
-app.use('/posts', postsRoute);
-app.use('/events', eventRoute);
-app.use('/forums', forumRoute);
-app.use('/notifications', notificationRoute);
-app.use('/event_forum_access', event_forum_accessRoute);
-app.use('/bookmarks', bookmarkRoute);
-app.use('/default_fields', default_fieldsRoute);
-app.use('/fields', fieldsRoute);
-app.use('/answers', answersRoute);
-app.use('/participation', participationRoute);
-app.use('/albums', albumRoute);
-app.use('/photographs', photographsRoute);
-app.use('/comments', commentRoute);
-app.use('/comment_path', comment_path);
-app.use('/ratings', ratingsRoute);
-app.use('/scores', scoresRoute);
-app.use('/reports', reportsRoute);
-app.use('/warnings', warningsRoute);
-app.use('/content_validation_status', content_validation_statusRoute);
-app.use('/active_discussions', active_discussionsRoute);
 
 
+//API
+app.use('/api/categories', categoryRoutes);
+app.use('/api/forum', forumRoutes);
+app.use('/api/post', postRoutes);
+app.use('/api/event', eventRoutes);
+app.use('/api/media', mediaRoutes);
+app.use('/api/rating', ratingRoutes);
+app.use('/api/administration', adminRoutes);
+app.use('/api/form', formsRoutes);
+app.use('/api/comment', commentsRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/dynamic', dynamicRoutes);
+app.use('/api/notification', notificationsRoutes);
 
 
 
