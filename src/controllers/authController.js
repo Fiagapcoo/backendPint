@@ -5,6 +5,31 @@ const { sendEmail } = require('../utils/email'); // Implement your email sending
 
 const controllers = {}; 
 
+function mashupAndRandomize(email, firstName, lastName) {
+    // Combine the strings
+    const combinedString = email + firstName + lastName;
+  
+    // Convert the combined string into an array of characters
+    const charArray = combinedString.split('');
+  
+    // Function to shuffle the array
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+  
+    // Shuffle the array
+    const shuffledArray = shuffleArray(charArray);
+  
+    // Convert the shuffled array back to a string
+    const randomizedString = shuffledArray.join('');
+  
+    return randomizedString;
+  }
+  
 
 controllers.register = async (req, res) => {
     const { email, firstName, lastName } = req.body;
@@ -16,8 +41,9 @@ controllers.register = async (req, res) => {
         // Generate JWT token for password setup
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
+        const result = mashupAndRandomize(email, firstName, lastName);
         // URL for password setup
-        const url = `${process.env.CLIENT_URL}/setup-password?token=${token}`;
+        const url = `${process.env.CLIENT_URL}/${result}/setup-password?token=${token}`;
 
         // Send email to user
         await sendEmail(user.email, 'Set up your password', `Click this link to set up your password: ${url}`);
