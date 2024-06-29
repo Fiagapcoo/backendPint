@@ -37,10 +37,10 @@ controllers.update_access_on_login = async (req, res) => {
     const { userID } = req.param; 
     console.log(req.param);
     try {
-        data = await updateAccessOnLogin(userID);
-        res.status(201).json({success:true, data:data, message:'Forum created successfully.'} );
+        await updateAccessOnLogin(userID);
+        res.status(201).send(' Update user last access login successfully.');
     } catch (error) {
-        res.status(500).send('Error creating Forum: ' + error.message);
+        res.status(500).send('Error updating user last access on login: ' + error.message);
     }
 };
 
@@ -48,8 +48,8 @@ controllers.get_user_role = async (req, res) => {
     const { userID } = req.params; 
     console.log(req.query);
     try {
-        await getUserRole(userID);
-        res.status(201).send(' Got User Role successfully.');
+        data = await getUserRole(userID);
+        res.status(201).json({success:true, data:data, message:' Got User Role successfully.'} );
     } catch (error) {
         res.status(500).send('Error getting user role: ' + error.message);
     }
