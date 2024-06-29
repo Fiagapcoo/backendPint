@@ -45,13 +45,13 @@ controllers.update_access_on_login = async (req, res) => {
 };
 
 controllers.get_user_role = async (req, res) => {
-    const { userID } = req.query; 
+    const { userID } = req.params; 
     console.log(req.query);
     try {
         await getUserRole(userID);
-        res.status(201).send('Forum created successfully.');
+        res.status(201).send(' Got User Role successfully.');
     } catch (error) {
-        res.status(500).send('Error creating Forum: ' + error.message);
+        res.status(500).send('Error getting user role: ' + error.message);
     }
 };
 
