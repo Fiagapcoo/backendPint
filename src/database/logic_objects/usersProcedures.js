@@ -150,8 +150,7 @@ async function getUserRole(userID) {
           type: QueryTypes.SELECT
         }
       );
-      console.log(result);
-      return result[0] ? result[0].RoleName : null;
+      return result[0] ? result[0].role_name : null;
     } catch (error) {
       console.error('Error getting user role:', error);
       throw error;
