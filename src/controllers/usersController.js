@@ -9,19 +9,19 @@ const { getUserPreferences,
 const controllers = {};
 
 controllers.get_user_preferences = async (req, res) => {
-    const { userID } = req.param; 
+    const { userID } = req.params; 
     console.log(req.param );
     try {
-        await getUserPreferences(userID);
-        res.status(201).send('Forum created successfully.');
+        data = await getUserPreferences(userID);
+        res.status(201).json({success:true, data:data, message:' Got User preferences successfully.'} );
     } catch (error) {
-        res.status(500).send('Error creating Forum: ' + error.message);
+        res.status(500).send('Error getting user preferences: ' + error.message);
     }
 };
 
 
 controllers.update_user_preferences = async (req, res) => {
-    const { userID} = req.param; 
+    const { userID} = req.params; 
     const {  preferredLanguageID = null, preferredAreas = null, preferredSubAreas = null, receiveNotifications = null } = req.body; 
     console.log(req.query);
     try {
@@ -56,8 +56,8 @@ controllers.get_user_role = async (req, res) => {
 };
 
 controllers.add_bookmark = async (req, res) => {
-    const { userID, contentID, contentType } = req.param; 
-    console.log(req.param);
+    const { userID, contentID, contentType } = req.body; 
+    console.log(req.body);
     try {
         await addBookmark(userID, contentID, contentType);
         res.status(201).send('Forum created successfully.');
