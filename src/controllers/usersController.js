@@ -37,8 +37,8 @@ controllers.update_access_on_login = async (req, res) => {
     const { userID } = req.param; 
     console.log(req.param);
     try {
-        await updateAccessOnLogin(userID);
-        res.status(201).send('Forum created successfully.');
+        data = await updateAccessOnLogin(userID);
+        res.status(201).json({success:true, data:data, message:'Forum created successfully.'} );
     } catch (error) {
         res.status(500).send('Error creating Forum: ' + error.message);
     }
