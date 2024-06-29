@@ -141,7 +141,7 @@ async function updateAccessOnLogin(userID) {
 async function getUserRole(userID) {
     try {
       const result = await db.sequelize.query(
-        `SELECT p."RoleName"
+        `SELECT p."role_name"
         FROM "hr"."users" u
         JOIN "security"."acc_permissions" p ON u."role_id" = p."role_id"
         WHERE u."user_id" = :userID`,
