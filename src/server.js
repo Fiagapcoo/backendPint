@@ -69,6 +69,7 @@ const commentsRoutes = require('./routes/commentsRoutes');
 const userRoutes = require('./routes/userRoutes');
 const dynamicRoutes = require('./routes/dynamic_contentRoutes');
 const notificationsRoutes = require('./routes/notificationRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 
 
@@ -101,8 +102,8 @@ app.use('/api/form', formsRoutes);
 app.use('/api/comment', commentsRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/dynamic', dynamicRoutes);
-app.use('/api/notification', notificationsRoutes);
-
+app.use('/api/notification', notificationsRoutes);authRoutes
+app.use('/api/auth', authRoutes);
 
 
 
