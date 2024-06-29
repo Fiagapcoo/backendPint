@@ -1,6 +1,6 @@
 const db = require('../models');
 const jwt = require('jsonwebtoken');
-const { sendEmail } = require('../utils/email'); // Implement your email sending logic
+const { sendEmail } = require('./emailController'); 
 
 
 const controllers = {}; 
