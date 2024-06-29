@@ -64,12 +64,15 @@ controllers.getEventsByCity = async (req, res) => {
 controllers.getPostById = async (req, res) => {
     const { post_id } = req.params;
     try {
-        const post = await db.Post.findByPk(post_id, {
+        const post = await db.Posts.findByPk(post_id, {
             include: [
-                { model: db.User, as: 'publisher' },
-                { model: db.Office, as: 'office' }
+                { model: db.Users, as: 'Publisher' },
+                { model: db.Users, as: 'Admin' },
+                { model: db.SubArea },
+                { model: db.OfficeAdmins, as: 'Office' }
             ]
         });
+
         if (post) {
             res.status(200).json(post);
         } else {
@@ -80,34 +83,40 @@ controllers.getPostById = async (req, res) => {
     }
 };
 
+
 controllers.getEventById = async (req, res) => {
     const { event_id } = req.params;
     try {
-        const event = await db.Event.findByPk(event_id, {
+        const event = await db.Events.findByPk(event_id, {
             include: [
-                { model: db.User, as: 'publisher' },
-                { model: db.Office, as: 'office' }
+                { model: db.Users, as: 'Publisher' },
+                { model: db.OfficeAdmins, as: 'Office' },
+                { model: db.Users, as: 'Admin' }
             ]
         });
+
         if (event) {
             res.status(200).json(event);
         } else {
-            res.status(404).send('Event not found');
+            res.status(404).json({ message: 'Event not found' });
         }
     } catch (error) {
-        res.status(500).send('Error retrieving event: ' + error.message);
+        res.status(500).json({ message: 'Error retrieving event', error: error.message });
     }
 };
 
 controllers.getForumById = async (req, res) => {
     const { forum_id } = req.params;
     try {
-        const forum = await db.Forum.findByPk(forum_id, {
+        const forum = await db.Forums.findByPk(forum_id, {
             include: [
-                { model: db.User, as: 'publisher' },
-                { model: db.Office, as: 'office' }
+                { model: db.Users, as: 'Publisher' },
+                { model: db.Users, as: 'Admin' },
+                { model: db.SubArea },
+                { model: db.Events }
             ]
         });
+
         if (forum) {
             res.status(200).json(forum);
         } else {

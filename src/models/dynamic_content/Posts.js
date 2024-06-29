@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         Posts.belongsTo(models.SubArea, { foreignKey: 'sub_area_id' });
         Posts.belongsTo(models.Users, { as: 'Publisher', foreignKey: 'publisher_id' });
         Posts.belongsTo(models.Users, { as: 'Admin', foreignKey: 'admin_id' });
-        Posts.belongsTo(models.OfficeAdmins, { foreignKey: 'office_id' });
+        Posts.belongsTo(models.OfficeAdmins, {as: 'Office', foreignKey: 'office_id' });
     };
 
     return Posts;
