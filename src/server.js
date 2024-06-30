@@ -9,7 +9,7 @@ const app = express();
 
 
 //por a correr 1 vez unica
-const insertData = require('./database/logic_objects/insertData');
+
 
 
 

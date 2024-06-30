@@ -1,0 +1,1 @@
+const insertData = require('./database/logic_objects/insertData');
