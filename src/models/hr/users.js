@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
 
     Users.associate = function(models) {
         Users.belongsTo(models.AccPermissions, { foreignKey: 'role_id' });
+        Users.hasOne(models.OfficeWorkers, { foreignKey: 'user_id' });
     };
 
     return Users;

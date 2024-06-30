@@ -166,9 +166,27 @@ controllers.getUserInfo = async (req, res) => {
     const { user_id } = req.params;
     try {
         const user = await db.Users.findByPk(user_id , {
-            attributes: { exclude: ['hashed_password', 'join_date', 'profile_pic'] }
+            attributes: { exclude: ['hashed_password', 'join_date', 'profile_pic'] },
+            include: [
+                {
+                    model: db.OfficeWorkers,
+                    as: 'OfficeWorkers',
+                    include: [
+                        {
+                            model: db.Offices,
+                            as: 'Office',
+                            attributes: ['office_id', 'city']
+                        }
+                    ]
+                }
+            ]
+            
         });
-        res.status(200).json({success:true, data:user});
+        if (user) {
+            res.status(200).json({ success: true, data: user });
+        } else {
+            res.status(404).json({ success: false, message: 'User not found' });
+        }
     } catch (error) {
         res.status(500).json({success:false, message:'Error retrieving user info: ' + error.message});
     }
