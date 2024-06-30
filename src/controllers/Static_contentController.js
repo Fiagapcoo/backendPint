@@ -35,7 +35,7 @@ controllers.get_all_areas = async (req, res) => {
 controllers.get_all_sub_areas = async (req, res) => {
     try {
         const sub_areas = await db.SubArea.findAll({ order: [['sub_area_id']] });
-        res.status(200).json({success:true, data: posts });
+        res.status(200).json({success:true, data: sub_areas });
     } catch (error) {
         res.status(500).json({success:true, message:'Error retrieving content: ' + error.message});
     }
