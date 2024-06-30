@@ -16,6 +16,8 @@ controllers.create_forum = async (req, res) => {
     }
 };
 
+/** @deprecated */ 
+/*
 controllers.create_forum_for_event = async (req, res) => {
     const { subAreaId, title, description, publisher_id, eventId } = req.body; 
     console.log(req.body);
@@ -26,7 +28,7 @@ controllers.create_forum_for_event = async (req, res) => {
         res.status(500).json({success:false, message:'Error creating Forum for event: ' + error.message});
     }
 };
-
+*/
 controllers.get_forum_state = async (req, res) => {
     const { forumId } = req.params; 
     console.log(req.params);

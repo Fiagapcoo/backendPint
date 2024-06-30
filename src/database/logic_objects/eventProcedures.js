@@ -10,7 +10,7 @@ async function spCreateEvent(officeId, subAreaId, name, description, eventDate, 
 
     const transaction = await db.sequelize.transaction();
     try {
-        await db.sequelize.query(
+        const [eventResult] = await  db.sequelize.query(
             `INSERT INTO "dynamic_content"."events" 
         ("office_id", "subarea_id", "publihser_id", "admin_id", "creation_date", "name", "description", "event_date", "recurring", "recurring_pattern", "max_participants", "event_location", "validated")
         VALUES (:officeId, :subAreaId, :publisher_id, :admin_id, CURRENT_TIMESTAMP, :name, :description, :eventDate, :recurring, :recurring_pattern, :max_participants, :location, :validated)`,
@@ -20,6 +20,29 @@ async function spCreateEvent(officeId, subAreaId, name, description, eventDate, 
                 transaction
             }
         );
+
+        const eventId = eventResult[0].event_id;
+        // Create the forum associated with the event
+        const [forumResult] = await db.sequelize.query(
+            `INSERT INTO "dynamic_content"."forums" 
+            ("office_id", "sub_area_id", "title", "content", "creation_date", "publisher_id", "admin_id", "event_id", "validated")
+            VALUES (:officeId, :subAreaId, :title, :description, CURRENT_TIMESTAMP, :publisher_id, :admin_id, :eventId, :validated)
+            RETURNING "forum_id"`,
+            {
+                replacements: { officeId, subAreaId, title: name, description, publisher_id, admin_id, eventId, validated },
+                type: QueryTypes.INSERT,
+                transaction
+            }
+        );
+
+        const forumId = forumResult[0].forum_id;
+        // Grant access to the publisher for the created forum
+        await db.sequelize.query(
+            `INSERT INTO "control"."event_forum_access" ("user_id", "forum_id")
+            VALUES (:publisher_id, :forumId)`,
+            { replacements: { publisher_id, forumId }, type: QueryTypes.INSERT, transaction }
+        );
+
 
         await transaction.commit();
     } catch (error) {
