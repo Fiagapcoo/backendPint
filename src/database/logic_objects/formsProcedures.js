@@ -164,7 +164,7 @@ async function editEventFormField(eventID, fieldID, { fieldName = null, fieldTyp
         }
 }
   
-async function getformschema(eventID) {
+async function getFormSchema(eventID) {
     try {
       const formschema = await db.sequelize.query(
         `SELECT "event_id", "field_id", "def_field_id", "field_name", "field_type", "field_value", "max_value", "min_value"
@@ -183,7 +183,7 @@ async function getformschema(eventID) {
     }  
 }
   
-async function getformschemaAsJson(eventID) {
+async function getFormSchemaAsJson(eventID) {
     try {
       const formschema = await db.sequelize.query(
         `SELECT "event_id", "field_id", "def_field_id", "field_name", "field_type", "field_value", "max_value", "min_value"
@@ -319,8 +319,8 @@ module.exports = {
   addCustomFieldsToEventForm,
   createEventForm,
   editEventFormField,
-  getformschema,
-  getformschemaAsJson,
+  getFormSchema,
+  getFormSchemaAsJson,
   insertFormAnswer,
   insertFormAnswers,
   deleteEventFormField

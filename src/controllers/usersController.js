@@ -10,7 +10,7 @@ const controllers = {};
 
 controllers.get_user_preferences = async (req, res) => {
     const { userID } = req.params; 
-    console.log(req.param );
+    console.log(req.params);
     try {
         data = await getUserPreferences(userID);
         res.status(201).json({success:true, data:data, message:' Got User preferences successfully.'} );
@@ -34,8 +34,8 @@ controllers.update_user_preferences = async (req, res) => {
 
 //change this controller later as to not be a controller maybe?
 controllers.update_access_on_login = async (req, res) => {
-    const { userID } = req.param; 
-    console.log(req.param);
+    const { userID } = req.params; 
+    console.log(req.params);
     try {
         await updateAccessOnLogin(userID);
         res.status(201).send(' Update user last access login successfully.');
@@ -69,8 +69,8 @@ controllers.add_bookmark = async (req, res) => {
    
 
 controllers.remove_bookmark = async (req, res) => {
-    const { userID, contentID, contentType } = req.param; 
-    console.log(req.param);
+    const { userID, contentID, contentType } = req.params; 
+    console.log(req.params);
     try {
         await removeBookmark(userID, contentID, contentType);
         res.status(201).send('Forum created successfully.');
@@ -80,8 +80,8 @@ controllers.remove_bookmark = async (req, res) => {
 };
 
 controllers.get_user_bookmarks = async (req, res) => {
-    const { userID } = req.param; 
-    console.log(req.param);
+    const { userID } = req.params; 
+    console.log(req.params);
     try {
         await getUserBookmarks(userID);
         res.status(201).send('Forum created successfully.');

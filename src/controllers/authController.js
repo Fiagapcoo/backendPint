@@ -48,10 +48,10 @@ controllers.register = async (req, res) => {
         // Send email to user
         await sendEmail(user.email, 'Set up your password', `Click this link to set up your password: ${url}`);
 
-        res.status(201).json({ message: 'User registered successfully. Please check your email to set up your password.' });
+        res.status(201).json({succes:true, message: 'User registered successfully. Please check your email to set up your password.' });
     } catch (error) {
         console.error('Error registering user:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({succes:false, message: 'Internal server error' });
     }
 };
 
@@ -73,10 +73,10 @@ controllers.setupPassword = async (req, res) => {
         const user = await db.User.findByPk(userId);
         await sendEmail(user.email, 'Password Setup Successful', 'Your password has been set up successfully.');
 
-        res.status(200).json({ message: 'Password set up successfully.' });
+        res.status(200).json({succes:true, message: 'Password set up successfully.' });
     } catch (error) {
         console.error('Error setting up password:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({succes:false, message: 'Internal server error' });
     }
 };
 

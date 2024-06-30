@@ -13,9 +13,9 @@ const {
     const { eventID, postID, areaID, subAreaID } = req.body;
     try {
       await triggerNotifications({ eventID, postID, areaID, subAreaID });
-      res.status(200).send('Notifications triggered successfully.');
+      res.status(200).json({success:true, message:'Notifications triggered successfully.'});
     } catch (error) {
-      res.status(500).send('Error triggering notifications: ' + error.message);
+      res.status(500).json({success:false, message:'Error triggering notifications: ' + error.message});
     }
   };
   
@@ -24,9 +24,9 @@ const {
     const { eventID, subAreaID } = req.body;
     try {
       await notifyEventChanges(eventID, subAreaID);
-      res.status(200).send('Event changes notified successfully.');
+      res.status(200).json({success:true, message:'Event changes notified successfully.'});
     } catch (error) {
-      res.status(500).send('Error notifying event changes: ' + error.message);
+      res.status(500).json({success:false, message:'Error notifying event changes: ' + error.message});
     }
   };
   
@@ -35,9 +35,9 @@ const {
     const { commentID, forumID } = req.body;
     try {
       await notifyEventComments(commentID, forumID);
-      res.status(200).send('Event comments notified successfully.');
+      res.status(200).json({success:true, message:'Event comments notified successfully.'});
     } catch (error) {
-      res.status(500).send('Error notifying event comments: ' + error.message);
+      res.status(500).json({success:false, message:'Error notifying event comments: ' + error.message});
     }
   };
   
@@ -46,9 +46,9 @@ const {
     const { eventID, interactionDescription } = req.body;
     try {
       await notifyEventCreator(eventID, interactionDescription);
-      res.status(200).send('Event creator notified successfully.');
+      res.status(200).json({success:true, message:'Event creator notified successfully.'});
     } catch (error) {
-      res.status(500).send('Error notifying event creator: ' + error.message);
+      res.status(500).json({success:false, message:'Error notifying event creator: ' + error.message});
     }
   };
   
@@ -57,9 +57,9 @@ const {
     const { eventID } = req.body;
     try {
       await notifyEventInteractions(eventID);
-      res.status(200).send('Event interactions notified successfully.');
+      res.status(200).json({success:true, message:'Event interactions notified successfully.'});
     } catch (error) {
-      res.status(500).send('Error notifying event interactions: ' + error.message);
+      res.status(500).json({success:false, message:'Error notifying event interactions: ' + error.message});
     }
   };
   

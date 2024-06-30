@@ -9,7 +9,7 @@ controllers.getAllContent = async (req, res) => {
         const events = await db.Events.findAll({ order: [['creation_date', 'DESC']] });
         res.status(200).json({ posts, forums, events });
     } catch (error) {
-        res.status(500).send('Error retrieving content: ' + error.message);
+        res.status(500).json({success:false, message:'Error retrieving content: ' + error.message});
     }
 };
 
@@ -25,7 +25,7 @@ controllers.getPostsByCity = async (req, res) => {
         });
         res.status(200).json(posts);
     } catch (error) {
-        res.status(500).send('Error retrieving posts: ' + error.message);
+        res.status(500).json({success:false, message:'Error retrieving posts: ' + error.message});
     }
 };
 
@@ -41,7 +41,7 @@ controllers.getForumsByCity = async (req, res) => {
         });
         res.status(200).json(forums);
     } catch (error) {
-        res.status(500).send('Error retrieving forums: ' + error.message);
+        res.status(500).json({success:false, message:'Error retrieving forums: ' + error.message});
     }
 };
 
@@ -57,7 +57,7 @@ controllers.getEventsByCity = async (req, res) => {
         });
         res.status(200).json(events);
     } catch (error) {
-        res.status(500).send('Error retrieving events: ' + error.message);
+        res.status(500).json({success:false, message:'Error retrieving events: ' + error.message});
     }
 };
 
@@ -76,10 +76,10 @@ controllers.getPostById = async (req, res) => {
         if (post) {
             res.status(200).json(post);
         } else {
-            res.status(404).send('Post not found');
+            res.status(404).json({success:false, message:'Post not found'});
         }
     } catch (error) {
-        res.status(500).send('Error retrieving post: ' + error.message);
+        res.status(500).json({success:false, message:'Error retrieving post: ' + error.message});
     }
 };
 
@@ -98,10 +98,10 @@ controllers.getEventById = async (req, res) => {
         if (event) {
             res.status(200).json(event);
         } else {
-            res.status(404).json({ message: 'Event not found' });
+            res.status(404).json({success:false, message: 'Event not found' });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Error retrieving event', error: error.message });
+        res.status(500).json({success:false, message: 'Error retrieving event', error: error.message });
     }
 };
 
@@ -120,10 +120,10 @@ controllers.getForumById = async (req, res) => {
         if (forum) {
             res.status(200).json(forum);
         } else {
-            res.status(404).send('Forum not found');
+            res.status(404).json({success:false, message:'Forum not found'});
         }
     } catch (error) {
-        res.status(500).send('Error retrieving forum: ' + error.message);
+        res.status(500).json({success:false, message:'Error retrieving forum: ' + error.message});
     }
 };
 
@@ -133,9 +133,9 @@ controllers.getUserInfo = async (req, res) => {
         const user = await db.Users.findByPk(user_id , {
             attributes: { exclude: ['hashed_password', 'join_date', 'profile_pic'] }
         });
-        res.status(200).json(user);
+        res.status(200).json({success:true, data:user});
     } catch (error) {
-        res.status(500).send('Error retrieving user info: ' + error.message);
+        res.status(500).json({success:false, message:'Error retrieving user info: ' + error.message});
     }
 };
 

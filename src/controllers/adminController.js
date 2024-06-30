@@ -14,28 +14,28 @@ const { getUserEngagementMetrics,
 const controllers = {};
 
 controllers.validate_content = async (req, res) => { 
-    const { contentType, contentID, adminID } = req.param; 
-    console.log(req.param);
+    const { contentType, contentID, adminID } = req.params; 
+    console.log(req.params);
     try {
         await validateContent(contentType,contentID, adminID);
 
 
-        res.status(201).send('Content validated successfully.');
+        res.status(201).json({success:true, message:'Content validated successfully.'});
     } catch (error) {
-        res.status(500).send('Error validating content: ' + error.message);
+        res.status(500).json({success:false, message:'Error validating content: ' + error.message});
     }
 };
 
 controllers.reject_content = async (req, res) => { 
-    const { contentType, contentId, adminId } = req.param; 
-    console.log(req.param);
+    const { contentType, contentId, adminId } = req.params; 
+    console.log(req.params);
     try {
         await rejectContent(contentType, contentId, adminId);
 
 
-        res.status(201).send('Content rejected successfully.');
+        res.status(201).json({success:true, message:'Content rejected successfully.'});
     } catch (error) {
-        res.status(500).send('Error rejecting content: ' + error.message);
+        res.status(500).json({success:false, message:'Error rejecting content: ' + error.message});
     }
 };
 
@@ -43,9 +43,9 @@ controllers.reject_content = async (req, res) => {
 controllers.getUserEngagementMetrics = async (req, res) => {
     try {
       const results = await getUserEngagementMetrics();
-      res.status(200).json(results);
+      res.status(200).json({success:true, data:results});
     } catch (error) {
-      res.status(500).send('Error fetching user engagement metrics: ' + error.message);
+      res.status(500).json({success:false, message:'Error fetching user engagement metrics: ' + error.message});
     }
 };
   
@@ -54,9 +54,9 @@ controllers.getContentValidationStatusByadmin = async (req, res) => {
     const { adminID } = req.params;
     try {
       const results = await getContentValidationStatusByadmin(adminID);
-      res.status(200).json(results);
+      res.status(200).json({success:true, data:results});
     } catch (error) {
-      res.status(500).send('Error fetching content validation status by admin: ' + error.message);
+      res.status(500).json({success:false, message:'Error fetching content validation status by admin: ' + error.message});
     }
 };
   
@@ -64,9 +64,9 @@ controllers.getContentValidationStatusByadmin = async (req, res) => {
 controllers.getContentValidationStatus = async (req, res) => {
     try {
       const results = await getContentValidationStatus();
-      res.status(200).json(results);
+      res.status(200).json({success:true, data:results});
     } catch (error) {
-      res.status(500).send('Error fetching content validation status: ' + error.message);
+      res.status(500).json({success:false, message:'Error fetching content validation status: ' + error.message});
     }
 };
   
@@ -74,18 +74,18 @@ controllers.getContentValidationStatus = async (req, res) => {
 controllers.getActiveDiscussions = async (req, res) => {
     try {
       const results = await getActiveDiscussions();
-      res.status(200).json(results);
+      res.status(200).json({success:true, data:results});
     } catch (error) {
-      res.status(500).send('Error fetching active discussions: ' + error.message);
+      res.status(500).json({success:false, message:'Error fetching active discussions: ' + error.message});
     }
 };
 // Get active warnings
 controllers.getActiveWarnings = async (req, res) => {
     try {
       const results = await getActiveWarnings();
-      res.status(200).json(results);
+      res.status(200).json({success:true, data:results});
     } catch (error) {
-      res.status(500).send('Error fetching active warnings: ' + error.message);
+      res.status(500).json({success:false, message:'Error fetching active warnings: ' + error.message});
     }
 };
   
@@ -94,20 +94,20 @@ controllers.getContentCenterToBeValidated = async (req, res) => {
     const { center_id } = req.params;
     try {
       const results = await getContentCenterToBeValidated(center_id);
-      res.status(200).json(results);
+      res.status(200).json({success:true, data:results});
     } catch (error) {
-      res.status(500).send('Error fetching content center to be validated: ' + error.message);
+      res.status(500).json({success:false, message:'Error fetching content center to be validated: ' + error.message});
     }
 };
   
 // Create center
 controllers.createCenter = async (req, res) => {
-    const { city } = req.query;
+    const { city } = req.body;
     try {
       await createCenter(city);
-      res.status(201).send('Center created successfully.');
+      res.status(201).json({success:true, message:'Center created successfully.'});
     } catch (error) {
-      res.status(500).send('Error creating center: ' + error.message);
+      res.status(500).json({success:false, message:'Error creating center: ' + error.message});
     }
 };
   
@@ -116,9 +116,9 @@ controllers.deleteCenter = async (req, res) => {
     const { center_id } = req.params;
     try {
       await deleteCenter(center_id);
-      res.status(200).send('Center deleted successfully.');
+      res.status(200).json({success:true, message:'Center deleted successfully.'});
     } catch (error) {
-      res.status(500).send('Error deleting center: ' + error.message);
+      res.status(500).json({success:false, message:'Error deleting center: ' + error.message});
     }
 };  
 

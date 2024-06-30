@@ -18,7 +18,7 @@ controllers.create_sub_category = async (req, res) => {
         await spCreateSubArea(areaId, title);
         res.status(201).json({success:true, message:'Category created successfully.'});
     } catch (error) {
-        res.status(500).json({success:true, message:'Error creating category: ' + error.message});
+        res.status(500).json({success:false, message:'Error creating category: ' + error.message});
     }
 };
 
