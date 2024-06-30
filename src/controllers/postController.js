@@ -5,7 +5,7 @@ const { spCreatePost,
 const controllers = {};
 
 controllers.create_post = async (req, res) => {
-    const { subAreaId, officeId, publisher_id, title, content, pLocation, filePath, type='N', rating=null } = req.body; 
+    const { subAreaId, officeId, publisher_id, title, content, pLocation=null, filePath=null, type='N', rating=null } = req.body; 
     console.log(req.query);
     try {
         await spCreatePost(subAreaId, officeId, publisher_id, title, content, pLocation, filePath, type, rating);
