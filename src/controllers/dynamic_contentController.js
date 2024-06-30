@@ -87,6 +87,7 @@ controllers.getPostById = async (req, res) => {
 
 controllers.getEventById = async (req, res) => {
     const { event_id } = req.params;
+    const userId = req.user.id; // Extracted from JWT 
     try {
         const event = await db.Events.findByPk(event_id, {
             include: [
@@ -97,11 +98,43 @@ controllers.getEventById = async (req, res) => {
             ]
         });
 
-        if (event) {
-            res.status(200).json(event);
-        } else {
-            res.status(404).json({success:false, message: 'Event not found' });
+        if (!event) {
+            return res.status(404).json({ success: false, message: 'Event not found' });
         }
+
+        // Check if the user is registered for the event
+        const participationExists = await db.sequelize.query(
+            `SELECT 1
+            FROM "control"."participation"
+            WHERE "user_id" = :userId AND "event_id" = :eventId`,
+            { replacements: { userId, eventId: event_id }, type: QueryTypes.SELECT }
+        );
+
+        // If user is registered, fetch the forum details
+        let forum = null;
+        if (participationExists.length > 0) {
+            const forumResult = await db.sequelize.query(
+                `SELECT "forum_id", "title", "content", "creation_date"
+                FROM "dynamic_content"."forums"
+                WHERE "event_id" = :eventId`,
+                { replacements: { eventId: event_id }, type: QueryTypes.SELECT }
+            );
+
+            if (forumResult.length > 0) {
+                forum = forumResult[0];
+            }
+        }
+
+        // Construct the response
+        const response = {
+            event,
+            forum
+        };
+
+        res.status(200).json({success:true, data: response});
+
+
+ 
     } catch (error) {
         res.status(500).json({success:false, message: 'Error retrieving event', error: error.message });
     }
