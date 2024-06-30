@@ -14,7 +14,7 @@ router.get('/user-info/:user_id', dynamicController.getUserInfo);
 
 
 
-router.get('/test/get-post/:post_id', dynamicController.getEventByIdNoRawQuery);
+router.get('/test/get-event/:event_id', dynamicController.getEventByIdNoRawQuery);
 
 
 module.exports = router;
