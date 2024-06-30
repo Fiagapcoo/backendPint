@@ -69,7 +69,8 @@ controllers.getPostById = async (req, res) => {
                 { model: db.Users, as: 'Publisher' },
                 { model: db.Users, as: 'Admin' },
                 { model: db.SubArea },
-                { model: db.OfficeAdmins, as: 'Office' }
+                { model: db.OfficeAdmins, as: 'Office' },
+                { model: db.Scores, as: 'Score', attributes: ['score', 'num_of_evals'] }
             ]
         });
 
@@ -91,7 +92,8 @@ controllers.getEventById = async (req, res) => {
             include: [
                 { model: db.Users, as: 'Publisher' },
                 { model: db.OfficeAdmins, as: 'Office' },
-                { model: db.Users, as: 'Admin' }
+                { model: db.Users, as: 'Admin' },
+                { model: db.Scores, as: 'Score', attributes: ['score', 'num_of_evals'] }
             ]
         });
 
