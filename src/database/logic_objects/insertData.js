@@ -142,7 +142,7 @@ async function bulkInsert() {
         ('Richard', 'Anderson', 'richard.anderson@example.com', '2023-10-20', 1),
         ('Guilhermo', 'Pedrinho', 'pv25215@alunos.estgv.ipv.pt', '2024-06-22', 3),
         ('Jose', 'Machado', 'pv26900@alunos.estgv.ipv.pt', '2024-06-22', 3),
-        ('Filipe', 'Correiqa', 'pv25005@alunos.estgv.ipv.pt', '2024-6-22', 3),
+        ('Filipe', 'Correia', 'pv25005@alunos.estgv.ipv.pt', '2024-6-22', 3),
         ('Tio', 'Patinhas', 'tio.patinhas@examples.com', '2024-06-22', 3),
         ('CENTRAL', 'ADMIN', 'god@example.com', '2023-01-15', 3)
         ON CONFLICT (email) DO NOTHING;

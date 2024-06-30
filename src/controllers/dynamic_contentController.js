@@ -170,7 +170,7 @@ controllers.getUserInfo = async (req, res) => {
             include: [
                 {
                     model: db.OfficeWorkers,
-                    as: 'OfficeWorkers',
+                    as: 'OfficeWorker',
                     include: [
                         {
                             model: db.Offices,
