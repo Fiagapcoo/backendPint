@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
         sub_area_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         area_id: { type: DataTypes.INTEGER, allowNull: false },
         title: { type: DataTypes.STRING(255), allowNull: false, unique: true },
-        icon_name: {type: DataTypes.STRING(50), allowNull:false}
+        // icon_name: {type: DataTypes.STRING(50), allowNull:false}
     }, {
         schema: 'static_content',
         tableName: 'sub_area',
