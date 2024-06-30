@@ -84,6 +84,44 @@ controllers.getPostById = async (req, res) => {
     }
 };
 
+// to test 
+controllers.getEventByIdNoRawQuery = async (req, res) => {
+    const { event_id } = req.params;
+    const user_id = req.user.id; // Assuming req.user contains the authenticated user's details
+
+    try {
+        const event = await db.Events.findByPk(event_id, {
+            include: [
+                { model: db.Users, as: 'Publisher' },
+                { model: db.OfficeAdmins, as: 'Office' },
+                { model: db.Users, as: 'Admin' },
+                { model: db.Scores, as: 'Score', attributes: ['score', 'num_of_evals'] },
+                {
+                    model: db.Forums,
+                    where: { event_id: event_id },
+                    required: false,
+                    include: [
+                        {
+                            model: db.EventForumAccess,
+                            where: { user_id: user_id },
+                            required: false,
+                            as: 'UserAccess'
+                        }
+                    ]
+                }
+            ]
+        });
+
+        if (event) {
+            res.status(200).json(event);
+        } else {
+            res.status(404).json({ success: false, message: 'Event not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error retrieving event', error: error.message });
+    }
+};
+
 
 controllers.getEventById = async (req, res) => {
     const { event_id } = req.params;

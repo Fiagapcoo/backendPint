@@ -12,4 +12,9 @@ router.get('/get-forum/:forum_id', dynamicController.getForumById);
 router.get('/user-info/:user_id', dynamicController.getUserInfo);
 //router.get('/user-preferences', dynamicController.getUserPreferences);
 
+
+
+router.get('/test/get-post/:post_id', dynamicController.getEventByIdNoRawQuery);
+
+
 module.exports = router;
