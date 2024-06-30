@@ -13,15 +13,15 @@ async function bulkInsert() {
         ON CONFLICT (language_id) DO NOTHING;
     `);
     await db.sequelize.query(`
-        INSERT INTO "static_content"."area" ("area_id", "title") 
+        INSERT INTO "static_content"."area" ("area_id", "title", "icon_name")
         VALUES
-        (100, 'Health'),
-        (200, 'Education'),
-        (300, 'Sports'),
-        (400, 'Gastronomy'),
-        (500, 'Housing'),
-        (600, 'Leisure'),
-        (700, 'Transportation')
+        (100, 'Health', 'Health'),
+        (200, 'Education', 'Education'),
+        (300, 'Sports', 'Sports'),
+        (400, 'Gastronomy', 'Gastronomy'),
+        (500, 'Housing', 'Housing'),
+        (600, 'Leisure', 'Leisure'),
+        (700, 'Transportation', 'Transports')
         ON CONFLICT (area_id) DO NOTHING;
     `);
     await db.sequelize.query(`
