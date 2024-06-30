@@ -26,7 +26,7 @@ controllers.create_sub_category = async (req, res) => {
 controllers.get_all_areas = async (req, res) => {
     try {
         const areas = await db.Area.findAll({ order: [['area_id']] });
-        res.status(200).json({success:true, data:posts });
+        res.status(200).json({success:true, data: areas });
     } catch (error) {
         res.status(500).json({success:false, message:'Error retrieving content: ' + error.message});
     }
