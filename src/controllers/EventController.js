@@ -7,10 +7,10 @@ const { spCreateEvent,
 const controllers = {};
 
 controllers.create_event = async (req, res) => {
-    const { officeId, subAreaId, name, description, eventDate, recurring=false, recurring_pattern='{"key": ""}', max_participants=null, location, publisher_id } = req.body; 
+    const { officeId, subAreaId, name, description, eventDate, recurring=false, recurring_pattern='{"key": ""}', max_participants=null, location, publisher_id, filePath } = req.body; 
     console.log(req.query);
     try {
-        await spCreateEvent(officeId, subAreaId, name, description, eventDate, recurring, recurring_pattern, max_participants, location, publisher_id);
+        await spCreateEvent(officeId, subAreaId, name, description, eventDate, recurring, recurring_pattern, max_participants, location, publisher_id, filePath);
         res.status(201).json({success:true, message:'Event created successfully.'});
     } catch (error) {
         res.status(500).json({success:false, message:'Error creating Event: ' + error.message});

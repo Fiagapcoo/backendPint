@@ -3,7 +3,7 @@ const { fnIsPublisherOfficeAdmin } = require('./generalHelpers');
 const db = require('../../models'); 
 
 //Procedure to Create an Event
-async function spCreateEvent(officeId, subAreaId, name, description, eventDate, recurring, recurring_pattern, max_participants, location, publisher_id) {
+async function spCreateEvent(officeId, subAreaId, name, description, eventDate, recurring, recurring_pattern, max_participants, location, publisher_id, filePath) {
     const isOfficeAdmin = await fnIsPublisherOfficeAdmin(publisher_id);
     const validated = isOfficeAdmin ? true : false;
     let admin_id = isOfficeAdmin ? publisher_id : null;
@@ -12,10 +12,10 @@ async function spCreateEvent(officeId, subAreaId, name, description, eventDate, 
     try {
         const [eventResult] = await  db.sequelize.query(
             `INSERT INTO "dynamic_content"."events" 
-        ("office_id", "subarea_id", "publihser_id", "admin_id", "creation_date", "name", "description", "event_date", "recurring", "recurring_pattern", "max_participants", "event_location", "validated")
-        VALUES (:officeId, :subAreaId, :publisher_id, :admin_id, CURRENT_TIMESTAMP, :name, :description, :eventDate, :recurring, :recurring_pattern, :max_participants, :location, :validated)`,
+        ("office_id", "subarea_id", "publisher_id", "admin_id", "creation_date", "name", "description", "event_date", "recurring", "recurring_pattern", "max_participants", "event_location", "validated", "filePath")
+        VALUES (:officeId, :subAreaId, :publisher_id, :admin_id, CURRENT_TIMESTAMP, :name, :description, :eventDate, :recurring, :recurring_pattern, :max_participants, :location, :validated, :filePath)`,
             {
-                replacements: { officeId, subAreaId, publisher_id, admin_id, name, description, eventDate, recurring, recurring_pattern, max_participants, location, validated },
+                replacements: { officeId, subAreaId, publisher_id, admin_id, name, description, eventDate, recurring, recurring_pattern, max_participants, location, validated, filePath },
                 type: QueryTypes.RAW,
                 transaction
             }
