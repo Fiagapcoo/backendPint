@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
         event_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         publisher_id: { type: DataTypes.INTEGER, allowNull: false },
         office_id: { type: DataTypes.INTEGER, allowNull: false },
-        subarea_id: { type: DataTypes.INTEGER, allowNull: false },
+        sub_area_id: { type: DataTypes.INTEGER, allowNull: false },
         admin_id: { type: DataTypes.INTEGER },
         creation_date: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
         name: { type: DataTypes.STRING(255), allowNull: false },
