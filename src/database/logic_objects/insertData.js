@@ -252,7 +252,7 @@ async function bulkInsert() {
         (4002, 4, 5, 'Neon Byte Bistro', 'Restaurant with a cyberpunk theme', 'P',CURRENT_TIMESTAMP);
     `);
     await db.sequelize.query(`
-        INSERT INTO "dynamic_content"."events" ("publisher_id", "office_id", "subarea_id", "name", "description", "event_date", "recurring","creation_date")
+        INSERT INTO "dynamic_content"."events" ("publisher_id", "office_id", "sub_area_id", "name", "description", "event_date", "recurring","creation_date")
         VALUES
         (1, 1, 1001, 'Volunteering', 'Viseu hospital will be hosting an auction to gain funding for children in need', '2023-11-15', false,CURRENT_TIMESTAMP),
         (2, 2, 2001, 'Marathon', 'Next Friday Alves Martins school will host a marathon in support of cancer', '2023-12-01', false,CURRENT_TIMESTAMP),

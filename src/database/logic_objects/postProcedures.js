@@ -6,29 +6,34 @@ const { fnIsPublisherOfficeAdmin } = require('./generalHelpers');
 async function spCreatePost(subAreaId, officeId, publisher_id, title, content, pLocation, filePath, type='N', rating=null) {
     const isOfficeAdmin = await fnIsPublisherOfficeAdmin(publisher_id);
     const validated = isOfficeAdmin ? true : false;
-    let adminId = isOfficeAdmin ? publisher_id : null
+    let adminId = isOfficeAdmin ? publisher_id : null;
 
     const transaction = await db.sequelize.transaction();
     try {
         const [result] = await db.sequelize.query(
             `INSERT INTO "dynamic_content"."posts" 
-        ("sub_area_id", "office_id", "admin_id", "publisher_id", "creation_date", "type", "title", "content", "p_location", "filepath", "validated")
-        VALUES (:subAreaId, :officeId, :adminId, :publisher_id, CURRENT_TIMESTAMP, :type, :title, :content, :pLocation, :filePath, :validated)
-        RETURNING "post_id"`,
+            ("sub_area_id", "office_id", "admin_id", "publisher_id", "creation_date", "type", "title", "content", "p_location", "filepath", "validated")
+            VALUES (:subAreaId, :officeId, :adminId, :publisher_id, CURRENT_TIMESTAMP, :type, :title, :content, :pLocation, :filePath, :validated)
+            RETURNING "post_id"`,
             {
                 replacements: { subAreaId, officeId, adminId, publisher_id, type, title, content, pLocation, filePath, validated },
                 type: QueryTypes.RAW,
                 transaction
             }
         );
-        if(type == 'P' )
-        {
-            const postId = result.post_id;
+        
+        const postId = result[0].post_id; // Extracting post_id from result
+
+        if(type === 'P') {
             await db.sequelize.query(
                 `INSERT INTO "dynamic_content"."ratings" 
-            ("post_id", "event_id", "critic_id", "evaluation")
-            VALUES (:postId, NULL, :publisher_id, :rating)`,
-                { replacements: { postId, publisher_id, rating }, type: QueryTypes.RAW, transaction }
+                ("post_id", "event_id", "critic_id", "evaluation", "evaluation_date")
+                VALUES (:postId, NULL, :publisher_id, :rating, CURRENT_TIMESTAMP)`,
+                { 
+                    replacements: { postId, publisher_id, rating }, 
+                    type: QueryTypes.RAW, 
+                    transaction 
+                }
             );
         }
 
@@ -38,6 +43,8 @@ async function spCreatePost(subAreaId, officeId, publisher_id, title, content, p
         throw error;
     }
 }
+
+
 
 // Function to Get Post State
 async function fnGetPostState(postId) {
