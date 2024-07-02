@@ -12,6 +12,7 @@ controllers.create_forum = async (req, res) => {
         await spCreateForum(officeID, subAreaId, title, description, publisher_id);
         res.status(201).json({success:true, message:'Forum created successfully.'});
     } catch (error) {
+        console.log(error);
         res.status(500).json({success:false, message:'Error creating Forum: ' + error.message});
     }
 };
