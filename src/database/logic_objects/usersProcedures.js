@@ -157,6 +157,29 @@ async function getUserRole(userID) {
     }
 }
 
+async function getUserByRole(role) {
+  try {
+    const result = await db.sequelize.transaction(async (transaction) => {
+      return await db.sequelize.query(
+        `SELECT u."user_id"
+         FROM "hr"."users" u
+         JOIN "security"."acc_permissions" p ON u."role_id" = p."role_id"
+         WHERE p."role_name" = :role`,
+        {
+          replacements: { role },
+          type: QueryTypes.SELECT,
+          transaction
+        }
+      );
+    });
+    return result;
+  } catch (error) {
+    console.error('Error getting user by role:', error);
+    throw error;
+  }
+}
+
+
 async function addBookmark(userID, contentID, contentType) {
     try {
       await db.sequelize.transaction(async (transaction) => {
@@ -265,6 +288,7 @@ async function getUserBookmarks(userID) {
     updateUserPreferences,
     updateAccessOnLogin,
     getUserRole,
+    getUserByRole,
     addBookmark,   
     removeBookmark, 
     getUserBookmarks,

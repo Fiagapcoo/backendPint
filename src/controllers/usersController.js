@@ -4,7 +4,9 @@ const { getUserPreferences,
         getUserRole,
         addBookmark,   
         removeBookmark, 
-        getUserBookmarks } = require('../database/logic_objects/usersProcedures');
+        getUserBookmarks,
+        getUserByRole } = require('../database/logic_objects/usersProcedures');
+
 
 const controllers = {};
 
@@ -54,6 +56,17 @@ controllers.get_user_role = async (req, res) => {
         res.status(500).send('Error getting user role: ' + error.message);
     }
 };
+
+controllers.get_user_by_role = async (req, res) => {
+    const { role } = req.params; 
+    console.log(req.params);
+    try {
+        data = await getUserByRole(role);
+        res.status(201).json({success:true, data:data, message:' Got User by Role successfully.'} );
+    } catch (error) {
+        res.status(500).send('Error getting user by role: ' + error.message);
+    }
+}
 
 controllers.add_bookmark = async (req, res) => {
     const { userID, contentID, contentType } = req.body; 

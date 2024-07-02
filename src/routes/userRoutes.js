@@ -8,6 +8,7 @@ router.delete('/remove-bookmark/:userID/:contentType/:contentID', controller.rem
 router.patch('/update-user-preferences/:userID', controller.update_user_preferences);
 router.get('/get-user-preferences/:userID', controller.get_user_preferences);
 router.get('/get-user-role/:userID', controller.get_user_role);
+router.get('/get-user-by-role/:role', controller.get_user_by_role);
 router.patch('/update-acess-on-login/:userID', controller.update_access_on_login); 
 
 
