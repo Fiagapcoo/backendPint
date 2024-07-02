@@ -251,19 +251,54 @@ async function getContentCenterToBeValidated(center_id) {
 }
   
 
-async function createCenter(city, id) {
+async function createCenter(city, admin, officeImage) {
   try {
-      await db.sequelize.query(
-          `INSERT INTO "centers"."offices" ("city", "id")
-           VALUES (:city, :id)`,
-          {
-              replacements: { city, id },
-              type: QueryTypes.INSERT
-          }
+    const result = await db.sequelize.transaction(async (transaction) => {
+      // Fetch the maximum office_id
+      const maxOfficeIdResult = await db.sequelize.query(
+        `SELECT MAX("office_id") as max_office_id
+         FROM "centers"."offices"`,
+        {
+          type: QueryTypes.SELECT,
+          transaction
+        }
       );
+
+      const maxOfficeId = maxOfficeIdResult[0].max_office_id || 0;
+      const newOfficeId = maxOfficeId + 1;
+
+      // Insert into centers.offices with the new office_id
+      const officeResult = await db.sequelize.query(
+        `INSERT INTO "centers"."offices" ("office_id", "city", "officeImage")
+         VALUES (:newOfficeId, :city, :officeImage)
+         RETURNING "office_id"`,
+        {
+          replacements: { newOfficeId, city, officeImage },
+          type: QueryTypes.INSERT,
+          transaction
+        }
+      );
+
+      const officeId = officeResult[0][0].office_id;
+
+      // Insert into centers.office_admins with the retrieved office_id
+      await db.sequelize.query(
+        `INSERT INTO "centers"."office_admins" ("office_id", "manager_id")
+         VALUES (:officeId, :admin)`,
+        {
+          replacements: { officeId, admin },
+          type: QueryTypes.INSERT,
+          transaction
+        }
+      );
+
+      return officeId;
+    });
+
+    return result;
   } catch (error) {
-      console.error('Error creating center:', error);
-      throw error;
+    console.error('Error creating center:', error);
+    throw error;
   }
 }
 

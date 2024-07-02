@@ -2,7 +2,8 @@
 module.exports = (sequelize, DataTypes) => {
     const Offices = sequelize.define('Offices', {
         office_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-        city: { type: DataTypes.STRING(100), allowNull: false, unique: true }
+        city: { type: DataTypes.STRING(100), allowNull: false, unique: true },
+        officeImage: { type: DataTypes.STRING(255), allowNull: true },
     }, {
         schema: 'centers',
         tableName: 'offices',

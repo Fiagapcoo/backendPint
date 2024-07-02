@@ -102,9 +102,9 @@ controllers.getContentCenterToBeValidated = async (req, res) => {
   
 // Create center
 controllers.createCenter = async (req, res) => {
-    const { city } = req.body;
+    const { city, admin, officeImage } = req.body;
     try {
-      await createCenter(city);
+      await createCenter(city, admin, officeImage);
       res.status(201).json({success:true, message:'Center created successfully.'});
     } catch (error) {
       res.status(500).json({success:false, message:'Error creating center: ' + error.message});
