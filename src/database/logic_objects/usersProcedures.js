@@ -161,7 +161,7 @@ async function getUserByRole(role) {
   try {
     const result = await db.sequelize.transaction(async (transaction) => {
       return await db.sequelize.query(
-        `SELECT u."user_id", (u."first_name" || u."last_name") AS "name"
+        `SELECT u."user_id", (u."first_name" || ' ' || u."last_name") AS "name""
          FROM "hr"."users" u
          JOIN "security"."acc_permissions" p ON u."role_id" = p."role_id"
          WHERE p."role_name" = :role`,
