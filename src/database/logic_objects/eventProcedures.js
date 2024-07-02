@@ -12,8 +12,9 @@ async function spCreateEvent(officeId, subAreaId, name, description, eventDate, 
     try {
         const [eventResult] = await  db.sequelize.query(
             `INSERT INTO "dynamic_content"."events" 
-        ("office_id", "subarea_id", "publisher_id", "admin_id", "creation_date", "name", "description", "event_date", "recurring", "recurring_pattern", "max_participants", "event_location", "validated", "filePath")
-        VALUES (:officeId, :subAreaId, :publisher_id, :admin_id, CURRENT_TIMESTAMP, :name, :description, :eventDate, :recurring, :recurring_pattern, :max_participants, :location, :validated, :filePath)`,
+        ("office_id", "sub_area_id", "publisher_id", "admin_id", "creation_date", "name", "description", "event_date", "recurring", "recurring_pattern", "max_participants", "event_location", "validated", "filepath")
+        VALUES (:officeId, :subAreaId, :publisher_id, :admin_id, CURRENT_TIMESTAMP, :name, :description, :eventDate, :recurring, :recurring_pattern, :max_participants, :location, :validated, :filePath)
+        RETURNING "event_id"`,
             {
                 replacements: { officeId, subAreaId, publisher_id, admin_id, name, description, eventDate, recurring, recurring_pattern, max_participants, location, validated, filePath },
                 type: QueryTypes.RAW,
