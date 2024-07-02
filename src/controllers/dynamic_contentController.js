@@ -230,6 +230,19 @@ controllers.getUserInfo = async (req, res) => {
     }
 };
 
+controllers.getEventByDate = async (req, res) => {
+    const {date } = req.query;
+    try {
+        const events = await db.Events.findAll({
+            where: { event_date: date },
+            order: [['creation_date', 'DESC']]
+        });
+        res.status(200).json({ success: true, data: events });
+    } catch (error) {
+        res.status(500).json({success:false, message:'Error retrieving events: ' + error.message});
+    }
+};
+
 module.exports = controllers;
 
 /*
