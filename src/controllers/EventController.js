@@ -2,7 +2,8 @@ const { spCreateEvent,
     spEventParticipationCleanup,
     spUnregisterUserFromEvent,
     fnGetEventState,
-    spEditEvent } = require('../database/logic_objects/eventProcedures');
+    spEditEvent,
+    spGetEvent } = require('../database/logic_objects/eventProcedures');
 
 const controllers = {};
 
@@ -65,5 +66,16 @@ controllers.edit_event = async (req, res) => {
         res.status(500).json({success:false, message:'Error creating Forum: ' + error.message});
     }
 };
+
+controllers.get_event = async (req, res) => {
+    const { eventId } = req.params; 
+    console.log(req.params);
+    try {
+        const event = await spGetEvent(eventId);
+        res.status(201).json({success:true, message:'Got event successfully.', data: event});
+    } catch (error) {
+        res.status(500).json({success:false, message:'Error getting event: ' + error.message});
+    }
+}
 
 module.exports = controllers;

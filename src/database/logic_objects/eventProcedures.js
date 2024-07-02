@@ -240,11 +240,21 @@ async function spEditEvent(eventId, subAreaId = null, officeId = null, adminId =
     }
 }
 
+async function spGetEvent(eventId) {
+    const event = await db.sequelize.query(
+        `SELECT * FROM "dynamic_content"."events" WHERE "event_id" = :eventId`,
+        { replacements: { eventId }, type: QueryTypes.SELECT }
+    );
+
+    return event.length ? event[0] : null;
+}
+
 module.exports = {
     spCreateEvent,
     spEventParticipationCleanup,
     spUnregisterUserFromEvent,
     spRegisterUserForEvent,
     fnGetEventState,
-    spEditEvent
+    spEditEvent,
+    spGetEvent
 }
