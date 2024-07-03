@@ -64,7 +64,7 @@ const spRegisterNewUser = async (firstName, lastName, email, profilePic = null, 
         }
       );
   
-      const userId = result.user_id;
+      const userId = result[0].user_id;
   
       await db.sequelize.query(
         `INSERT INTO "security"."user_account_details" ("user_id")

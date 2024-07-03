@@ -33,12 +33,12 @@ function mashupAndRandomize(email, firstName, lastName) {
   
 
 controllers.register = async (req, res) => {
-    const { email, firstName, lastName } = req.body;
+    const { email, firstName, lastName, centerId } = req.body;
 
     try {
         // Create the user in the database without a password
         //const user = await db.User.create({ email, first_name:firstName, last_name:lastName });
-        const user = spRegisterNewUser (firstName, lastName, email, 1);
+        const user = await spRegisterNewUser (firstName, lastName, email, centerId);
         // Generate JWT token for password setup
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
