@@ -1,6 +1,7 @@
 const db = require('../models');
 const jwt = require('jsonwebtoken');
 const { sendEmail } = require('./emailController'); 
+const {spRegisterNewUser} = require ('../database/logic_objects/securityProcedures');
 
 
 const controllers = {}; 
@@ -36,8 +37,8 @@ controllers.register = async (req, res) => {
 
     try {
         // Create the user in the database without a password
-        const user = await db.User.create({ email, first_name:firstName, last_name:lastName });
-
+        //const user = await db.User.create({ email, first_name:firstName, last_name:lastName });
+        const user = spRegisterNewUser (firstName, lastName, email, 1);
         // Generate JWT token for password setup
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
