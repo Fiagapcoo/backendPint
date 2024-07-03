@@ -36,7 +36,7 @@ controllers.register = async (req, res) => {
 
     try {
         // Create the user in the database without a password
-        const user = await db.User.create({ email, firstName, lastName });
+        const user = await db.User.create({ email, first_name:firstName, last_name:lastName });
 
         // Generate JWT token for password setup
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -51,7 +51,7 @@ controllers.register = async (req, res) => {
         res.status(201).json({succes:true, message: 'User registered successfully. Please check your email to set up your password.' });
     } catch (error) {
         console.error('Error registering user:', error);
-        res.status(500).json({succes:false, message: 'Internal server error' });
+        res.status(500).json({succes:false, message: 'Internal server error' + error });
     }
 };
 

@@ -87,8 +87,7 @@ app.use((req, res, next) => {
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-
+         
 
 //API
 app.use('/api/categories', categoryRoutes);

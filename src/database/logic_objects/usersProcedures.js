@@ -144,7 +144,8 @@ async function getUserRole(userID) {
         `SELECT p."role_name"
         FROM "hr"."users" u
         JOIN "security"."acc_permissions" p ON u."role_id" = p."role_id"
-        WHERE u."user_id" = :userID`,
+        WHERE u."user_id" = :userID
+        RETURNING p."role_name"`,
         {
           replacements: { userID },
           type: QueryTypes.SELECT
