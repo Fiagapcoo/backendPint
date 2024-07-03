@@ -236,10 +236,8 @@ controllers.getUsers = async (req, res) => {
         const users = await db.Users.findAll({
             attributes: { 
                 exclude: ['hashed_password', 'join_date', 'profile_pic'],
-                include: [
-                    [sequelize.fn('DISTINCT', sequelize.col('User.id')), 'id']
-                ]
-             },
+            },
+            distinct: true,
             include: [
                 {
                     model: db.OfficeWorkers,
