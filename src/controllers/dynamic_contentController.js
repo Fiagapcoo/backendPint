@@ -269,17 +269,17 @@ controllers.updateUserOffice = async (req, res) => {
 
         const officeWorker = await db.OfficeWorkers.findOne({ where: { user_id } });
         if (officeWorker) {
-            officeWorker.office_id = office_id;
-            await officeWorker.save();
-        } else {
-            await db.OfficeWorkers.create({ user_id, office_id });
+            await officeWorker.destroy();
         }
+        
+        await db.OfficeWorkers.create({ user_id, office_id });
 
         res.status(200).json({ success: true, message: 'User office updated successfully' });
-    }catch (error) { 
-        res.status(500).json({success:false, message:'Error updating user office: ' + error.message});
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error updating user office: ' + error.message });
     }
 };
+
 
 controllers.getEventByDate = async (req, res) => {
     const {date } = req.query;
