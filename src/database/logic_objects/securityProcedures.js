@@ -67,6 +67,7 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
       const res = await db.sequelize.query(
         `SELECT "user_id" FROM "hr"."users" WHERE "email" = :email`,
         {
+          replacements: { email },
           type: QueryTypes.SELECT,
           transaction
         }
