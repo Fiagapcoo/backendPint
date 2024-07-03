@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
+require('dotenv').config(); // Ensure you have this line to load environment variables from a .env file
 
-//Configure the nodemailer transport object
+// Configure the nodemailer transport object
 const transporter = nodemailer.createTransport({
     host: 'smtp.mail.ru',
     port: 465,
@@ -21,11 +22,18 @@ const transporter = nodemailer.createTransport({
  */
 const sendEmail = (req, res) => {
     const { to, subject, body } = req.body;
+    console.log('to:', to);
+    console.log('subject:', subject);
+    console.log('body:', body);
+
+    if (!to || !subject || !body) {
+        return res.status(400).send('Missing required fields: to, subject, or body');
+    }
 
     const mailOptions = {
         from: process.env.MAILRU_USER,
-        to: to,
-        subject: subject,
+        to,
+        subject,
         text: body
     };
 
@@ -39,4 +47,24 @@ const sendEmail = (req, res) => {
     });
 };
 
-module.exports = { sendEmail };
+const sendMail = async ({ to, subject, body }) => {
+    const mailOptions = {
+        from: process.env.MAILRU_USER,
+        to,
+        subject,
+        html: body // Use 'html' if you are sending HTML content
+    };
+
+    return new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending email:', error);
+                return reject('Error sending email');
+            }
+            console.log('Email sent:', info.response);
+            resolve('Email sent successfully');
+        });
+    });
+};
+
+module.exports = { sendEmail, sendMail };

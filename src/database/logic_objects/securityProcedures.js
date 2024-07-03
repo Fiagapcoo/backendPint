@@ -1,6 +1,7 @@
 const { QueryTypes } = require('sequelize');
 const { logError} = require('./generalHelpers');
 const { logUserAction} = require('./usersProcedures');
+const { sendMail } = require('../../controllers/emailController');
 
 const db = require('../../models'); 
 
@@ -40,7 +41,7 @@ const spAssignUserToCenter = async (userId, centerId, transaction) => {
 
 const spSendWelcomeEmail = async (email) => {
     try {
-      await sendEmail({
+      sendMail({
         to: email,
         subject: 'Welcome to the Company!',
         body: '<br><br>Welcome to the company! We are excited to have you on board in SoftShares.<br><br>Best Regards,<br>Softinsa'
@@ -87,7 +88,7 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
   
       await spAssignUserToCenter(userId, centerId, transaction);
   
-      await sendEmail({
+      await sendMail({
         to: email,
         subject: 'SOFTSHARES - Account Creation',
         body: 'This email serves as a notification for successful account creation. Pay attention as you will soon receive an email with a link to create your password!'
@@ -142,7 +143,7 @@ const spCreateUserPassword = async (email, password) => {
         }
       );
   
-      await sendEmail({
+      await sendMail({
         to: email,
         subject: 'SOFTSHARES - Account Creation',
         body: 'This email serves as a notification for successful account password creation. Your new password will be needed every time you log in and will be valid for the next 6 months. You will receive an email reminder to change your password one week before it expires. According to our company security policies, passwords cannot be reused.'
@@ -194,7 +195,7 @@ const spChangeUserPassword = async (userId, email, newPassword) => {
         }
       );
   
-      await sendEmail({
+      await sendMail({
         to: email,
         subject: 'SOFTSHARES - Account Action - Password Changes',
         body: 'This email serves as a notification for successful account password modification. If you did not take this action, please inform your security team right away!'
@@ -232,7 +233,7 @@ const spDeactivateUser = async (userId) => {
       );
   
       if (user && user.email) {
-        await sendEmail({
+        await sendMail({
           to: user.email,
           subject: 'SOFTSHARES - Account Status Change',
           body: 'This email serves to inform you that your Softshares account has been deactivated.'
@@ -268,7 +269,7 @@ const spActivateUser = async (userId) => {
       );
   
       if (user && user.email) {
-        await sendEmail({
+        await sendMail({
           to: user.email,
           subject: 'SOFTSHARES - Account Status Change',
           body: 'This email serves to inform you that your Softshares account has been activated.'
@@ -354,7 +355,7 @@ const spSendPasswordExpiryNotification = async (email) => {
       const subject = 'Password Expiry Notification';
       const content = 'Your password is set to expire in 7 days. Please update your password to ensure uninterrupted access to your account.';
   
-      await sendEmail({
+      await sendMail({
         to: email,
         subject,
         text: content
