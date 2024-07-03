@@ -112,6 +112,36 @@ controllers.login = async (req, res) => {
     }
 };
 
+//TODO
+controllers.login_web = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        // Find the user by email
+        const user = await db.User.findOne({ where: { email } });
+
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'Invalid email or password' });
+        }
+
+        // Compare the password
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.status(401).json({ success: false, message: 'Invalid email or password' });
+        }
+
+        // Generate JWT token
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '4h' });
+
+        res.status(200).json({ token, success: true, message: 'Login successful' });
+    } catch (error) {
+        console.error('Error logging in:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+
 controllers.login_mobile = async (req, res) => {
     const { email, password } = req.body;
 
