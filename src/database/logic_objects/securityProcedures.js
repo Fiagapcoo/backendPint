@@ -5,8 +5,8 @@ const { logUserAction} = require('./usersProcedures');
 const db = require('../../models'); 
 
 
-const spAssignUserToCenter = async (userId, centerId) => {
-    const transaction = await db.sequelize.transaction();
+const spAssignUserToCenter = async (userId, centerId, transaction) => {
+    //const transaction = await db.sequelize.transaction();
     try {
       const exists = await db.sequelize.query(
         `SELECT 1 FROM "centers"."office_workers" WHERE "user_id" = :userId AND "office_id" = :centerId`,
@@ -31,9 +31,9 @@ const spAssignUserToCenter = async (userId, centerId) => {
         throw new Error('User is already assigned to this center.');
       }
   
-      await transaction.commit();
+      //await transaction.commit();
     } catch (error) {
-      await transaction.rollback();
+      //await transaction.rollback();
       throw error;
     }
 };
@@ -85,7 +85,7 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
         }
       );
   
-      await spAssignUserToCenter(userId, centerId);
+      await spAssignUserToCenter(userId, centerId, transaction);
   
       await sendEmail({
         to: email,
