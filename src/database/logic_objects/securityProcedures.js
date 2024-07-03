@@ -1,7 +1,7 @@
 const { QueryTypes } = require('sequelize');
 const { logError} = require('./generalHelpers');
 const { logUserAction} = require('./usersProcedures');
-
+const { sendEmail } = require('../../controllers/emailController');
 const db = require('../../models'); 
 
 
@@ -72,7 +72,7 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
           transaction
         }
       )
-      console.log(res); exit();
+      console.log(res);
       const userId = result[0].user_id;
   
       await db.sequelize.query(
