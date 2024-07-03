@@ -50,7 +50,7 @@ const spSendWelcomeEmail = async (email) => {
     }
 };
 
-const spRegisterNewUser = async (firstName, lastName, email, profilePic = null, centerId) => {
+const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePic = null) => {
     const transaction = await db.sequelize.transaction();
     try {
       const [result] = await db.sequelize.query(
