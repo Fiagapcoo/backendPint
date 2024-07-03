@@ -63,7 +63,12 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
           transaction
         }
       );
-  
+      
+      const res = await db.sequelize.findAll(
+        `SELECT "user_id" FROM "hr"."users" WHERE "email" = :email`
+
+      )
+      console.log(res); exit();
       const userId = result[0].user_id;
   
       await db.sequelize.query(
