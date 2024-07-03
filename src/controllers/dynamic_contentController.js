@@ -234,7 +234,12 @@ controllers.getUsers = async (req, res) => {
 
     try {
         const users = await db.Users.findAll({
-            attributes: { exclude: ['hashed_password', 'join_date', 'profile_pic'] },
+            attributes: { 
+                exclude: ['hashed_password', 'join_date', 'profile_pic'],
+                include: [
+                    [sequelize.fn('DISTINCT', sequelize.col('User.id')), 'id']
+                ]
+             },
             include: [
                 {
                     model: db.OfficeWorkers,
@@ -247,7 +252,8 @@ controllers.getUsers = async (req, res) => {
                         }
                     ]
                 }
-            ]
+            ],
+            group: ['User.id', 'OfficeWorkers.id', 'OfficeWorkers->Office.office_id']
         });
         res.status(200).json({ success: true, data: users });
     } catch (error) {
