@@ -88,15 +88,16 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
   
       await spAssignUserToCenter(userId, centerId, transaction);
   
-      await sendMail({
-        to: email,
-        subject: 'SOFTSHARES - Account Creation',
-        body: 'This email serves as a notification for successful account creation. Pay attention as you will soon receive an email with a link to create your password!'
-      });
+      // await sendMail({
+      //   to: email,
+      //   subject: 'SOFTSHARES - Account Creation',
+      //   body: 'This email serves as a notification for successful account creation. Pay attention as you will soon receive an email with a link to create your password!'
+      // });
   
-      await spSendWelcomeEmail(email);
+      //await spSendWelcomeEmail(email);
   
       await transaction.commit();
+      return res;
     } catch (error) {
       await transaction.rollback();
       throw error;

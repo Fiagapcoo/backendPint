@@ -1,6 +1,6 @@
 const db = require('../models');
 const jwt = require('jsonwebtoken');
-const { sendEmail } = require('./emailController'); 
+const { sendMail } = require('./emailController'); 
 const {spRegisterNewUser} = require ('../database/logic_objects/securityProcedures');
 
 
@@ -39,15 +39,18 @@ controllers.register = async (req, res) => {
         // Create the user in the database without a password
         //const user = await db.User.create({ email, first_name:firstName, last_name:lastName });
         const user = await spRegisterNewUser (firstName, lastName, email, centerId);
+        console.log("OLA")
+        console.log('user:', user);
         // Generate JWT token for password setup
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         const result = mashupAndRandomize(email, firstName, lastName);
         // URL for password setup
         const url = `${process.env.CLIENT_URL}/${result}/setup-password?token=${token}`;
-
+        console.log('url:', url);
+        console.log('user:', user);
         // Send email to user
-        await sendEmail(user.email, 'Set up your password', `Click this link to set up your password: ${url}`);
+        await sendMail({to: email, subject: 'Set up your password', body: `Click this link to set up your password: ${url}`});
 
         res.status(201).json({succes:true, message: 'User registered successfully. Please check your email to set up your password.' });
     } catch (error) {
@@ -72,7 +75,7 @@ controllers.setupPassword = async (req, res) => {
 
         // Send confirmation email
         const user = await db.User.findByPk(userId);
-        await sendEmail(user.email, 'Password Setup Successful', 'Your password has been set up successfully.');
+        await sendMail(user.email, 'Password Setup Successful', 'Your password has been set up successfully.');
 
         res.status(200).json({succes:true, message: 'Password set up successfully.' });
     } catch (error) {
