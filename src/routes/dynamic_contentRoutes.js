@@ -12,6 +12,7 @@ router.get('/get-event/:event_id', dynamicController.getEventById);
 router.get('/get-event-by-date', dynamicController.getEventByDate);
 router.get('/get-forum/:forum_id', dynamicController.getForumById);
 router.get('/user-info/:user_id', dynamicController.getUserInfo);
+router.get('/get-users', dynamicController.getUsers);
 //router.get('/user-preferences', dynamicController.getUserPreferences);
 
 

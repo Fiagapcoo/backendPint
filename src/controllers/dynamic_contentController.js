@@ -230,6 +230,33 @@ controllers.getUserInfo = async (req, res) => {
     }
 };
 
+controllers.getUsers = async (req, res) => {
+
+    try {
+        const users = await db.Users.findAll({
+            attributes: { exclude: ['hashed_password', 'join_date', 'profile_pic'] },
+            include: [
+                {
+                    model: db.OfficeWorkers,
+                    as: 'OfficeWorker',
+                    include: [
+                        {
+                            model: db.Offices,
+                            as: 'Office',
+                            attributes: ['office_id', 'city']
+                        }
+                    ]
+                }
+            ]
+        });
+        res.status(200).json({ success: true, data: users });
+    } catch (error) {
+        res.status(500).json({success:false, message:'Error retrieving users: ' + error.message});
+    }
+
+
+};
+
 controllers.getEventByDate = async (req, res) => {
     const {date } = req.query;
     try {
