@@ -237,8 +237,8 @@ controllers.getUsers = async (req, res) => {
             SELECT DISTINCT u.user_id, u.email, u.first_name, u.last_name,
                             ow.office_id, o.city
             FROM "hr"."users" u
-            LEFT JOIN "centeres"."office_workers" ow ON u.user_id = ow.user_id
-            LEFT JOIN "centeres"."offices" o ON ow.office_id = o.office_id
+            LEFT JOIN "centers"."office_workers" ow ON u.user_id = ow.user_id
+            LEFT JOIN "centers"."offices" o ON ow.office_id = o.office_id
         `;
 
         const users = await db.sequelize.query(query, {
