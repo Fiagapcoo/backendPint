@@ -9,7 +9,8 @@ const { getUserEngagementMetrics,
         getActiveWarnings,
         getContentCenterToBeValidated,
         createCenter,
-        deleteCenter } = require('../database/logic_objects/adminProcedures');
+        deleteCenter,
+        getCenters } = require('../database/logic_objects/adminProcedures');
 
 const controllers = {};
 
@@ -120,6 +121,15 @@ controllers.deleteCenter = async (req, res) => {
     } catch (error) {
       res.status(500).json({success:false, message:'Error deleting center: ' + error.message});
     }
-};  
+}; 
+
+controllers.getCenters = async (req, res) => {
+    try {
+      const results = await getCenters();
+      res.status(200).json({success:true, data:results});
+    } catch (error) {
+      res.status(500).json({success:false, message:'Error fetching centers: ' + error.message});
+    }
+};
 
 module.exports = controllers;
