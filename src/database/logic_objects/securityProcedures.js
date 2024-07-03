@@ -64,7 +64,7 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
         }
       );
       
-      const res = await db.sequelize.findAll(
+      const res = await db.Users.findAll(
         `SELECT "user_id" FROM "hr"."users" WHERE "email" = :email`
 
       )
