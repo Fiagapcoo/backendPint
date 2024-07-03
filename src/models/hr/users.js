@@ -6,8 +6,8 @@ module.exports = (sequelize, DataTypes) => {
         first_name: { type: DataTypes.STRING(30), allowNull: false },
         last_name: { type: DataTypes.STRING(30), allowNull: false },
         email: { type: DataTypes.STRING(100), allowNull: false, unique: true },
-        hashed_password: { type: DataTypes.STRING(255) },
-        profile_pic: { type: DataTypes.TEXT },
+        hashed_password: { type: DataTypes.STRING(255),  allowNull:true },
+        profile_pic: { type: DataTypes.TEXT ,  allowNull:true },
         role_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
