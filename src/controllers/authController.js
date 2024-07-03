@@ -54,7 +54,7 @@ controllers.register = async (req, res) => {
 
         res.status(201).json({succes:true, message: 'User registered successfully. Please check your email to set up your password.' });
     } catch (error) {
-        console.error('Error registering user:', error);
+        console.error('CONSOLE LOG REGISTER:', error);
         res.status(500).json({succes:false, message: 'Internal server error' + error });
     }
 };
