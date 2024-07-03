@@ -233,26 +233,18 @@ controllers.getUserInfo = async (req, res) => {
 controllers.getUsers = async (req, res) => {
 
     try {
-        const users = await db.Users.findAll({
-            attributes: { 
-                exclude: ['hashed_password', 'join_date', 'profile_pic'],
-            },
-            distinct: true,
-            include: [
-                {
-                    model: db.OfficeWorkers,
-                    as: 'OfficeWorker',
-                    include: [
-                        {
-                            model: db.Offices,
-                            as: 'Office',
-                            attributes: ['office_id', 'city']
-                        }
-                    ]
-                }
-            ],
-            group: ['User.id', 'OfficeWorkers.id', 'OfficeWorkers->Office.office_id']
+        const query = `
+            SELECT DISTINCT u."user_id", u."email", u."first_name", u."last_name",
+                            ow."office_id", o."city"
+            FROM "hr"."users" u
+            LEFT JOIN officeworkers ow ON u.user_id = ow.user_id
+            LEFT JOIN offices o ON ow.office_id = o.office_id
+        `;
+
+        const users = await db.sequelize.query(query, {
+            type: db.Sequelize.QueryTypes.SELECT
         });
+
         res.status(200).json({ success: true, data: users });
     } catch (error) {
         res.status(500).json({success:false, message:'Error retrieving users: ' + error.message});
