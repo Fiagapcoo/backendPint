@@ -18,6 +18,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Forums.associate = function(models) {
+        Forums.belongsTo(models.OfficeAdmins, {as: 'Office_admin', foreignKey: 'office_id' });
+        Forums.belongsTo(models.Offices, {as: 'Office', foreignKey: 'office_id' });
         Forums.belongsTo(models.SubArea, { foreignKey: 'sub_area_id' });
         Forums.belongsTo(models.Users, { as: 'Publisher', foreignKey: 'publisher_id' });
         Forums.belongsTo(models.Users, { as: 'Admin', foreignKey: 'admin_id' });

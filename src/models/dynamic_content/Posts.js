@@ -19,10 +19,11 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Posts.associate = function(models) {
+        Posts.belongsTo(models.OfficeAdmins, {as: 'Office_admin', foreignKey: 'office_id' });
+        Posts.belongsTo(models.Offices, {as: 'Office', foreignKey: 'office_id' });
         Posts.belongsTo(models.SubArea, { foreignKey: 'sub_area_id' });
         Posts.belongsTo(models.Users, { as: 'Publisher', foreignKey: 'publisher_id' });
         Posts.belongsTo(models.Users, { as: 'Admin', foreignKey: 'admin_id' });
-        Posts.belongsTo(models.OfficeAdmins, {as: 'Office', foreignKey: 'office_id' });
         Posts.hasOne(models.Scores, { as: 'Score', foreignKey: 'post_id' });
 
     };

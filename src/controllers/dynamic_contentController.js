@@ -19,11 +19,12 @@ controllers.getPostsByCity = async (req, res) => {
         const posts = await db.Posts.findAll({
             include: [{
                 model: db.Offices,
+                as: 'Office',
                 where: { city }
             }],
             order: [['creation_date', 'DESC']]
         });
-        res.status(200).json(posts);
+        res.status(200).json({success:true , data:posts});
     } catch (error) {
         res.status(500).json({success:false, message:'Error retrieving posts: ' + error.message});
     }
@@ -35,11 +36,12 @@ controllers.getForumsByCity = async (req, res) => {
         const forums = await db.Forums.findAll({
             include: [{
                 model: db.Offices,
+                as: 'Office',
                 where: { city }
             }],
             order: [['creation_date', 'DESC']]
         });
-        res.status(200).json(forums);
+        res.status(200).json({success:true , data:forums});
     } catch (error) {
         res.status(500).json({success:false, message:'Error retrieving forums: ' + error.message});
     }
@@ -51,11 +53,12 @@ controllers.getEventsByCity = async (req, res) => {
         const events = await db.Events.findAll({
             include: [{
                 model: db.Offices,
+                as: 'Office',
                 where: { city }
             }],
             order: [['creation_date', 'DESC']]
         });
-        res.status(200).json(events);
+            res.status(200).json({success:true , data:events});
     } catch (error) {
         res.status(500).json({success:false, message:'Error retrieving events: ' + error.message});
     }
