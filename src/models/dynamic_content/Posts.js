@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         title: { type: DataTypes.STRING(255), allowNull: false },
         content: { type: DataTypes.TEXT, allowNull: false },
         p_location: { type: DataTypes.STRING(255) },
-        filepath: { type: DataTypes.TEXT }
+        filepath: { type: DataTypes.TEXT, allowNull: true},
     }, {
         schema: 'dynamic_content',
         tableName: 'posts',

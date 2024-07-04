@@ -253,6 +253,34 @@ controllers.getUsers = async (req, res) => {
 
 };
 
+controllers.updateUserOffice = async (req, res) => {
+    const { user_id, office_id } = req.body;
+
+    try {
+        const user = await db.Users.findByPk(user_id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        const office = await db.Offices.findByPk(office_id);
+        if (!office) {
+            return res.status(404).json({ success: false, message: 'Office not found' });
+        }
+
+        const officeWorker = await db.OfficeWorkers.findOne({ where: { user_id } });
+        if (officeWorker) {
+            await officeWorker.destroy();
+        }
+        
+        await db.OfficeWorkers.create({ user_id, office_id });
+
+        res.status(200).json({ success: true, message: 'User office updated successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error updating user office: ' + error.message });
+    }
+};
+
+
 controllers.getEventByDate = async (req, res) => {
     const {date } = req.query;
     try {

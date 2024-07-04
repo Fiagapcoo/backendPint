@@ -1,7 +1,7 @@
 const { QueryTypes } = require('sequelize');
 const db = require('../../models'); 
 
-async function spCreateCategory(title) {
+async function spCreateCategory(title, icon) {
     const exists = await db.sequelize.query(
         `SELECT 1 FROM "static_content"."area" WHERE "title" = :title`,
         { replacements: { title }, type: QueryTypes.SELECT }
@@ -9,8 +9,8 @@ async function spCreateCategory(title) {
 
     if (exists.length === 0) {
         await db.sequelize.query(
-            `INSERT INTO "static_content"."area" ("title") VALUES (:title)`,
-            { replacements: { title }, type: QueryTypes.RAW }
+            `INSERT INTO "static_content"."area" ("title", "icon_name") VALUES (:title, :icon)`,
+            { replacements: { title, icon }, type: QueryTypes.RAW }
         );
     } else {
         console.log('Category already exists.');

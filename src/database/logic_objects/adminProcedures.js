@@ -511,6 +511,22 @@ async function spMakeWarningInactive(warningId, adminId, officeId) {
     }
 }
 
+async function getCenters() {
+    try {
+      const results = await db.sequelize.query(
+        `SELECT "office_id", "city", "officeImage"
+         FROM "centers"."offices"`,
+        {
+          type: QueryTypes.SELECT
+        }
+      );
+      return results;
+    } catch (error) {
+      console.error('Error fetching centers:', error);
+      throw error;
+    }
+}
+
 module.exports = {
     getUserEngagementMetrics,
     getContentValidationStatusByadmin,
@@ -524,6 +540,7 @@ module.exports = {
     deleteCenter,
     spValidateContent,
     spCreateWarning,
-    spMakeWarningInactive
+    spMakeWarningInactive,
+    getCenters
     
 };

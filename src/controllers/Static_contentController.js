@@ -3,9 +3,9 @@ const db = require('../models');
 const controllers = {};
 
 controllers.create_category = async (req, res) => {
-    const { title } = req.body; 
+    const { title, icon } = req.body; 
     try {
-        await spCreateCategory(title);
+        await spCreateCategory(title, icon);
         res.status(201).json({success:true, message:'Category created successfully.'});
     } catch (error) {
         res.status(500).json({success:false, message:'Error creating category: ' + error.message});
