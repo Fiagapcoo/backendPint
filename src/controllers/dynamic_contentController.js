@@ -1,5 +1,5 @@
 const db = require('../models'); 
-
+const { QueryTypes } = require('sequelize');
 const controllers = {};
 
 controllers.getAllContent = async (req, res) => {
@@ -14,15 +14,17 @@ controllers.getAllContent = async (req, res) => {
 };
 
 controllers.getPostsByCity = async (req, res) => {
-    const { city } = req.params;
+    const { city_id } = req.params;
     try {
-        const posts = await db.Posts.findAll({
-            include: [{
-                model: db.Offices,
-                as: 'Office',
-                where: { city }
-            }],
-            order: [['creation_date', 'DESC']]
+        const posts = await db.sequelize.query(`
+            SELECT p.*, o.city
+            FROM "dynamic_content"."posts" p
+            JOIN "centers"."offices" o ON p.office_id = o.office_id
+            WHERE o.office_id = :city_id
+            ORDER BY p.creation_date DESC
+        `, {
+            replacements: { city_id },
+            type: QueryTypes.SELECT
         });
         res.status(200).json({success:true , data:posts});
     } catch (error) {
@@ -31,34 +33,38 @@ controllers.getPostsByCity = async (req, res) => {
 };
 
 controllers.getForumsByCity = async (req, res) => {
-    const { city } = req.params;
+    const { city_id } = req.params;
     try {
-        const forums = await db.Forums.findAll({
-            include: [{
-                model: db.Offices,
-                as: 'Office',
-                where: { city }
-            }],
-            order: [['creation_date', 'DESC']]
+        const forums = await db.sequelize.query(`
+            SELECT f.*, o.city
+            FROM "dynamic_content"."forums" f
+            JOIN "centers"."offices" o ON f.office_id = o.office_id
+            WHERE o.office_id = :city_id
+            ORDER BY f.creation_date DESC
+        `, {
+            replacements: { city_id },
+            type: QueryTypes.SELECT
         });
-        res.status(200).json({success:true , data:forums});
+        res.status(200).json({success:true , data: forums});
     } catch (error) {
         res.status(500).json({success:false, message:'Error retrieving forums: ' + error.message});
     }
 };
 
 controllers.getEventsByCity = async (req, res) => {
-    const { city } = req.params;
+    const { city_id } = req.params;
     try {
-        const events = await db.Events.findAll({
-            include: [{
-                model: db.Offices,
-                as: 'Office',
-                where: { city }
-            }],
-            order: [['creation_date', 'DESC']]
+        const events = await db.sequelize.query(`
+            SELECT e.*, o.city
+            FROM "dynamic_content"."events" e
+            JOIN "centers"."offices" o ON e.office_id = o.office_id
+            WHERE o.office_id = :city_id
+            ORDER BY e.creation_date DESC
+        `, {
+            replacements: { city_id },
+            type: QueryTypes.SELECT
         });
-            res.status(200).json({success:true , data:events});
+            res.status(200).json({success:true , data: events});
     } catch (error) {
         res.status(500).json({success:false, message:'Error retrieving events: ' + error.message});
     }

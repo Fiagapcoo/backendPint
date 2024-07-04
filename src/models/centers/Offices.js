@@ -13,6 +13,9 @@ module.exports = (sequelize, DataTypes) => {
     Offices.associate = function(models) {
         Offices.belongsTo(models.OfficeAdmins, { foreignKey: 'office_id' });
         Offices.belongsTo(models.OfficeWorkers, { foreignKey: 'office_id' });
+        Offices.hasMany(models.Posts, { as: 'Posts', foreignKey: 'office_id' });
+        Offices.hasMany(models.Forums, { as: 'Forums', foreignKey: 'office_id' });
+        Offices.hasMany(models.Events, { as: 'Events', foreignKey: 'office_id' });
         
     };
 
