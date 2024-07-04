@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Events.associate = function(models) {
-        Events.belongsTo(models.OfficeAdmins, {as: 'Office', foreignKey: 'office_id' });
+        Events.belongsTo(models.OfficeAdmins, {as: 'Office_admin', foreignKey: 'office_id' });
         Events.belongsTo(models.Offices, {as: 'Office', foreignKey: 'office_id' });
         Events.belongsTo(models.Users, { as: 'Publisher', foreignKey: 'publisher_id' });
         Events.belongsTo(models.Users, { as: 'Admin', foreignKey: 'admin_id' });
