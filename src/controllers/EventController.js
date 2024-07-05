@@ -33,8 +33,8 @@ controllers.create_event = async (req, res) => {
 */
 
 controllers.register_user_for_event = async (req, res) => {
-    const { userId, eventId } = req.body; 
-    console.log(req.body);
+    const { userId, eventId } = req.params; 
+    console.log(req.params);
     try {
         await spRegisterUserForEvent(userId, eventId);
         res.status(201).json({success:true, message:'Registered for event successfully.'});
@@ -44,8 +44,8 @@ controllers.register_user_for_event = async (req, res) => {
 };
 
 controllers.unregister_user_from_event = async (req, res) => {
-    const { userId, eventId } = req.body; 
-    console.log(req.body);
+    const { userId, eventId } = req.params; 
+    console.log(req.params);
     try {
         await spUnregisterUserFromEvent(userId, eventId);
         res.status(201).json({success:true, message:'Unregistered from event successfully.'});
