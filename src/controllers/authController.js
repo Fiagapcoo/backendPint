@@ -46,7 +46,7 @@ controllers.register = async (req, res) => {
 
         const result = mashupAndRandomize(email, firstName, lastName);
         // URL for password setup
-        const url = `${process.env.CLIENT_URL}/${result}/setup-password?token=${token}`;
+        const url = `${process.env.CLIENT_URL}/setup-password/${result}?token=${token}`;
         console.log('url:', url);
         console.log('user:', user);
         // Send email to user
