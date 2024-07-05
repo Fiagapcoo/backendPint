@@ -103,9 +103,6 @@ app.use('/api/user', userRoutes);
 app.use('/api/dynamic', dynamicRoutes);
 app.use('/api/notification', notificationsRoutes);authRoutes
 app.use('/api/auth', authRoutes);
-
-
-
 app.use('/upload', uploadRoute);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/email', emailRoute);

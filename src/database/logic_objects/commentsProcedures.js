@@ -5,7 +5,7 @@ async function addComment({ parentCommentID = null, contentID, contentType, user
   const t = await db.sequelize.transaction();
   try {
     // Insert the new comment
-    const [newComment] = await db.sequelize.query(
+    const [result] = await db.sequelize.query(
       `INSERT INTO "communication"."comments" ("forum_id", "post_id", "publisher_id", "comment_date", "content")
        VALUES (
          CASE WHEN :contentType = 'Forum' THEN :contentID ELSE NULL END,
@@ -19,11 +19,11 @@ async function addComment({ parentCommentID = null, contentID, contentType, user
       }
     );
 
-    const newCommentID = newComment.comment_id;
+    const newCommentID = result[0].comment_id;
 
-    // Insert the path to the new comment (self-reference with deph 0)
+    // Insert the path to the new comment (self-reference with depth 0)
     await db.sequelize.query(
-      `INSERT INTO "communication"."comment_path" ("ancestor_id", "descendant_id", "deph")
+      `INSERT INTO "communication"."comment_path" ("ancestor_id", "descendant_id", "depth")
        VALUES (:newCommentID, :newCommentID, 0)`,
       {
         replacements: { newCommentID },
@@ -36,8 +36,8 @@ async function addComment({ parentCommentID = null, contentID, contentType, user
     if (parentCommentID !== null) {
       // Insert paths for all ancestors of the parent comment to the new comment
       await db.sequelize.query(
-        `INSERT INTO "communication"."comment_path" ("ancestor_id", "descendant_id", "deph")
-         SELECT "ancestor_id", :newCommentID, "deph" + 1
+        `INSERT INTO "communication"."comment_path" ("ancestor_id", "descendant_id", "depth")
+         SELECT "ancestor_id", :newCommentID, "depth" + 1
          FROM "communication"."comment_path"
          WHERE "descendant_id" = :parentCommentID`,
         {
@@ -49,7 +49,7 @@ async function addComment({ parentCommentID = null, contentID, contentType, user
 
       // Insert the direct link from parent to new comment
       await db.sequelize.query(
-        `INSERT INTO "communication"."comment_path" ("ancestor_id", "descendant_id", "deph")
+        `INSERT INTO "communication"."comment_path" ("ancestor_id", "descendant_id", "depth")
          VALUES (:parentCommentID, :newCommentID, 1)`,
         {
           replacements: { parentCommentID, newCommentID },
@@ -62,14 +62,20 @@ async function addComment({ parentCommentID = null, contentID, contentType, user
     await t.commit();
   } catch (error) {
     await t.rollback();
-    console.error('Error adding comment:', error);
-    await db.sequelize.query(
-      `EXEC "security"."error_log" :errorMessage`,
-      {
-        replacements: { errorMessage: error.message },
-        type: QueryTypes.RAW
-      }
-    );
+    console.error('Error adding comment:', error.message);
+
+    try {
+      await db.sequelize.query(
+        `EXEC "security"."error_log" :errorMessage`,
+        {
+          replacements: { errorMessage: error.message },
+          type: QueryTypes.RAW
+        }
+      );
+    } catch (logError) {
+      console.error('Error logging the error:', logError.message);
+    }
+
     throw error;
   }
 }
