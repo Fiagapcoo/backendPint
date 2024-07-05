@@ -1,4 +1,4 @@
-
+const validator = require('validator');
 
 const { getUserEngagementMetrics,
         getContentValidationStatusByadmin,
@@ -16,6 +16,17 @@ const controllers = {};
 
 controllers.validate_content = async (req, res) => { 
     const { contentType, contentID, adminID } = req.params; 
+
+    // Validate inputs
+    if (!validator.isIn(contentType, ['post', 'event', 'forum'])) {
+      return res.status(400).json({ success: false, message: 'Invalid content type' });
+    }
+    if (!validator.isInt(contentID.toString())) {
+        return res.status(400).json({ success: false, message: 'Invalid content ID' });
+    }
+    if (!validator.isInt(adminID.toString())) {
+        return res.status(400).json({ success: false, message: 'Invalid admin ID' });
+    }
     console.log(req.params);
     try {
         await validateContent(contentType,contentID, adminID);
@@ -28,10 +39,20 @@ controllers.validate_content = async (req, res) => {
 };
 
 controllers.reject_content = async (req, res) => { 
-    const { contentType, contentId, adminId } = req.params; 
+    const { contentType, contentID, adminID } = req.params; 
+    // Validate inputs
+    if (!validator.isIn(contentType, ['post', 'event', 'forum'])) {
+      return res.status(400).json({ success: false, message: 'Invalid content type' });
+    }
+    if (!validator.isInt(contentID.toString())) {
+        return res.status(400).json({ success: false, message: 'Invalid content ID' });
+    }
+    if (!validator.isInt(adminID.toString())) {
+        return res.status(400).json({ success: false, message: 'Invalid admin ID' });
+    }
     console.log(req.params);
     try {
-        await rejectContent(contentType, contentId, adminId);
+        await rejectContent(contentType, contentId, adminID);
 
 
         res.status(201).json({success:true, message:'Content rejected successfully.'});
@@ -53,6 +74,10 @@ controllers.getUserEngagementMetrics = async (req, res) => {
 // Get content validation status by admin
 controllers.getContentValidationStatusByadmin = async (req, res) => {
     const { adminID } = req.params;
+    // Validate Inputs 
+    if (!validator.isInt(adminID.toString())) {
+      return res.status(400).json({ success: false, message: 'Invalid admin ID' });
+    }
     try {
       const results = await getContentValidationStatusByadmin(adminID);
       res.status(200).json({success:true, data:results});
@@ -93,6 +118,10 @@ controllers.getActiveWarnings = async (req, res) => {
 // Get content center to be validated
 controllers.getContentCenterToBeValidated = async (req, res) => {
     const { center_id } = req.params;
+    // Validate Inputs 
+    if (!validator.isInt(center_id.toString())) {
+      return res.status(400).json({ success: false, message: 'Invalid center ID' });
+    }
     try {
       const results = await getContentCenterToBeValidated(center_id);
       res.status(200).json({success:true, data:results});
@@ -104,6 +133,16 @@ controllers.getContentCenterToBeValidated = async (req, res) => {
 // Create center
 controllers.createCenter = async (req, res) => {
     const { city, admin, officeImage } = req.body;
+    // Validate inputs
+    if (validator.isEmpty(city)) {
+      return res.status(400).json({ success: false, message: 'City is required' });
+    }
+    if (!validator.isInt(admin.toString())) {
+        return res.status(400).json({ success: false, message: 'Invalid admin ID' });
+    }
+    if (validator.isEmpty(officeImage)) {
+        return res.status(400).json({ success: false, message: 'Office image is required' });
+    }
     try {
       await createCenter(city, admin, officeImage);
       res.status(201).json({success:true, message:'Center created successfully.'});
@@ -115,6 +154,10 @@ controllers.createCenter = async (req, res) => {
 // Delete center
 controllers.deleteCenter = async (req, res) => {
     const { center_id } = req.params;
+    // Validate Inputs 
+    if (!validator.isInt(center_id.toString())) {
+      return res.status(400).json({ success: false, message: 'Invalid center ID' });
+    }
     try {
       await deleteCenter(center_id);
       res.status(200).json({success:true, message:'Center deleted successfully.'});

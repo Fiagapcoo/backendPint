@@ -1,7 +1,7 @@
 const db = require('../../models'); 
 const { QueryTypes } = require('sequelize');
 
-async function addComment({ parentCommentID = null, contentID, contentType, userID, commentText }) {
+async function spAddComment({ parentCommentID = null, contentID, contentType, userID, commentText }) {
   const t = await db.sequelize.transaction();
   try {
     // Insert the new comment
@@ -34,12 +34,33 @@ async function addComment({ parentCommentID = null, contentID, contentType, user
 
     // If this is a reply to another comment, update the comment_path table
     if (parentCommentID !== null) {
+      // Check if the parent comment exists
+      const parentCommentExists = await db.sequelize.query(
+        `SELECT 1 FROM "communication"."comments" WHERE "comment_id" = :parentCommentID`,
+        {
+          replacements: { parentCommentID },
+          type: QueryTypes.SELECT,
+          transaction: t
+        }
+      );
+
+      if (parentCommentExists.length === 0) {
+        throw new Error('Parent comment does not exist.');
+      }
+
       // Insert paths for all ancestors of the parent comment to the new comment
+      // Avoid inserting duplicates
       await db.sequelize.query(
         `INSERT INTO "communication"."comment_path" ("ancestor_id", "descendant_id", "depth")
          SELECT "ancestor_id", :newCommentID, "depth" + 1
          FROM "communication"."comment_path"
-         WHERE "descendant_id" = :parentCommentID`,
+         WHERE "descendant_id" = :parentCommentID
+           AND NOT EXISTS (
+               SELECT 1 
+               FROM "communication"."comment_path"
+               WHERE "ancestor_id" = "communication"."comment_path"."ancestor_id"
+                 AND "descendant_id" = :newCommentID
+           )`,
         {
           replacements: { newCommentID, parentCommentID },
           type: QueryTypes.INSERT,
@@ -48,9 +69,11 @@ async function addComment({ parentCommentID = null, contentID, contentType, user
       );
 
       // Insert the direct link from parent to new comment
+      // Avoid inserting duplicates
       await db.sequelize.query(
         `INSERT INTO "communication"."comment_path" ("ancestor_id", "descendant_id", "depth")
-         VALUES (:parentCommentID, :newCommentID, 1)`,
+         VALUES (:parentCommentID, :newCommentID, 1)
+         ON CONFLICT ("ancestor_id", "descendant_id") DO NOTHING`,
         {
           replacements: { parentCommentID, newCommentID },
           type: QueryTypes.INSERT,
@@ -66,7 +89,7 @@ async function addComment({ parentCommentID = null, contentID, contentType, user
 
     try {
       await db.sequelize.query(
-        `EXEC "security"."error_log" :errorMessage`,
+        `EXEC "security"."LogError" :errorMessage`,
         {
           replacements: { errorMessage: error.message },
           type: QueryTypes.RAW
