@@ -1,8 +1,8 @@
 const db = require('../../models'); 
 const { QueryTypes } = require('sequelize');
 const contentTables = {
-  post: 'posts',
-  forum: 'forums'
+  post: 'post_id',
+  forum: 'forum_id'
 };
 async function spAddComment({ parentCommentID = null, contentID, contentType, userID, commentText }) {
   const t = await db.sequelize.transaction();
@@ -11,6 +11,19 @@ async function spAddComment({ parentCommentID = null, contentID, contentType, us
     if (!table) {
       throw new Error('Invalid content type');
     }
+    
+    // Insert the new comment
+    const [result] = await db.sequelize.query(
+      `INSERT INTO "communication"."comments" ("${table}", "publisher_id", "comment_date", "content")
+      VALUES ( :contentID, :userID, CURRENT_TIMESTAMP, :commentText
+      ) RETURNING "comment_id"`,
+      {
+        replacements: { contentID, contentType, userID, commentText },
+        type: QueryTypes.INSERT,
+        transaction: t
+      }
+    );
+    /*
     if (table == "posts"){
            // Insert the new comment
            const [result] = await db.sequelize.query(
@@ -37,6 +50,7 @@ async function spAddComment({ parentCommentID = null, contentID, contentType, us
             }
           );
     }
+          */
     const newCommentID = result[0].comment_id;
 
     // Insert the path to the new comment (self-reference with depth 0)
