@@ -16,7 +16,7 @@ controllers.getAllContent = async (req, res) => {
 
 controllers.getPostsByCity = async (req, res) => {
     const { city_id } = req.params;
-    if (!validator.isValidInt(city_id)) {
+    if (!validator.isInt(city_id)) {
         return res.status(400).json({ success: false, message: 'Invalid city ID' });
     }
     try {
@@ -38,7 +38,7 @@ controllers.getPostsByCity = async (req, res) => {
 
 controllers.getForumsByCity = async (req, res) => {
     const { city_id } = req.params;
-    if (!validator.isValidInt(city_id)) {
+    if (!validator.isInt(city_id)) {
         return res.status(400).json({ success: false, message: 'Invalid city ID' });
     }
     try {
@@ -60,7 +60,7 @@ controllers.getForumsByCity = async (req, res) => {
 
 controllers.getEventsByCity = async (req, res) => {
     const { city_id } = req.params;
-    if (!validator.isValidInt(city_id)) {
+    if (!validator.isInt(city_id)) {
         return res.status(400).json({ success: false, message: 'Invalid city ID' });
     }
     try {
@@ -82,7 +82,7 @@ controllers.getEventsByCity = async (req, res) => {
 
 controllers.getPostById = async (req, res) => {
     const { post_id } = req.params;
-    if (!validator.isValidInt(post_id)) {
+    if (!validator.isInt(post_id)) {
         return res.status(400).json({ success: false, message: 'Invalid post ID' });
     }
     try {
@@ -110,7 +110,7 @@ controllers.getPostById = async (req, res) => {
 controllers.getEventByIdNoRawQuery = async (req, res) => {
     const { event_id } = req.params;
     const user_id = req.user.id; // Extracted from JWT 
-    if (!validator.isValidInt(event_id)) {
+    if (!validator.isInt(event_id)) {
         return res.status(400).json({ success: false, message: 'Invalid event ID' });
     }
     try {
@@ -150,7 +150,7 @@ controllers.getEventByIdNoRawQuery = async (req, res) => {
 controllers.getEventById = async (req, res) => {
     const { event_id } = req.params;
     const user_id = req.user.id; // Extracted from JWT 
-    if (!validator.isValidInt(event_id)) {
+    if (!validator.isInt(event_id)) {
         return res.status(400).json({ success: false, message: 'Invalid event ID' });
     }
     try {
@@ -207,7 +207,7 @@ controllers.getEventById = async (req, res) => {
 
 controllers.getForumById = async (req, res) => {
     const { forum_id } = req.params;
-    if (!validator.isValidInt(forum_id)) {
+    if (!validator.isInt(forum_id)) {
         return res.status(400).json({ success: false, message: 'Invalid forum ID' });
     }
     try {
@@ -232,7 +232,7 @@ controllers.getForumById = async (req, res) => {
 
 controllers.getUserInfo = async (req, res) => {
     const { user_id } = req.params;
-    if (!validator.isValidInt(user_id)) {
+    if (!validator.isInt(user_id)) {
         return res.status(400).json({ success: false, message: 'Invalid user ID' });
     }
     try {
@@ -288,7 +288,7 @@ controllers.getUsers = async (req, res) => {
 
 controllers.updateUserOffice = async (req, res) => {
     const { user_id, office_id } = req.body;
-    if (!validator.isValidInt(user_id) || !validator.isValidInt(office_id)) {
+    if (!validator.isInt(user_id) || !validator.isInt(office_id)) {
         return res.status(400).json({ success: false, message: 'Invalid user ID or office ID' });
     }
     try {
