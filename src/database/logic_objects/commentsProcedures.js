@@ -1,24 +1,42 @@
 const db = require('../../models'); 
 const { QueryTypes } = require('sequelize');
-
+const contentTables = {
+  post: 'posts',
+  forum: 'forums'
+};
 async function spAddComment({ parentCommentID = null, contentID, contentType, userID, commentText }) {
   const t = await db.sequelize.transaction();
   try {
-    // Insert the new comment
-    const [result] = await db.sequelize.query(
-      `INSERT INTO "communication"."comments" ("forum_id", "post_id", "publisher_id", "comment_date", "content")
-       VALUES (
-         CASE WHEN :contentType = 'Forum' THEN :contentID ELSE NULL END,
-         CASE WHEN :contentType = 'Post' THEN :contentID ELSE NULL END,
-         :userID, CURRENT_TIMESTAMP, :commentText
-       ) RETURNING "comment_id"`,
-      {
-        replacements: { contentID, contentType, userID, commentText },
-        type: QueryTypes.INSERT,
-        transaction: t
-      }
-    );
-
+    const table = contentTables[contentType];
+    if (!table) {
+      throw new Error('Invalid content type');
+    }
+    if (table == "posts"){
+           // Insert the new comment
+           const [result] = await db.sequelize.query(
+            `INSERT INTO "communication"."comments" ("post_id", "publisher_id", "comment_date", "content")
+            VALUES ( :contentID, :userID, CURRENT_TIMESTAMP, :commentText
+            ) RETURNING "comment_id"`,
+            {
+              replacements: { contentID, userID, commentText },
+              type: QueryTypes.INSERT,
+              transaction: t
+            }
+          );     
+    }
+    else {
+          // Insert the new comment
+          const [result] = await db.sequelize.query(
+            `INSERT INTO "communication"."comments" ("forum_id", "publisher_id", "comment_date", "content")
+            VALUES ( :contentID, :userID, CURRENT_TIMESTAMP, :commentText
+            ) RETURNING "comment_id"`,
+            {
+              replacements: { contentID, contentType, userID, commentText },
+              type: QueryTypes.INSERT,
+              transaction: t
+            }
+          );
+    }
     const newCommentID = result[0].comment_id;
 
     // Insert the path to the new comment (self-reference with depth 0)

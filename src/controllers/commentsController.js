@@ -23,12 +23,12 @@ controllers.add_comment = async (req, res) => {
     if (validator.isEmpty(commentText)) {
         return res.status(400).json({ success: false, message: 'Comment text cannot be empty' });
     }
-
+    const intContID = parseInt(contentID);
     try {
-        await spAddComment({ parentCommentID, contentID, contentType, userID, commentText });
-        res.status(201).json({success:true, message:'Commentary added successfully.'});
+        await spAddComment({ parentCommentID, intContID, contentType, userID, commentText });
+        res.status(201).json({success:true, message:'Comment added successfully.'});
     } catch (error) {
-        res.status(500).json({success:false, message:'Error adding Commentary: ' + error.message});
+        res.status(500).json({success:false, message:'Error adding Comment: ' + error.message});
     }
 };
 
