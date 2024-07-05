@@ -75,57 +75,57 @@ async function addComment({ parentCommentID = null, contentID, contentType, user
 }
 
 async function getCommentTree(contentID, contentType) {
-    try {
-      const results = await db.sequelize.query(
-        `WITH CommentHierarchy AS (
-           SELECT 
-               c."comment_id",
-               c."forum_id",
-               c."post_id",
-               c."publisher_id",
-               c."comment_date",
-               c."content",
-               0 AS "deph"
-           FROM "communication"."comments" c
-           WHERE 
-               (:contentType = 'Post' AND c."post_id" = :contentID) OR
-               (:contentType = 'Forum' AND c."forum_id" = :contentID)
-  
-           UNION ALL
-  
-           SELECT 
-               c."comment_id",
-               c."forum_id",
-               c."post_id",
-               c."publisher_id",
-               c."comment_date",
-               c."content",
-               ch."deph" + 1
-           FROM "communication"."comments" c
-           INNER JOIN "communication"."comment_path" cp ON c."comment_id" = cp."descendant_id"
-           INNER JOIN CommentHierarchy ch ON cp."ancestor_id" = ch."comment_id"
-           WHERE cp."deph" > 0
-         )
+  try {
+    const results = await db.sequelize.query(
+      `WITH RECURSIVE "CommentHierarchy" AS (
          SELECT 
-             "comment_id",
-             "forum_id",
-             "post_id",
-             "publisher_id",
-             "comment_date",
-             "content",
-             "deph"
-         FROM CommentHierarchy`,
-        {
-          replacements: { contentID, contentType },
-          type: QueryTypes.SELECT
-        }
-      );
-      return results;
-    } catch (error) {
-      console.error('Error fetching comment tree:', error);
-      throw error;
-    }
+             c."comment_id",
+             c."forum_id",
+             c."post_id",
+             c."publisher_id",
+             c."comment_date",
+             c."content",
+             0 AS "depth"
+         FROM "communication"."comments" c
+         WHERE 
+             (:contentType = 'Post' AND c."post_id" = :contentID) OR
+             (:contentType = 'Forum' AND c."forum_id" = :contentID)
+  
+         UNION ALL
+  
+         SELECT 
+             c."comment_id",
+             c."forum_id",
+             c."post_id",
+             c."publisher_id",
+             c."comment_date",
+             c."content",
+             ch."depth" + 1
+         FROM "communication"."comments" c
+         INNER JOIN "communication"."comment_path" cp ON c."comment_id" = cp."descendant_id"
+         INNER JOIN "CommentHierarchy" ch ON cp."ancestor_id" = ch."comment_id"
+         WHERE cp."depth" > 0
+       )
+       SELECT 
+           "comment_id",
+           "forum_id",
+           "post_id",
+           "publisher_id",
+           "comment_date",
+           "content",
+           "depth"
+       FROM "CommentHierarchy"`,
+      {
+        replacements: { contentID, contentType },
+        type: QueryTypes.SELECT
+      }
+    );
+    return results;
+  } catch (error) {
+    console.error('Error fetching comment tree:', error);
+    throw error;
   }
+}
 module.exports = {
   addComment,
   getCommentTree
