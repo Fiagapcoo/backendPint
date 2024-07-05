@@ -1,5 +1,6 @@
 const { spCreateEvent, 
     spEventParticipationCleanup,
+    spRegisterUserForEvent,
     spUnregisterUserFromEvent,
     fnGetEventState,
     spEditEvent,
@@ -30,6 +31,18 @@ controllers.create_event = async (req, res) => {
     }
 };
 */
+
+controllers.register_user_for_event = async (req, res) => {
+    const { userId, eventId } = req.body; 
+    console.log(req.body);
+    try {
+        await spRegisterUserForEvent(userId, eventId);
+        res.status(201).json({success:true, message:'Registered for event successfully.'});
+    } catch (error) {
+        res.status(500).json({success:false, message:'Error registering for event: ' + error.message});
+    }
+};
+
 controllers.unregister_user_from_event = async (req, res) => {
     const { userId, eventId } = req.body; 
     console.log(req.body);
