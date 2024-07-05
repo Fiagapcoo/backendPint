@@ -6,7 +6,7 @@ const { spCreateForum,
 const controllers = {};
 
 controllers.create_forum = async (req, res) => {
-    const { officeID, subAreaId, title, description, publisher_id } = req.body; 
+    const { officeID, subAreaId, title, publisher_id, description=null } = req.body; 
     console.log(req.body);
     try {
         await spCreateForum(officeID, subAreaId, title, description, publisher_id);

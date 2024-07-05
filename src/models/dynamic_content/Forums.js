@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
         sub_area_id: { type: DataTypes.INTEGER },
         creation_date: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
         title: { type: DataTypes.STRING(255), allowNull: false },
-        content: { type: DataTypes.TEXT },
+        content: { type: DataTypes.TEXT, allowNull: false},
         event_id: { type: DataTypes.INTEGER },
         validated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
         forum_status: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true }

@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         type: { type: DataTypes.CHAR(1), allowNull: false, defaultValue: 'N' },
         validated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
         title: { type: DataTypes.STRING(255), allowNull: false },
-        content: { type: DataTypes.TEXT, allowNull: false },
+        content: { type: DataTypes.TEXT, allowNull: true },
         price: { type: DataTypes.INTEGER, allowNull: true },
         p_location: { type: DataTypes.STRING(255) },
         filepath: { type: DataTypes.TEXT, allowNull: true},
