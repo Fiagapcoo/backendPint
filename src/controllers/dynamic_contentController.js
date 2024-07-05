@@ -1,5 +1,6 @@
 const db = require('../models'); 
 const { QueryTypes } = require('sequelize');
+const validator = require('validator');
 const controllers = {};
 
 controllers.getAllContent = async (req, res) => {
@@ -15,6 +16,9 @@ controllers.getAllContent = async (req, res) => {
 
 controllers.getPostsByCity = async (req, res) => {
     const { city_id } = req.params;
+    if (!isValidInt(city_id)) {
+        return res.status(400).json({ success: false, message: 'Invalid city ID' });
+    }
     try {
         const posts = await db.sequelize.query(`
             SELECT p.*, o.city
@@ -34,6 +38,9 @@ controllers.getPostsByCity = async (req, res) => {
 
 controllers.getForumsByCity = async (req, res) => {
     const { city_id } = req.params;
+    if (!isValidInt(city_id)) {
+        return res.status(400).json({ success: false, message: 'Invalid city ID' });
+    }
     try {
         const forums = await db.sequelize.query(`
             SELECT f.*, o.city
@@ -53,6 +60,9 @@ controllers.getForumsByCity = async (req, res) => {
 
 controllers.getEventsByCity = async (req, res) => {
     const { city_id } = req.params;
+    if (!isValidInt(city_id)) {
+        return res.status(400).json({ success: false, message: 'Invalid city ID' });
+    }
     try {
         const events = await db.sequelize.query(`
             SELECT e.*, o.city
@@ -72,6 +82,9 @@ controllers.getEventsByCity = async (req, res) => {
 
 controllers.getPostById = async (req, res) => {
     const { post_id } = req.params;
+    if (!isValidInt(post_id)) {
+        return res.status(400).json({ success: false, message: 'Invalid post ID' });
+    }
     try {
         const post = await db.Posts.findByPk(post_id, {
             include: [
@@ -96,8 +109,10 @@ controllers.getPostById = async (req, res) => {
 // to test 
 controllers.getEventByIdNoRawQuery = async (req, res) => {
     const { event_id } = req.params;
-    const user_id = req.user.id; // Assuming req.user contains the authenticated user's details
-
+    const user_id = req.user.id; // Extracted from JWT 
+    if (!isValidInt(event_id)) {
+        return res.status(400).json({ success: false, message: 'Invalid event ID' });
+    }
     try {
         const event = await db.Events.findByPk(event_id, {
             include: [
@@ -134,7 +149,10 @@ controllers.getEventByIdNoRawQuery = async (req, res) => {
 
 controllers.getEventById = async (req, res) => {
     const { event_id } = req.params;
-    const userId = req.user.id; // Extracted from JWT 
+    const user_id = req.user.id; // Extracted from JWT 
+    if (!isValidInt(event_id)) {
+        return res.status(400).json({ success: false, message: 'Invalid event ID' });
+    }
     try {
         const event = await db.Events.findByPk(event_id, {
             include: [
@@ -153,8 +171,8 @@ controllers.getEventById = async (req, res) => {
         const participationExists = await db.sequelize.query(
             `SELECT 1
             FROM "control"."participation"
-            WHERE "user_id" = :userId AND "event_id" = :eventId`,
-            { replacements: { userId, eventId: event_id }, type: QueryTypes.SELECT }
+            WHERE "user_id" = :user_id AND "event_id" = :eventId`,
+            { replacements: { user_id, eventId: event_id }, type: QueryTypes.SELECT }
         );
 
         // If user is registered, fetch the forum details
@@ -189,6 +207,9 @@ controllers.getEventById = async (req, res) => {
 
 controllers.getForumById = async (req, res) => {
     const { forum_id } = req.params;
+    if (!isValidInt(forum_id)) {
+        return res.status(400).json({ success: false, message: 'Invalid forum ID' });
+    }
     try {
         const forum = await db.Forums.findByPk(forum_id, {
             include: [
@@ -211,6 +232,9 @@ controllers.getForumById = async (req, res) => {
 
 controllers.getUserInfo = async (req, res) => {
     const { user_id } = req.params;
+    if (!isValidInt(user_id)) {
+        return res.status(400).json({ success: false, message: 'Invalid user ID' });
+    }
     try {
         const user = await db.Users.findByPk(user_id , {
             attributes: { exclude: ['hashed_password', 'join_date', 'profile_pic'] },
@@ -264,7 +288,9 @@ controllers.getUsers = async (req, res) => {
 
 controllers.updateUserOffice = async (req, res) => {
     const { user_id, office_id } = req.body;
-
+    if (!isValidInt(user_id) || !isValidInt(office_id)) {
+        return res.status(400).json({ success: false, message: 'Invalid user ID or office ID' });
+    }
     try {
         const user = await db.Users.findByPk(user_id);
         if (!user) {
@@ -291,7 +317,10 @@ controllers.updateUserOffice = async (req, res) => {
 
 
 controllers.getEventByDate = async (req, res) => {
-    const {date } = req.query;
+    const { date } = req.parms;
+    if (!validator.isDate(date)) {
+        return res.status(400).json({ success: false, message: 'Invalid date' });
+    }
     try {
         const events = await db.Events.findAll({
             where: { event_date: date },

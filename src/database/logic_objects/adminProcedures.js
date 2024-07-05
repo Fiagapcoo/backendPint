@@ -98,6 +98,11 @@ async function getActiveDiscussions() {
     }
 }
 
+const contentTables = {
+  post: 'posts',
+  event: 'events',
+  forum: 'forums'
+};
 
 async function validateContent(contentType,contentID, adminID) {
   const transaction = await db.sequelize.transaction();
@@ -145,19 +150,18 @@ async function validateContent(contentType,contentID, adminID) {
             transaction
           }
         )
-          const table = contentTables[contentType];
-          if (!table) {
-              throw new Error('Invalid content type');
-          }
+        const table = contentTables[contentType];
+        if (!table) {
+            throw new Error('Invalid content type');
+        }
 
-          await db.sequelize.query(
-              `UPDATE "dynamic_content"."${table}"
-          SET "validated" = true
-          WHERE "${contentType.toLowerCase()}_id" = :contentID`,
+        await db.sequelize.query(
+             `UPDATE "dynamic_content"."${table}"
+              SET "validated" = true
+               WHERE "${contentType.toLowerCase()}_id" = :contentID`,
               { replacements: { contentcontentIDId }, type: QueryTypes.UPDATE, transaction }
-          );
-          
-      ;
+        );
+        
       await transaction.commit();
     } catch (error) {
         await transaction.rollback();

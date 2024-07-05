@@ -1,5 +1,6 @@
 const db = require('../models');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 const { sendMail } = require('./emailController'); 
 const {spRegisterNewUser} = require ('../database/logic_objects/securityProcedures');
 
@@ -35,6 +36,16 @@ function mashupAndRandomize(email, firstName, lastName) {
 controllers.register = async (req, res) => {
     const { email, firstName, lastName, centerId } = req.body;
 
+    //Validate Inputs
+    if (!validator.isEmail(email)) {
+        return res.status(400).json({ message: 'Invalid email' });
+    }
+    if (validator.isEmpty(firstName) || !validator.isAlpha(firstName)) {
+        return res.status(400).json({ message: 'Invalid first name' });
+    }
+    if (validator.isEmpty(lastName) || !validator.isAlpha(lastName)) {
+        return res.status(400).json({ message: 'Invalid last name' });
+    }
     try {
         // Create the user in the database without a password
         //const user = await db.User.create({ email, first_name:firstName, last_name:lastName });
@@ -62,6 +73,13 @@ controllers.register = async (req, res) => {
 controllers.setupPassword = async (req, res) => {
     const { token, password } = req.body;
 
+    // Validate inputs
+    if (!validator.isJWT(token)) {
+        return res.status(400).json({ success: false, message: 'Invalid token' });
+    }
+    if (!validator.isStrongPassword(password)) {
+        return res.status(400).json({ success: false, message: 'Password is not strong enough' });
+    }
     try {
         // Verify JWT token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -86,6 +104,14 @@ controllers.setupPassword = async (req, res) => {
 
 controllers.login = async (req, res) => {
     const { email, password } = req.body;
+
+    // Validate inputs
+    if (!validator.isEmail(email)) {
+        return res.status(400).json({ success: false, message: 'Invalid email' });
+    }
+    if (validator.isEmpty(password)) {
+        return res.status(400).json({ success: false, message: 'Password cannot be empty' });
+    }
 
     try {
         // Find the user by email
@@ -116,6 +142,14 @@ controllers.login = async (req, res) => {
 controllers.login_web = async (req, res) => {
     const { email, password } = req.body;
 
+    // Validate inputs
+    if (!validator.isEmail(email)) {
+        return res.status(400).json({ success: false, message: 'Invalid email' });
+    }
+    if (validator.isEmpty(password)) {
+        return res.status(400).json({ success: false, message: 'Password cannot be empty' });
+    }
+
     try {
         // Find the user by email
         const user = await db.User.findOne({ where: { email } });
@@ -145,6 +179,14 @@ controllers.login_web = async (req, res) => {
 controllers.login_mobile = async (req, res) => {
     const { email, password } = req.body;
 
+    // Validate inputs
+    if (!validator.isEmail(email)) {
+        return res.status(400).json({ success: false, message: 'Invalid email' });
+    }
+    if (validator.isEmpty(password)) {
+        return res.status(400).json({ success: false, message: 'Password cannot be empty' });
+    }
+    
     try {
         // Find the user by email
         const user = await db.User.findOne({ where: { email } });

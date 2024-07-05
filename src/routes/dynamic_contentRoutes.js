@@ -9,7 +9,7 @@ router.get('/events-by-city/:city_id', dynamicController.getEventsByCity);
 router.get('/all-content', dynamicController.getAllContent);
 router.get('/get-post/:post_id', dynamicController.getPostById);
 router.get('/get-event/:event_id', dynamicController.getEventById);
-router.get('/get-event-by-date', dynamicController.getEventByDate);
+router.get('/get-event-by-date/:date', dynamicController.getEventByDate);
 router.get('/get-forum/:forum_id', dynamicController.getForumById);
 router.get('/user-info/:user_id', dynamicController.getUserInfo);
 router.get('/get-users', dynamicController.getUsers);

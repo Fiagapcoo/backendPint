@@ -1,11 +1,42 @@
 const Sequelize = require('sequelize');
+const validator = require('validator');
 module.exports = (sequelize, DataTypes) => {
     const Users = sequelize.define('Users', {
         user_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         //employee_id: { type: DataTypes.UUID, allowNull: false, defaultValue: Sequelize.UUIDV4 },
-        first_name: { type: DataTypes.STRING(30), allowNull: false },
-        last_name: { type: DataTypes.STRING(30), allowNull: false },
-        email: { type: DataTypes.STRING(100), allowNull: false, unique: true },
+        first_name: { 
+            type: DataTypes.STRING(30), 
+            allowNull: false,
+            validate: {
+                notNull: { msg: 'First name is required' },
+                notEmpty: { msg: 'First name cannot be empty' },
+                isAlpha: { msg: 'First name must contain only letters' }
+            } 
+        },
+        last_name: { 
+            type: DataTypes.STRING(30), 
+            allowNull: false,
+            validate: {
+                notNull: { msg: 'Last name is required' },
+                notEmpty: { msg: 'Last name cannot be empty' },
+                isAlpha: { msg: 'Last name must contain only letters' }
+            }
+         },
+        email: { 
+            type: DataTypes.STRING(100), 
+            allowNull: false, 
+            unique: true,
+            validate: {
+                notNull: { msg: 'Email is required' },
+                notEmpty: { msg: 'Email cannot be empty' },
+                isEmail: { msg: 'Email is not valid' },
+                isValidEmail(value) {
+                    if (!validator.isEmail(value)) {
+                        throw new Error('Email is not valid');
+                    }
+                } 
+            }
+        },
         hashed_password: { type: DataTypes.STRING(255),  allowNull:true },
         profile_pic: { type: DataTypes.TEXT ,  allowNull:true },
         role_id: {
