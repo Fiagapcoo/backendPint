@@ -1,4 +1,4 @@
-const { addComment,
+const { spAddComment,
         getCommentTree } = require('../database/logic_objects/commentsProcedures');
 const validator = require('validator');
 const controllers = {};

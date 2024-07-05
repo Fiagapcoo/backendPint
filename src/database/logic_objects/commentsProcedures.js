@@ -156,6 +156,6 @@ async function getCommentTree(contentID, contentType) {
   }
 }
 module.exports = {
-  addComment,
+  spAddComment,
   getCommentTree
 };
