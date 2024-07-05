@@ -53,7 +53,7 @@ controllers.register = async (req, res) => {
         console.log("OLA")
         console.log('user:', user);
         // Generate JWT token for password setup
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         const result = mashupAndRandomize(email, firstName, lastName);
         // URL for password setup
@@ -209,6 +209,29 @@ controllers.login_mobile = async (req, res) => {
     } catch (error) {
         console.error('Error logging in:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+controllers.validateToken = async (req, res) => {
+    const { token } = req.body;
+
+    try {
+        // Verify the token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log('decoded:', decoded);
+
+        // Find the user by ID
+        const user = await db.User.findById(decoded.id);
+        console.log('user:', user);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Return the user details
+        res.status(200).json({ success: true, user: { firstName: user.firstName, lastName: user.lastName, email: user.email } });
+    } catch (error) {
+        console.error('Error validating token:', error);
+        res.status(400).json({ success: false, message: 'Invalid token' });
     }
 };
 
