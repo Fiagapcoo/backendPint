@@ -23,10 +23,11 @@ const sp_findUserById = async (userId) => {
   }
 };
 
-const spCreatePassword = async (userId, hashedPassword, salt) => {
-  console.log("spUpdatePassword");
-  console.log(userId + " " + hashedPassword);
+const spCreatePassword = async (userId, Password) => {
+  
   try {
+    const salt = bcrypt.genSalt(12);
+    const hashedPassword = bcrypt.hash(Password, salt);
 
 
     await db.sequelize.query(
@@ -46,11 +47,13 @@ const spCreatePassword = async (userId, hashedPassword, salt) => {
         }
       );
 
+
   }catch (error) {
     logError(error);
     throw error;
   }
 };
+
 
 const spAssignUserToCenter = async (userId, centerId, transaction) => {
     //const transaction = await db.sequelize.transaction();

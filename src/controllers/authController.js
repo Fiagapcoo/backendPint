@@ -1,7 +1,6 @@
 const db = require("../models");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
-const bcrypt = require("bcryptjs");
 const { sendMail } = require("./emailController");
 
 const {
@@ -104,12 +103,9 @@ controllers.setupPassword = async (req, res) => {
     console.log("req.user:", req.user.id);
     const userId = req.user.id;
 
-    const salt = bcrypt.genSalt(12);
 
-    const hashedPassword = bcrypt.hash(password, salt);
-    console.log("hashed"+ hashedPassword);
 
-    await spCreatePassword(userId, hashedPassword, salt);
+    await spCreatePassword(userId, hashedPassword);
     
 
     const user = await sp_findUserById(userId);
@@ -118,6 +114,45 @@ controllers.setupPassword = async (req, res) => {
       to: user.email,
       subject: "Password Setup Successful",
       body: "Your password has been set up successfully.",
+    });
+
+    res
+      .status(200)
+      .json({ success: true, message: "Password set up successfully." });
+  } catch (error) {
+    console.error("Error setting up password:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+controllers.UpdatePassword = async (req, res) => {
+  const {password} = req.body;
+
+//   if (!validator.isJWT(token)) {
+//     return res.status(400).json({ success: false, message: "Invalid token" });
+//   }
+  if (!validator.isStrongPassword(password)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Password is not strong enough" });
+  }
+  try {
+    console.log("req.user:", req.user.id);
+    const userId = req.user.id;
+
+    const salt = bcrypt.genSalt(12);
+
+    const hashedPassword = bcrypt.hash(password, salt);
+
+    // await (userId, hashedPassword, salt);
+    
+
+    const user = await sp_findUserById(userId);
+    console.log("user:", user);
+    await sendMail({
+      to: user.email,
+      subject: "Password Updated Successful",
+      body: "Your password has been Updated successfully.",
     });
 
     res
