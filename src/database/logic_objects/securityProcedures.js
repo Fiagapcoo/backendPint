@@ -26,8 +26,8 @@ const sp_findUserById = async (userId) => {
 const spCreatePassword = async (userId, Password) => {
   const transaction = await db.sequelize.transaction();
   try {
-    const salt = bcrypt.genSalt(12);
-    const hashedPassword = bcrypt.hash(Password, salt);
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(Password, 12);
 
 
     await db.sequelize.query(
@@ -38,15 +38,14 @@ const spCreatePassword = async (userId, Password) => {
       }
     );
 
-    await db.sequelize.query(
-      `INSERT INTO "security"."user_passwords_dictionary" ("user_id", "hashed_password", "salt")
-        VALUES (:userId, :hashedPassword, :salt)`,
-        {
-          replacements: { userId, hashedPassword, salt },
-          type: QueryTypes.INSERT
-        }
-      );
-      await logUserAction(userId, 'PASSWORD CREATED', 'Created user account password', transaction);
+    // await db.sequelize.query(
+    //   `INSERT INTO "security"."user_passwords_dictionary" ("user_id", "hashed_passwd", "salt")
+    //     VALUES (:userId, :hashedPassword, :salt)`,
+    //     {
+    //       replacements: { userId, hashedPassword, salt },
+    //       type: QueryTypes.INSERT
+    //     }
+    //   );
     await transaction.commit();
   }catch (error) {
     await transaction.rollback();
@@ -81,7 +80,7 @@ const spAssignUserToCenter = async (userId, centerId, transaction) => {
         throw new Error('User is already assigned to this center.');
       }
   
-      await transaction.commit();
+      // await transaction.commit();
     } catch (error) {
       await transaction.rollback();
       throw error;
@@ -375,11 +374,31 @@ const spSendPasswordExpiryNotification = async (email) => {
       throw error;
     }
 };
+
+const sp_findUserByEmail = async (email) => {
+    try {
+        const [user] = await db.sequelize.query(
+            `SELECT * 
+             FROM "hr"."users" 
+             WHERE "email" = :email`,
+            {
+                replacements: { email },
+                type: QueryTypes.SELECT
+            }
+        );
+
+        return user;
+    } catch (error) {
+        throw error;
+    }
+};
+
   
   
   
 
 module.exports = {
+    sp_findUserByEmail,
     sp_findUserById,
     spAssignUserToCenter,
     spSendWelcomeEmail,

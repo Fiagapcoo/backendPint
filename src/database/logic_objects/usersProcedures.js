@@ -5,7 +5,7 @@ async function logUserAction(userID, type, description) {
     try {
       await db.sequelize.transaction(async (transaction) => {
         await db.sequelize.query(
-          `INSERT INTO "user_interactions"."user_actions_log" (user_id, action_type, action_description) VALUES (:userID, :type, :description)`,
+          `INSERT INTO "user_interactions"."user_actions_log" (user_id, action_type, action_description, action_date) VALUES (:userID, :type, :description, CURRENT_TIMESTAMP)`,
           {
             replacements: { userID, type, description },
             type: QueryTypes.INSERT,

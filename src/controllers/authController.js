@@ -1,13 +1,16 @@
 const db = require("../models");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
+const bcrypt = require("bcryptjs");
 const { sendMail } = require("./emailController");
+const { logUserAction} = require('../database/logic_objects/usersProcedures');
 
 
 const {
   spRegisterNewUser,
   spCreatePassword,
-  sp_findUserById
+  sp_findUserById,
+  sp_findUserByEmail
 } = require("../database/logic_objects/securityProcedures");
 
 const controllers = {};
@@ -106,10 +109,11 @@ controllers.setupPassword = async (req, res) => {
 
 
 
-    await spCreatePassword(userId, hashedPassword);
+    await spCreatePassword(userId, password);
     
 
     const user = await sp_findUserById(userId);
+    console.log("user:", user);
     console.log("user:", user);
     await sendMail({
       to: user.email,
@@ -118,6 +122,7 @@ controllers.setupPassword = async (req, res) => {
     });
 
     
+    await logUserAction(userId, 'PASSWORD CREATED', 'Created user account password');
     res
       .status(200)
       .json({ success: true, message: "Password set up successfully." });
@@ -166,45 +171,7 @@ controllers.UpdatePassword = async (req, res) => {
   }
 };
 
-controllers.login = async (req, res) => {
-  const { email, password } = req.body;
 
-  if (!validator.isEmail(email)) {
-    return res.status(400).json({ success: false, message: "Invalid email" });
-  }
-  if (validator.isEmpty(password)) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Password cannot be empty" });
-  }
-
-  try {
-    const user = await db.User.findOne({ where: { email } });
-
-    if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid email or password" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.hashed_password);
-
-    if (!isMatch) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid email or password" });
-    }
-
-    const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, {
-      expiresIn: "4h",
-    });
-
-    res.status(200).json({ token, success: true, message: "Login successful" });
-  } catch (error) {
-    console.error("Error logging in:", error);
-    res.status(500).json({ success: false, message: "Internal server error" });
-  }
-};
 
 controllers.login_web = async (req, res) => {
   const { email, password } = req.body;
@@ -219,7 +186,8 @@ controllers.login_web = async (req, res) => {
   }
 
   try {
-    const user = await db.User.findOne({ where: { email } });
+    const user = await sp_findUserByEmail(email);
+    console.log("user:", user);
 
     if (!user) {
       return res
