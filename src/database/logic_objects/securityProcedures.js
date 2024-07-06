@@ -5,6 +5,41 @@ const { sendMail } = require('../../controllers/emailController');
 
 const db = require('../../models'); 
 
+const sp_findUserById = async (userId) => {
+  try {
+      const [user] = await db.sequelize.query(
+          `SELECT "user_id", "first_name", "last_name", "email" 
+           FROM "hr"."users" 
+           WHERE "user_id" = :userId`,
+          {
+              replacements: { userId },
+              type: QueryTypes.SELECT
+          }
+      );
+
+      return user;
+  } catch (error) {
+      throw error;
+  }
+};
+
+const spUpdatePassword = async (userId, hashedPassword) => {
+  console.log("spUpdatePassword");
+  console.log(userId + " " + hashedPassword);
+  try {
+
+    await db.sequelize.query(
+      `UPDATE "hr"."users" SET "hashed_password" = :hashedPassword WHERE "user_id" = :userId`,
+      {
+        replacements: { hashedPassword, userId },
+        type: QueryTypes.UPDATE
+      }
+    );
+  }catch (error) {
+    logError(error);
+    throw error;
+  }
+};
 
 const spAssignUserToCenter = async (userId, centerId, transaction) => {
     //const transaction = await db.sequelize.transaction();
@@ -372,6 +407,7 @@ const spSendPasswordExpiryNotification = async (email) => {
   
 
 module.exports = {
+    sp_findUserById,
     spAssignUserToCenter,
     spSendWelcomeEmail,
     spRegisterNewUser,
@@ -381,5 +417,6 @@ module.exports = {
     spActivateUser,
     spSetCenterAdmin,
     spCheckPasswordExpiry,
-    spSendPasswordExpiryNotification
+    spSendPasswordExpiryNotification,
+    spUpdatePassword
 }

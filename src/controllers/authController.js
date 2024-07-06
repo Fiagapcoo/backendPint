@@ -1,238 +1,265 @@
-const db = require('../models');
-const jwt = require('jsonwebtoken');
-const validator = require('validator');
-const { sendMail } = require('./emailController'); 
-const {spRegisterNewUser} = require ('../database/logic_objects/securityProcedures');
+const db = require("../models");
+const jwt = require("jsonwebtoken");
+const validator = require("validator");
+const bcrypt = require("bcryptjs");
+const { sendMail } = require("./emailController");
 
+const {
+  spRegisterNewUser,
+  spUpdatePassword,
+  sp_findUserById
+} = require("../database/logic_objects/securityProcedures");
 
-const controllers = {}; 
+const controllers = {};
 
 function mashupAndRandomize(email, firstName, lastName) {
-    // Combine the strings
-    const combinedString = email + firstName + lastName;
-  
-    // Convert the combined string into an array of characters
-    const charArray = combinedString.split('');
-  
-    // Function to shuffle the array
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
+  const combinedString = email + firstName + lastName;
+  const charArray = combinedString.split("");
+
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
-  
-    // Shuffle the array
-    const shuffledArray = shuffleArray(charArray);
-  
-    // Convert the shuffled array back to a string
-    const randomizedString = shuffledArray.join('');
-  
-    return randomizedString;
+    return array;
   }
-  
+
+  const shuffledArray = shuffleArray(charArray);
+  return shuffledArray.join("");
+}
 
 controllers.register = async (req, res) => {
-    const { email, firstName, lastName, centerId } = req.body;
+  const { email, firstName, lastName, centerId } = req.body;
 
-    //Validate Inputs
-    if (!validator.isEmail(email)) {
-        return res.status(400).json({ message: 'Invalid email' });
-    }
-    if (validator.isEmpty(firstName) || !validator.isAlpha(firstName)) {
-        return res.status(400).json({ message: 'Invalid first name' });
-    }
-    if (validator.isEmpty(lastName) || !validator.isAlpha(lastName)) {
-        return res.status(400).json({ message: 'Invalid last name' });
-    }
-    try {
-        // Create the user in the database without a password
-        //const user = await db.User.create({ email, first_name:firstName, last_name:lastName });
-        const user = await spRegisterNewUser (firstName, lastName, email, centerId);
-        console.log("OLA")
-        console.log('user:', user);
-        // Generate JWT token for password setup
-        const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ message: "Invalid email" });
+  }
+  if (
+    validator.isEmpty(firstName) ||
+    !validator.isAlpha(firstName, "en-US", { ignore: " " })
+  ) {
+    return res.status(400).json({ message: "Invalid first name" });
+  }
+  if (
+    validator.isEmpty(lastName) ||
+    !validator.isAlpha(lastName, "en-US", { ignore: " " })
+  ) {
+    return res.status(400).json({ message: "Invalid last name" });
+  }
 
-        const result = mashupAndRandomize(email, firstName, lastName);
-        // URL for password setup
-        const url = `${process.env.CLIENT_URL}/setup-password/${result}?token=${token}`;
-        console.log('url:', url);
-        console.log('user:', user);
-        // Send email to user
-        await sendMail({to: email, subject: 'Set up your password', body: `Click this link to set up your password: ${url}`});
+  try {
+    const user = await spRegisterNewUser(firstName, lastName, email, centerId);
+    console.log("DMAKLDNWAJBDAWJBDJKWABDJKAWBDKJWAKJAWDJHKAW");
+    console.log("user:", user);
 
-        res.status(201).json({succes:true, message: 'User registered successfully. Please check your email to set up your password.' });
-    } catch (error) {
-        console.error('CONSOLE LOG REGISTER:', error);
-        res.status(500).json({succes:false, message: 'Internal server error' + error });
+    // Assegure que 'user' seja um objeto simples
+    if (Array.isArray(user) && user.length > 0) {
+      const userPayload = {
+        id: user[0].user_id, // Acesse o primeiro elemento do array
+      };
+      console.log("userPayload:", userPayload);
+
+      const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+
+      const url = `${process.env.CLIENT_URL}/setup-password/${email}?token=${token}`;
+      console.log("url:", url);
+      console.log("user:", user);
+
+      await sendMail({
+        to: email,
+        subject: "Set up your new password",
+        body: `Link: ${url}`,
+      });
+
+      res
+        .status(201)
+        .json({
+          success: true,
+          message:
+            "User registered successfully. Please check your email to set up your password.",
+        });
     }
+  } catch (error) {
+    console.error("CONSOLE LOG REGISTER:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Internal server error: " + error });
+  }
 };
 
 controllers.setupPassword = async (req, res) => {
-    const { token, password } = req.body;
+  const {password } = req.body;
 
-    // Validate inputs
-    if (!validator.isJWT(token)) {
-        return res.status(400).json({ success: false, message: 'Invalid token' });
-    }
-    if (!validator.isStrongPassword(password)) {
-        return res.status(400).json({ success: false, message: 'Password is not strong enough' });
-    }
-    try {
-        // Verify JWT token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.id;
+//   if (!validator.isJWT(token)) {
+//     return res.status(400).json({ success: false, message: "Invalid token" });
+//   }
+  if (!validator.isStrongPassword(password)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Password is not strong enough" });
+  }
+  try {
+    console.log("req.user:", req.user.id);
+    const userId = req.user.id;
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(password, 12);
+    console.log("hashed"+ hashedPassword);
 
-        // Update the user with the new password
-        await db.User.update({ password: hashedPassword }, { where: { id: userId } });
+    await spUpdatePassword(userId, hashedPassword);
+    
 
-        // Send confirmation email
-        const user = await db.User.findByPk(userId);
-        await sendMail(user.email, 'Password Setup Successful', 'Your password has been set up successfully.');
+    const user = await sp_findUserById(userId);
+    console.log("user:", user);
+    await sendMail({
+      to: user.email,
+      subject: "Password Setup Successful",
+      body: "Your password has been set up successfully.",
+    });
 
-        res.status(200).json({succes:true, message: 'Password set up successfully.' });
-    } catch (error) {
-        console.error('Error setting up password:', error);
-        res.status(500).json({succes:false, message: 'Internal server error' });
-    }
+    res
+      .status(200)
+      .json({ success: true, message: "Password set up successfully." });
+  } catch (error) {
+    console.error("Error setting up password:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
 };
 
 controllers.login = async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    // Validate inputs
-    if (!validator.isEmail(email)) {
-        return res.status(400).json({ success: false, message: 'Invalid email' });
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ success: false, message: "Invalid email" });
+  }
+  if (validator.isEmpty(password)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Password cannot be empty" });
+  }
+
+  try {
+    const user = await db.User.findOne({ where: { email } });
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
     }
-    if (validator.isEmpty(password)) {
-        return res.status(400).json({ success: false, message: 'Password cannot be empty' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
     }
 
-    try {
-        // Find the user by email
-        const user = await db.User.findOne({ where: { email } });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "4h",
+    });
 
-        if (!user) {
-            return res.status(401).json({ success: false, message: 'Invalid email or password' });
-        }
-
-        // Compare the password
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-            return res.status(401).json({ success: false, message: 'Invalid email or password' });
-        }
-
-        // Generate JWT token
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '4h' });
-
-        res.status(200).json({ token, success: true, message: 'Login successful' });
-    } catch (error) {
-        console.error('Error logging in:', error);
-        res.status(500).json({ success: false, message: 'Internal server error' });
-    }
+    res.status(200).json({ token, success: true, message: "Login successful" });
+  } catch (error) {
+    console.error("Error logging in:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
 };
 
-//TODO
 controllers.login_web = async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    // Validate inputs
-    if (!validator.isEmail(email)) {
-        return res.status(400).json({ success: false, message: 'Invalid email' });
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ success: false, message: "Invalid email" });
+  }
+  if (validator.isEmpty(password)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Password cannot be empty" });
+  }
+
+  try {
+    const user = await db.User.findOne({ where: { email } });
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
     }
-    if (validator.isEmpty(password)) {
-        return res.status(400).json({ success: false, message: 'Password cannot be empty' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
     }
 
-    try {
-        // Find the user by email
-        const user = await db.User.findOne({ where: { email } });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "4h",
+    });
 
-        if (!user) {
-            return res.status(401).json({ success: false, message: 'Invalid email or password' });
-        }
-
-        // Compare the password
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-            return res.status(401).json({ success: false, message: 'Invalid email or password' });
-        }
-
-        // Generate JWT token
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '4h' });
-
-        res.status(200).json({ token, success: true, message: 'Login successful' });
-    } catch (error) {
-        console.error('Error logging in:', error);
-        res.status(500).json({ success: false, message: 'Internal server error' });
-    }
+    res.status(200).json({ token, success: true, message: "Login successful" });
+  } catch (error) {
+    console.error("Error logging in:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
 };
-
 
 controllers.login_mobile = async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    // Validate inputs
-    if (!validator.isEmail(email)) {
-        return res.status(400).json({ success: false, message: 'Invalid email' });
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ success: false, message: "Invalid email" });
+  }
+  if (validator.isEmpty(password)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Password cannot be empty" });
+  }
+
+  try {
+    const user = await db.User.findOne({ where: { email } });
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
     }
-    if (validator.isEmpty(password)) {
-        return res.status(400).json({ success: false, message: 'Password cannot be empty' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
     }
-    
-    try {
-        // Find the user by email
-        const user = await db.User.findOne({ where: { email } });
 
-        if (!user) {
-            return res.status(401).json({ success: false, message: 'Invalid email or password' });
-        }
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
-        // Compare the password
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-            return res.status(401).json({ success: false, message: 'Invalid email or password' });
-        }
-
-        // Generate JWT token
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-        res.status(200).json({ token, success: true, message: 'Login successful' });
-    } catch (error) {
-        console.error('Error logging in:', error);
-        res.status(500).json({ success: false, message: 'Internal server error' });
-    }
+    res.status(200).json({ token, success: true, message: "Login successful" });
+  } catch (error) {
+    console.error("Error logging in:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
 };
 
-controllers.validateToken = async (req, res) => {
-    const { token } = req.body;
 
-    try {
-        // Verify the token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log('decoded:', decoded);
 
-        // Find the user by ID
-        const user = await db.User.findById(decoded.id);
-        console.log('user:', user);
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
 
-        // Return the user details
-        res.status(200).json({ success: true, user: { firstName: user.firstName, lastName: user.lastName, email: user.email } });
-    } catch (error) {
-        console.error('Error validating token:', error);
-        res.status(400).json({ success: false, message: 'Invalid token' });
-    }
+
+
+controllers.testjwt = async (req, res) => {
+  const info = {
+    id: 1,
+    email: "abc@gmail.com",
+  };
+
+  const token = jwt.sign(info, process.env.JWT_SECRET, { expiresIn: "1h" });
+  console.log("token:", token);
 };
 
 module.exports = controllers;
