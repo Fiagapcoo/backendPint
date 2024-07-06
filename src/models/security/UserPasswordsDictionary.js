@@ -1,8 +1,14 @@
+const addMonths = (date, months) => {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + months);
+    return d;
+};
+
 module.exports = (sequelize, DataTypes) => {
     const UserPasswordsDictionary = sequelize.define('UserPasswordsDictionary', {
         user_id: { type: DataTypes.INTEGER, primaryKey: true },
         hashed_passwd: { type: DataTypes.STRING(255), allowNull: false },
-        //salt: { type: DataTypes.STRING(255), allowNull: false },
+        salt: { type: DataTypes.STRING(255), allowNull: false },
         valid_from: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
         valid_to: { type: DataTypes.DATE, defaultValue: '9999-12-31 23:59:59' }
     }, {
@@ -20,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
                     valid_to: new Date()
                 });
                 userPassword.valid_from = new Date();
-                userPassword.valid_to = '9999-12-31 23:59:59';
+                userPassword.valid_to = addMonths(new Date(), 6);;
             },
             beforeDestroy: async (userPassword, options) => {
                 const historyModel = sequelize.models.UserPasswordsDictionaryHistory;
