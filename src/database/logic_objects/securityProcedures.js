@@ -23,7 +23,7 @@ const sp_findUserById = async (userId) => {
   }
 };
 
-const spUpdatePassword = async (userId, hashedPassword, salt) => {
+const spCreatePassword = async (userId, hashedPassword, salt) => {
   console.log("spUpdatePassword");
   console.log(userId + " " + hashedPassword);
   try {
@@ -422,12 +422,12 @@ module.exports = {
     spAssignUserToCenter,
     spSendWelcomeEmail,
     spRegisterNewUser,
-    spCreateUserPassword,
+    //spCreateUserPassword,
     spChangeUserPassword,
     spDeactivateUser,
     spActivateUser,
     spSetCenterAdmin,
     spCheckPasswordExpiry,
     spSendPasswordExpiryNotification,
-    spUpdatePassword
+    spCreatePassword
 }

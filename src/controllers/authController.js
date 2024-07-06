@@ -6,7 +6,7 @@ const { sendMail } = require("./emailController");
 
 const {
   spRegisterNewUser,
-  spUpdatePassword,
+  spCreatePassword,
   sp_findUserById
 } = require("../database/logic_objects/securityProcedures");
 
@@ -49,7 +49,7 @@ controllers.register = async (req, res) => {
 
   try {
     const user = await spRegisterNewUser(firstName, lastName, email, centerId);
-    console.log("DMAKLDNWAJBDAWJBDJKWABDJKAWBDKJWAKJAWDJHKAW");
+
     console.log("user:", user);
 
     // Assegure que 'user' seja um objeto simples
@@ -62,8 +62,8 @@ controllers.register = async (req, res) => {
       const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
-
-      const url = `${process.env.CLIENT_URL}/setup-password/${email}?token=${token}`;
+      const random_sub_url = mashupAndRandomize(email, firstName, lastName) 
+      const url = `${process.env.CLIENT_URL}/setup-password/${random_sub_url}?token=${token}`;
       console.log("url:", url);
       console.log("user:", user);
 
@@ -109,7 +109,7 @@ controllers.setupPassword = async (req, res) => {
     const hashedPassword = bcrypt.hash(password, salt);
     console.log("hashed"+ hashedPassword);
 
-    await spUpdatePassword(userId, hashedPassword, salt);
+    await spCreatePassword(userId, hashedPassword, salt);
     
 
     const user = await sp_findUserById(userId);
