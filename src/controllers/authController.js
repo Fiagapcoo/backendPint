@@ -202,12 +202,14 @@ controllers.login_web = async (req, res) => {
         .status(401)
         .json({ success: false, message: "Invalid email or password" });
     }
-
-    const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, {
-      expiresIn: "4h",
-    });
-
-    res.status(200).json({ token, success: true, message: "Login successful" });
+    if (user.role_id != 1)
+    {    const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, {
+            expiresIn: "4h",
+            });
+        res.status(200).json({ token, success: true, message: "Login successful" });
+    }
+    else res.status(403).json({ success: false, message: "Dont have permission to access! Contact your admin!" });
+    
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
