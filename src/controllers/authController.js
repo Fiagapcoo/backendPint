@@ -2,6 +2,7 @@ const db = require("../models");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const { sendMail } = require("./emailController");
+const { logUserAction} = require('./usersProcedures');
 
 const {
   spRegisterNewUser,
@@ -116,6 +117,7 @@ controllers.setupPassword = async (req, res) => {
       body: "Your password has been set up successfully.",
     });
 
+    
     res
       .status(200)
       .json({ success: true, message: "Password set up successfully." });

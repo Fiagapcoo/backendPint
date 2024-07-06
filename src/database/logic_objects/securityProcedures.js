@@ -24,7 +24,7 @@ const sp_findUserById = async (userId) => {
 };
 
 const spCreatePassword = async (userId, Password) => {
-  
+  const transaction = await db.sequelize.transaction();
   try {
     const salt = bcrypt.genSalt(12);
     const hashedPassword = bcrypt.hash(Password, salt);
@@ -46,9 +46,10 @@ const spCreatePassword = async (userId, Password) => {
           type: QueryTypes.INSERT
         }
       );
-
-
+      await logUserAction(userId, 'PASSWORD CREATED', 'Created user account password', transaction);
+    await transaction.commit();
   }catch (error) {
+    await transaction.rollback();
     logError(error);
     throw error;
   }
@@ -56,7 +57,7 @@ const spCreatePassword = async (userId, Password) => {
 
 
 const spAssignUserToCenter = async (userId, centerId, transaction) => {
-    //const transaction = await db.sequelize.transaction();
+    const transaction = await db.sequelize.transaction();
     try {
       const exists = await db.sequelize.query(
         `SELECT 1 FROM "centers"."office_workers" WHERE "user_id" = :userId AND "office_id" = :centerId`,
@@ -81,9 +82,9 @@ const spAssignUserToCenter = async (userId, centerId, transaction) => {
         throw new Error('User is already assigned to this center.');
       }
   
-      //await transaction.commit();
+      await transaction.commit();
     } catch (error) {
-      //await transaction.rollback();
+      await transaction.rollback();
       throw error;
     }
 };
@@ -155,59 +156,71 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
 
 
 
-const spChangeUserPassword = async (userId, email, newPassword) => {
-    const transaction = await db.sequelize.transaction();
-    try {
-      const salt = generateSalt();
-      const hashedPassword = hashPassword(newPassword, salt);
-  
-      const [previousPassword] = await db.sequelize.query(
-        `SELECT 1 FROM "security"."user_passwords_dictionary"
-         WHERE "user_id" = :userId AND "hashed_password" = :hashedPassword`,
-        {
-          replacements: { userId, hashedPassword },
-          type: QueryTypes.SELECT,
-          transaction
-        }
+const spChangeUserPassword = async (userId, newPassword) => {
+  const transaction = await db.sequelize.transaction();
+  try {
+      // Retrieve previous salts
+      const previousPasswords = await db.sequelize.query(
+          `SELECT hashed_passwd, salt FROM "security"."user_passwords_dictionary"
+           WHERE "user_id" = :userId`,
+          {
+              replacements: { userId },
+              type: QueryTypes.SELECT,
+              transaction
+          }
       );
-  
-      if (previousPassword) {
-        throw new Error('The new password must not be the same as any previously used passwords.');
-      }
-  
-      await db.sequelize.query(
-        `UPDATE "hr"."users" SET "hashed_password" = :hashedPassword WHERE "user_id" = :userId`,
-        {
-          replacements: { hashedPassword, userId },
-          type: QueryTypes.UPDATE,
-          transaction
+      console.log('Previous paswrdsL:  ');
+      console.log(previousPasswords);
+
+      // Check if the new password is the same as any previous hashed passwords
+      for (const prev of previousPasswords) {
+        const isMatch = await bcrypt.compare(newPassword, prev.hashed_passwd);
+        if (isMatch) {
+            throw new Error('The new password must not be the same as any previously used passwords.');
         }
-      );
-  
-      await db.sequelize.query(
-        `INSERT INTO "security"."user_passwords_dictionary" ("user_id", "hashed_password", "salt")
-         VALUES (:userId, :hashedPassword, :salt)`,
-        {
-          replacements: { userId, hashedPassword, salt },
-          type: QueryTypes.INSERT,
+    }
+
+      // Generate new salt and hash the new password
+      const salt = await bcrypt.genSalt(12);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+      // Update the current password table
+      await db.UserPasswordsDictionary.update({
+          hashed_passwd: hashedPassword,
+          salt: salt,
+          valid_from: new Date(),
+          valid_to: addMonths(new Date(), 6)
+      }, {
+          where: { user_id: userId },
           transaction
-        }
-      );
-  
-      await sendMail({
-        to: email,
-        subject: 'SOFTSHARES - Account Action - Password Changes',
-        body: 'This email serves as a notification for successful account password modification. If you did not take this action, please inform your security team right away!'
       });
-  
+
+      // Insert the new password into the dictionary
+      await db.UserPasswordsDictionary.create({
+          user_id: userId,
+          hashed_passwd: hashedPassword,
+          salt: salt,
+          valid_from: new Date(),
+          valid_to: addMonths(new Date(), 6)
+      }, { transaction });
+
+      // Send email notification
+      await sendMail({
+          to: user.email,  // assuming user email is available
+          subject: 'SOFTSHARES - Account Action - Password Changes',
+          body: 'This email serves as a notification for successful account password modification. If you did not take this action, please inform your security team right away!'
+      });
+
+      // Log the user action
       await logUserAction(userId, 'PASSWORD CHANGE', 'Changed account password', transaction);
-  
+
       await transaction.commit();
-    } catch (error) {
+  } catch (error) {
       await transaction.rollback();
       throw error;
-    }
+  }
 };
+
   
 
 const spDeactivateUser = async (userId) => {
