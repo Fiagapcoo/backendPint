@@ -104,10 +104,12 @@ controllers.setupPassword = async (req, res) => {
     console.log("req.user:", req.user.id);
     const userId = req.user.id;
 
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const salt = bcrypt.genSalt(12);
+
+    const hashedPassword = bcrypt.hash(password, salt);
     console.log("hashed"+ hashedPassword);
 
-    await spUpdatePassword(userId, hashedPassword);
+    await spUpdatePassword(userId, hashedPassword, salt);
     
 
     const user = await sp_findUserById(userId);

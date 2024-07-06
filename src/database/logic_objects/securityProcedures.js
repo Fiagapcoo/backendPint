@@ -2,7 +2,7 @@ const { QueryTypes } = require('sequelize');
 const { logError} = require('./generalHelpers');
 const { logUserAction} = require('./usersProcedures');
 const { sendMail } = require('../../controllers/emailController');
-
+const bcrypt = require('bcryptjs');
 const db = require('../../models'); 
 
 const sp_findUserById = async (userId) => {
@@ -23,10 +23,11 @@ const sp_findUserById = async (userId) => {
   }
 };
 
-const spUpdatePassword = async (userId, hashedPassword) => {
+const spUpdatePassword = async (userId, hashedPassword, salt) => {
   console.log("spUpdatePassword");
   console.log(userId + " " + hashedPassword);
   try {
+
 
     await db.sequelize.query(
       `UPDATE "hr"."users" SET "hashed_password" = :hashedPassword WHERE "user_id" = :userId`,
@@ -35,6 +36,16 @@ const spUpdatePassword = async (userId, hashedPassword) => {
         type: QueryTypes.UPDATE
       }
     );
+
+    await db.sequelize.query(
+      `INSERT INTO "security"."user_passwords_dictionary" ("user_id", "hashed_password", "salt")
+        VALUES (:userId, :hashedPassword, :salt)`,
+        {
+          replacements: { userId, hashedPassword, salt },
+          type: QueryTypes.INSERT
+        }
+      );
+
   }catch (error) {
     logError(error);
     throw error;
@@ -123,13 +134,13 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
   
       await spAssignUserToCenter(userId, centerId, transaction);
   
-      // await sendMail({
-      //   to: email,
-      //   subject: 'SOFTSHARES - Account Creation',
-      //   body: 'This email serves as a notification for successful account creation. Pay attention as you will soon receive an email with a link to create your password!'
-      // });
+      await sendMail({
+        to: email,
+        subject: 'SOFTSHARES - Account Creation',
+        body: 'This email serves as a notification for successful account creation. Pay attention as you will soon receive an email with a link to create your password!'
+      });
   
-      //await spSendWelcomeEmail(email);
+      await spSendWelcomeEmail(email);
   
       await transaction.commit();
       return res;
@@ -157,8 +168,8 @@ const spCreateUserPassword = async (email, password) => {
       }
   
       const userId = user.user_id;
-      const salt = generateSalt();
-      const hashedPassword = hashPassword(password, salt);
+      const salt = bcrypt.generateSalt();
+      const hashedPassword = bcrypt.hashPassword(password, salt);
   
       await db.sequelize.query(
         `UPDATE "hr"."users" SET "hashed_password" = :hashedPassword WHERE "user_id" = :userId`,
