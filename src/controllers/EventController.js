@@ -10,6 +10,16 @@ const controllers = {};
 
 controllers.create_event = async (req, res) => {
     const { officeId, subAreaId, name, description, eventDate, recurring=false, recurring_pattern='{"key": ""}', max_participants=null, location, publisher_id, filePath } = req.body; 
+    
+    if (!validator.isInt(publisher_id.toString())) {
+        return res.status(400).json({ success: false, message: 'Invalid admin ID' });
+    }
+    if (!validator.isInt(officeId.toString())) {
+        return res.status(400).json({ success: false, message: 'Invalid office ID' });
+    }
+    if (!validator.isInt(subAreaId.toString())) {
+        return res.status(400).json({ success: false, message: 'Invalid sub-area ID' });
+    }
     console.log(req.query);
     try {
         await spCreateEvent(officeId, subAreaId, name, description, eventDate, recurring, recurring_pattern, max_participants, location, publisher_id, filePath);

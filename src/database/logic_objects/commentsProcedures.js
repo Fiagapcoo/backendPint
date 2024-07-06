@@ -139,46 +139,46 @@ async function getCommentTree(contentID, contentType) {
   try {
     const results = await db.sequelize.query(
       `WITH RECURSIVE "CommentHierarchy" AS (
-  SELECT 
-    c."comment_id",
-    c."forum_id",
-    c."post_id",
-    c."publisher_id",
-    c."comment_date",
-    c."content",
-    0 AS "depth",
-    ARRAY[c."comment_id"] AS "path"
-  FROM "communication"."comments" c
-  WHERE 
-    c."post_id" = :contentID OR
-    c."forum_id" = :contentID
+        SELECT 
+          c."comment_id",
+          c."forum_id",
+          c."post_id",
+          c."publisher_id",
+          c."comment_date",
+          c."content",
+          0 AS "depth",
+          ARRAY[c."comment_id"] AS "path"
+        FROM "communication"."comments" c
+        WHERE 
+          c."post_id" = :contentID OR
+          c."forum_id" = :contentID
 
-  UNION ALL
+        UNION ALL
 
-  SELECT 
-    c."comment_id",
-    c."forum_id",
-    c."post_id",
-    c."publisher_id",
-    c."comment_date",
-    c."content",
-    ch."depth" + 1,
-    ch."path" || c."comment_id"
-  FROM "communication"."comments" c
-  INNER JOIN "communication"."comment_path" cp ON c."comment_id" = cp."descendant_id"
-  INNER JOIN "CommentHierarchy" ch ON cp."ancestor_id" = ch."comment_id"
-  WHERE NOT c."comment_id" = ANY(ch."path")
-)
-SELECT 
-  "comment_id",
-  "forum_id",
-  "post_id",
-  "publisher_id",
-  "comment_date",
-  "content",
-  "depth"
-FROM "CommentHierarchy";
-`,
+        SELECT 
+          c."comment_id",
+          c."forum_id",
+          c."post_id",
+          c."publisher_id",
+          c."comment_date",
+          c."content",
+          ch."depth" + 1,
+          ch."path" || c."comment_id"
+        FROM "communication"."comments" c
+        INNER JOIN "communication"."comment_path" cp ON c."comment_id" = cp."descendant_id"
+        INNER JOIN "CommentHierarchy" ch ON cp."ancestor_id" = ch."comment_id"
+        WHERE NOT c."comment_id" = ANY(ch."path")
+      )
+      SELECT 
+        "comment_id",
+        "forum_id",
+        "post_id",
+        "publisher_id",
+        "comment_date",
+        "content",
+        "depth"
+      FROM "CommentHierarchy";
+      `,
       {
         replacements: { contentID, contentType },
         type: QueryTypes.SELECT
