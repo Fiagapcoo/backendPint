@@ -185,24 +185,22 @@ const spChangeUserPassword = async (userId, newPassword) => {
       const hashedPassword = await bcrypt.hash(newPassword, salt);
 
       // Update the current password table
-      await db.UserPasswordsDictionary.update({
-          hashed_passwd: hashedPassword,
-          salt: salt,
-          valid_from: new Date(),
-          valid_to: addMonths(new Date(), 6)
-      }, {
-          where: { user_id: userId },
-          transaction
-      });
-
-      // Insert the new password into the dictionary
-      await db.UserPasswordsDictionary.create({
-          user_id: userId,
-          hashed_passwd: hashedPassword,
-          salt: salt,
-          valid_from: new Date(),
-          valid_to: addMonths(new Date(), 6)
-      }, { transaction });
+      await db.sequelize.query(
+        `UPDATE "hr"."users" SET "hashed_password" = :hashedPassword WHERE "user_id" = :userId`,
+        {
+          replacements: { hashedPassword, userId },
+          type: QueryTypes.UPDATE
+        }
+      );
+      // INSERT NEW PASSWD INTO THE DIC
+      await db.sequelize.query(
+        `INSERT INTO "security"."user_passwords_dictionary" ("user_id", "hashed_password", "salt")
+          VALUES (:userId, :hashedPassword, :salt)`,
+          {
+            replacements: { userId, hashedPassword, salt },
+            type: QueryTypes.INSERT
+          }
+        );
 
       // Send email notification
       await sendMail({
