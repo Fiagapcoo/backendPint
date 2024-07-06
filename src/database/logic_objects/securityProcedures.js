@@ -154,57 +154,6 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
 };
 
 
-const spCreateUserPassword = async (email, password) => {
-    const transaction = await db.sequelize.transaction();
-    try {
-      const [user] = await db.sequelize.query(
-        `SELECT "user_id" FROM "hr"."users" WHERE "email" = :email`,
-        {
-          replacements: { email },
-          type: QueryTypes.SELECT,
-          transaction
-        }
-      );
-  
-      if (!user) {
-        throw new Error('User not found');
-      }
-  
-      const userId = user.user_id;
-      const salt = bcrypt.generateSalt();
-      const hashedPassword = bcrypt.hashPassword(password, salt);
-  
-      await db.sequelize.query(
-        `UPDATE "hr"."users" SET "hashed_password" = :hashedPassword WHERE "user_id" = :userId`,
-        {
-          replacements: { hashedPassword, userId },
-          type: QueryTypes.UPDATE,
-          transaction
-        }
-      );
-  
-      await db.sequelize.query(
-        `INSERT INTO "security"."user_passwords_dictionary" ("user_id", "hashed_password", "salt")
-         VALUES (:userId, :hashedPassword, :salt)`,
-        {
-          replacements: { userId, hashedPassword, salt },
-          type: QueryTypes.INSERT,
-          transaction
-        }
-      );
-  
-      await sendMail({
-        to: email,
-        subject: 'SOFTSHARES - Account Creation',
-        body: 'This email serves as a notification for successful account password creation. Your new password will be needed every time you log in and will be valid for the next 6 months. You will receive an email reminder to change your password one week before it expires. According to our company security policies, passwords cannot be reused.'
-      });
-  
-      await transaction.commit();
-    } catch (error) {
-      await transaction.rollback();
-      throw error;
-    }
-};
 
 const spChangeUserPassword = async (userId, email, newPassword) => {
     const transaction = await db.sequelize.transaction();
