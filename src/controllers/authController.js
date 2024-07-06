@@ -2,7 +2,7 @@ const db = require("../models");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const { sendMail } = require("./emailController");
-const { logUserAction} = require('./usersProcedures');
+
 
 const {
   spRegisterNewUser,
