@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
                 await historyModel.create({
                     user_id: userPassword.user_id,
                     hashed_passwd: userPassword.hashed_passwd,
-                    //salt: userPassword.salt,
+                    salt: userPassword.salt,
                     valid_from: userPassword.valid_from,
                     valid_to: new Date()
                 });
@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
                 await historyModel.create({
                     user_id: userPassword.user_id,
                     hashed_passwd: userPassword.hashed_passwd,
-                    //salt: userPassword.salt,
+                    salt: userPassword.salt,
                     valid_from: userPassword.valid_from,
                     valid_to: new Date()
                 });
