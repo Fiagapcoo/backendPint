@@ -57,7 +57,6 @@ const spCreatePassword = async (userId, Password) => {
 
 
 const spAssignUserToCenter = async (userId, centerId, transaction) => {
-    const transaction = await db.sequelize.transaction();
     try {
       const exists = await db.sequelize.query(
         `SELECT 1 FROM "centers"."office_workers" WHERE "user_id" = :userId AND "office_id" = :centerId`,
