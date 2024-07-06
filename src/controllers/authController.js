@@ -187,7 +187,7 @@ controllers.login = async (req, res) => {
         .json({ success: false, message: "Invalid email or password" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.hashed_password);
 
     if (!isMatch) {
       return res
@@ -195,7 +195,7 @@ controllers.login = async (req, res) => {
         .json({ success: false, message: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, {
       expiresIn: "4h",
     });
 
@@ -227,7 +227,7 @@ controllers.login_web = async (req, res) => {
         .json({ success: false, message: "Invalid email or password" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.hashed_password);
 
     if (!isMatch) {
       return res
@@ -235,7 +235,7 @@ controllers.login_web = async (req, res) => {
         .json({ success: false, message: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, {
       expiresIn: "4h",
     });
 

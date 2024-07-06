@@ -5,6 +5,7 @@ const authController = require('../controllers/authController');
 
 router.post('/register', authController.register);
 router.post('/setup-password', validation, authController.setupPassword);
+router.post('/change-password', validation, authController.setupPassword);
 router.post('/login', authController.login);
 router.post('/login_mobile', authController.login_mobile);
 router.post('/token-test', authController.testjwt);
