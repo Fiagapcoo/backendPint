@@ -245,7 +245,7 @@ controllers.login_mobile = async (req, res) => {
         .json({ success: false, message: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
     await updateAccessOnLogin(user.user_id);
