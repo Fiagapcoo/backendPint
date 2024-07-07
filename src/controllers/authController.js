@@ -229,7 +229,7 @@ controllers.login_mobile = async (req, res) => {
   }
 
   try {
-    const user = await db.User.findOne({ where: { email } });
+    const user = await sp_findUserByEmail(email);
 
     if (!user) {
       return res
@@ -237,7 +237,7 @@ controllers.login_mobile = async (req, res) => {
         .json({ success: false, message: "Invalid email or password" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.hashed_password);
 
     if (!isMatch) {
       return res
