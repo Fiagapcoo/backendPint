@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const { sendMail } = require("./emailController");
-const { logUserAction} = require('../database/logic_objects/usersProcedures');
+const { logUserAction, updateAccessOnLogin} = require('../database/logic_objects/usersProcedures');
 
 
 const {
@@ -198,6 +198,7 @@ controllers.login_web = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.hashed_password);
 
     if (!isMatch) {
+      await updateAccessOnLogin(user.user_id);
       return res
         .status(401)
         .json({ success: false, message: "Invalid email or password" });
@@ -248,7 +249,7 @@ controllers.login_mobile = async (req, res) => {
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
-
+    await updateAccessOnLogin(user.user_id);
     res.status(200).json({ token, success: true, message: "Login successful" });
   } catch (error) {
     console.error("Error logging in:", error);
