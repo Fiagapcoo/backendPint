@@ -8,7 +8,7 @@ const db = require('../../models');
 const sp_findUserById = async (userId) => {
   try {
       const [user] = await db.sequelize.query(
-          `SELECT "user_id", "first_name", "last_name", "email" 
+          `SELECT "user_id", "first_name", "last_name", "email", "last_access", "profile_pic"
            FROM "hr"."users" 
            WHERE "user_id" = :userId`,
           {

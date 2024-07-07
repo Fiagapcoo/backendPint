@@ -9,6 +9,8 @@ router.post('/change-password', validation, authController.setupPassword);
 router.post('/login', authController.login_web);
 router.post('/login_mobile', authController.login_mobile);
 router.post('/token-test', authController.testjwt);
-//router.post('/validate-token', authController.validateToken);
+router.post('/validate-token', authController.validateToken);
+router.get('/get-user-by-token', validation, authController.getUserByToken);
+router.put('/update-last-access', validation, authController.updateLastAccess);
 
 module.exports = router;

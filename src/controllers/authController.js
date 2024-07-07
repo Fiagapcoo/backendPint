@@ -104,7 +104,6 @@ controllers.setupPassword = async (req, res) => {
       .json({ success: false, message: "Password is not strong enough" });
   }
   try {
-    console.log("req.user:", req.user.id);
     const userId = req.user.id;
 
 
@@ -271,5 +270,42 @@ controllers.testjwt = async (req, res) => {
   const token = jwt.sign(info, process.env.JWT_SECRET, { expiresIn: "1h" });
   console.log("token:", token);
 };
+
+controllers.validateToken = async (req, res) => {
+  const { token } = req.body;
+
+   try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("decoded:", decoded);
+    res.status(200).json({ success: true, message: "Token is valid" });
+  } catch (error) {
+    console.error("Error validating token:", error);
+    res.status(401).json({ success: false, message: "Invalid token" });
+  }
+}
+
+controllers.getUserByToken = async (req, res) => {
+  const user_id = req.user.id;
+
+  try {
+    const user = await sp_findUserById(user_id);
+    res.status(200).json({ success: true, user });
+    
+  } catch (error) {
+    console.error("Error getting user by token:", error);
+  }
+}
+
+controllers.updateLastAccess = async (req, res) => {
+  const user_id = req.user.id;
+
+  try {
+    const user = await sp_findUserById(user_id);
+    
+  } catch (error) {
+    console.error("Error updating last access:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
 
 module.exports = controllers;

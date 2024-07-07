@@ -288,9 +288,10 @@ controllers.getUsers = async (req, res) => {
 
 controllers.updateUserOffice = async (req, res) => {
     const { user_id, office_id } = req.body;
-    if (!validator.isInt(user_id) || !validator.isInt(office_id)) {
-        return res.status(400).json({ success: false, message: 'Invalid user ID or office ID' });
-    }
+    console.log(req.body)
+    // if (!validator.isInt(user_id) || !validator.isInt(office_id)) {
+    //     return res.status(400).json({ success: false, message: 'Invalid user ID or office ID' });
+    // }
     try {
         const user = await db.Users.findByPk(user_id);
         if (!user) {
@@ -317,7 +318,7 @@ controllers.updateUserOffice = async (req, res) => {
 
 
 controllers.getEventByDate = async (req, res) => {
-    const { date } = req.parms;
+    const { date } = req.params;
     if (!validator.isDate(date)) {
         return res.status(400).json({ success: false, message: 'Invalid date' });
     }
