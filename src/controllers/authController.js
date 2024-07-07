@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const { sendMail } = require("./emailController");
-const { logUserAction, updateAccessOnLogin} = require('../database/logic_objects/usersProcedures');
+const { logUserAction, updateAccessOnLogin, sp_verifyUser} = require('../database/logic_objects/usersProcedures');
 
 
 const {
@@ -205,11 +205,20 @@ controllers.login_web = async (req, res) => {
   try {
     const user = await sp_findUserByEmail(email);
     console.log("user:", user);
-
+ 
     if (!user) {
       return res
         .status(401)
         .json({ success: false, message: "Invalid email or password" });
+    }
+
+    const validation = await sp_verifyUser(user.user_id);
+    console.log("validation:", validation);
+
+    if(validation.account_status == false || validation.account_restriction == true){
+      return res
+        .status(401)
+        .json({ success: false, message: "Account is not active or restricted! Contact your admin!" });
     }
 
     const isMatch = await bcrypt.compare(password, user.hashed_password);
@@ -271,6 +280,15 @@ controllers.login_mobile = async (req, res) => {
       return res
         .status(401)
         .json({ success: false, message: "Invalid email or password" });
+    }
+
+    const validation = await sp_verifyUser(user.user_id);
+    console.log("validation:", validation);
+
+    if(validation.account_status == false || validation.account_restriction == true){
+      return res
+        .status(401)
+        .json({ success: false, message: "Account is not active or restricted! Contact your admin!" });
     }
 
     const isMatch = await bcrypt.compare(password, user.hashed_password);

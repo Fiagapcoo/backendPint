@@ -282,6 +282,25 @@ async function getUserBookmarks(userID) {
       throw error;
     }
 }
+
+async function sp_verifyUser(userID) {
+    try {
+      const result = await db.sequelize.query(
+        `SELECT u."user_id", a."account_status", a."account_restriction"
+        FROM "hr"."users" u
+        JOIN "security"."user_account_details" a ON u."user_id" = a."user_id"
+        WHERE u."user_id" = :userID`,
+        {
+          replacements: { userID },
+          type: QueryTypes.SELECT
+        }
+      );
+      return result[0];
+    } catch (error) {
+      console.error('Error verifying user:', error);
+      throw error;
+    }
+};
   
   module.exports = {
     logUserAction,
@@ -293,4 +312,5 @@ async function getUserBookmarks(userID) {
     addBookmark,   
     removeBookmark, 
     getUserBookmarks,
+    sp_verifyUser
 }
