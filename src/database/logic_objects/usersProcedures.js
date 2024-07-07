@@ -323,6 +323,26 @@ async function sp_updateLastAccess(userID) {
       throw error;
     }
 }
+
+async function updateAccStatus(userID, accountStatus) {
+    try {
+      await db.sequelize.transaction(async (transaction) => {
+        await db.sequelize.query(
+          `UPDATE "security"."user_account_details"
+          SET "account_status" = :accountStatus
+          WHERE "user_id" = :userID`,
+          {
+            replacements: { userID, accountStatus },
+            type: QueryTypes.UPDATE,
+            transaction
+          }
+        );
+      });
+    } catch (error) {
+      console.error('Error updating account status:', error);
+      throw error;
+    }
+};
   
   module.exports = {
     logUserAction,
@@ -335,5 +355,6 @@ async function sp_updateLastAccess(userID) {
     removeBookmark, 
     getUserBookmarks,
     sp_verifyUser,
-    sp_updateLastAccess
+    sp_updateLastAccess,
+    updateAccStatus
 }

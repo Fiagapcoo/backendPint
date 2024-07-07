@@ -5,7 +5,8 @@ const { getUserPreferences,
         addBookmark,   
         removeBookmark, 
         getUserBookmarks,
-        getUserByRole } = require('../database/logic_objects/usersProcedures');
+        getUserByRole,
+        updateAccStatus } = require('../database/logic_objects/usersProcedures');
 
 
 const controllers = {};
@@ -102,5 +103,16 @@ controllers.get_user_bookmarks = async (req, res) => {
         res.status(500).send('Error creating Forum: ' + error.message);
     }
 };
+
+controllers.update_acc_status = async (req, res) => {
+    const {status } = req.body; 
+    const user = req.user.id;
+    try {
+        await updateAccStatus(user, status);
+        res.status(201).send('User updated successfully.');
+    } catch (error) {
+        res.status(500).send('Error creating Forum: ' + error.message);
+    }
+}
 
 module.exports = controllers;
