@@ -170,7 +170,25 @@ controllers.UpdatePassword = async (req, res) => {
   }
 };
 
+//check cookie
+// app.get('/data', cookieParser(),  function(req, res) {
+//   var csrf = req.get('CSRF');
+//   var str = req.cookies['jwt'];
+//   try {
+//     let jwtPayload = jwt.verify(str, KEY);
+//     let csrfPayload = jwt.verify(csrf, KEY);
+//     if(jwtPayload["type"] != 'access')
+//       throw "invalid jwt payload";
+//     if(csrfPayload["type"] != 'csrf')
+//       throw "invalid anti-CSRF token payload"
+//     res.send("Very Secret Data");
+//   } catch(e) {
+//     console.error(e);
+//     res.status(401);
+//     res.send("Bad Token");
+//   }
 
+// });
 
 controllers.login_web = async (req, res) => {
   const { email, password } = req.body;
@@ -203,7 +221,25 @@ controllers.login_web = async (req, res) => {
         .json({ success: false, message: "Invalid email or password" });
     }
     if (user.role_id != 1)
-    {    const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, {
+    {    
+      // jwt with encryption
+      // var payload = {
+      //   username: user.user_id,
+      //   type: 'access'
+      // };
+
+      // var csrfPayload = {
+      //   username: user.user_id,
+      //   type: 'csrf'
+      // };
+
+      // var token = jwt.sign(payload, KEY, {algorithm: 'HS256', expiresIn: "4h"});
+      // var csrf = jwt.sign(csrfPayload, KEY, {algorithm: 'HS256', expiresIn: "4h"});
+      // console.log("Success");
+      // res.cookie('jwt', token, {magAge: 4*60*60*1000, httpOnly: true/*, secure: true */});
+      // res.send(csrf);
+      
+      const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, {
             expiresIn: "4h",
             });
         res.status(200).json({ token, success: true, message: "Login successful" });
