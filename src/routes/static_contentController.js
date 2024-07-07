@@ -8,5 +8,4 @@ router.post('/create-sub-category', validation, static_contentController.create_
 router.get('/get-areas', validation, static_contentController.get_all_areas);
 router.get('/get-sub-areas', validation, static_contentController.get_all_sub_areas);
 
-
 module.exports = router;

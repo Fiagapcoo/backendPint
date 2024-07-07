@@ -38,7 +38,6 @@ const authRoutes = require('./routes/authRoutes');
 
 
 
-
 app.set('port', process.env.PORT || 8000);
 app.use(logger('dev'));
 
