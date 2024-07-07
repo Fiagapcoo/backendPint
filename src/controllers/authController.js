@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const { sendMail } = require("./emailController");
-const { logUserAction, updateAccessOnLogin, sp_verifyUser} = require('../database/logic_objects/usersProcedures');
+const { logUserAction, updateAccessOnLogin, sp_verifyUser, sp_updateLastAccess} = require('../database/logic_objects/usersProcedures');
 
 
 const {
@@ -251,6 +251,8 @@ controllers.login_web = async (req, res) => {
       const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, {
             expiresIn: "4h",
             });
+            
+        await sp_updateLastAccess(user.user_id); //TODO - check this
         res.status(200).json({ token, success: true, message: "Login successful" });
     }
     else res.status(403).json({ success: false, message: "Dont have permission to access! Contact your admin!" });
@@ -302,7 +304,7 @@ controllers.login_mobile = async (req, res) => {
     const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
-    await updateAccessOnLogin(user.user_id);
+    await sp_updateLastAccess(user.user_id); //TODO - check this
     res.status(200).json({ token, success: true, message: "Login successful" });
   } catch (error) {
     console.error("Error logging in:", error);
@@ -354,7 +356,9 @@ controllers.updateLastAccess = async (req, res) => {
   const user_id = req.user.id;
 
   try {
-    const user = await sp_findUserById(user_id);
+    await sp_updateLastAccess(user_id);
+    res.status(200).json({ success: true, message: "Last access updated" });
+
     
   } catch (error) {
     console.error("Error updating last access:", error);

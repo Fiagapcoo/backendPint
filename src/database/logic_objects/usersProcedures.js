@@ -301,6 +301,28 @@ async function sp_verifyUser(userID) {
       throw error;
     }
 };
+
+async function sp_updateLastAccess(userID) {
+    try {
+      await db.sequelize.transaction(async (transaction) => {
+        await db.sequelize.query(
+          `UPDATE "hr"."users"
+          SET "last_access" = CURRENT_TIMESTAMP
+          WHERE "user_id" = :userID`,
+          {
+            replacements: { userID },
+            type: QueryTypes.UPDATE,
+            transaction
+          }
+        );
+      }
+      );
+    }
+    catch (error) {
+      console.error('Error updating last access:', error);
+      throw error;
+    }
+}
   
   module.exports = {
     logUserAction,
@@ -312,5 +334,6 @@ async function sp_verifyUser(userID) {
     addBookmark,   
     removeBookmark, 
     getUserBookmarks,
-    sp_verifyUser
+    sp_verifyUser,
+    sp_updateLastAccess
 }
