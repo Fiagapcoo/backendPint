@@ -28,7 +28,6 @@ const sp_findUserById = async (userId) => {
 const spCreatePassword = async (userId, Password) => {
   const transaction = await db.sequelize.transaction();
   try {
-    const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(Password, 12);
 
 
@@ -48,6 +47,13 @@ const spCreatePassword = async (userId, Password) => {
     //       type: QueryTypes.INSERT
     //     }
     //   );
+
+    await sendMail({
+      to: email,
+      subject: 'SOFTSHARES - Account Status',
+      body: 'Your password has been set successfully! Please await for your account to be activated by an admin! You will receive the update by email! Thank you for your patiente!'
+    });
+
     await transaction.commit();
   }catch (error) {
     await transaction.rollback();
@@ -127,8 +133,8 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
       const userId = result[0].user_id;
   
       await db.sequelize.query(
-        `INSERT INTO "security"."user_account_details" ("user_id")
-         VALUES (:userId)`,
+        `INSERT INTO "security"."user_account_details" ("user_id", "account_status", "account_restriction")
+         VALUES (:userId, false, false)`,
         {
           replacements: { userId },
           type: QueryTypes.INSERT,
@@ -155,7 +161,7 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
 };
 
 
-
+// TODO
 const spChangeUserPassword = async (userId, newPassword) => {
   const transaction = await db.sequelize.transaction();
   try {
@@ -178,11 +184,10 @@ const spChangeUserPassword = async (userId, newPassword) => {
         if (isMatch) {
             throw new Error('The new password must not be the same as any previously used passwords.');
         }
-    }
+      }
 
-      // Generate new salt and hash the new password
-      const salt = await bcrypt.genSalt(12);
-      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      const hashedPassword = await bcrypt.hash(Password, 12);
+
 
       // Update the current password table
       await db.sequelize.query(
@@ -395,20 +400,7 @@ const sp_findUserByEmail = async (email) => {
     }
 };
 
-const sp_insertUserAccDetails = async (userId) => {
-    try {
-        await db.sequelize.query(
-            `INSERT INTO "security"."user_account_details" ("user_id", "account_status", "account_restriction")
-             VALUES (:userId, false, false)`,
-            {
-                replacements: { userId },
-                type: QueryTypes.INSERT
-            }
-        );
-    } catch (error) {
-        throw error;
-    }
-};
+
   
   
 
@@ -426,5 +418,4 @@ module.exports = {
     spCheckPasswordExpiry,
     spSendPasswordExpiryNotification,
     spCreatePassword,
-    sp_insertUserAccDetails
 }

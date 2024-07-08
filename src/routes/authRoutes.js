@@ -11,6 +11,6 @@ router.post('/login_mobile', authController.login_mobile);
 router.post('/token-test', authController.testjwt);
 router.post('/validate-token', authController.validateToken);
 router.get('/get-user-by-token', validation, authController.getUserByToken);
-router.put('/update-last-access', validation, authController.updateLastAccess);
+//router.put('/update-last-access', validation, authController.updateLastAccess);
 
 module.exports = router;

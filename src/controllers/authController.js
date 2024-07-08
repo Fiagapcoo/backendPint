@@ -21,7 +21,7 @@ const {
   spCreatePassword,
   sp_findUserById,
   sp_findUserByEmail,
-  sp_insertUserAccDetails
+  spChangeUserPassword
 } = require("../database/logic_objects/securityProcedures");
 
 const controllers = {};
@@ -77,7 +77,7 @@ controllers.register = async (req, res) => {
       const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
-       await sp_insertUserAccDetails(user[0].user_id);
+       //await sp_insertUserAccDetails(user[0].user_id);
       const random_sub_url = mashupAndRandomize(email, firstName, lastName) 
       const url = `${process.env.CLIENT_URL}/setup-password/${random_sub_url}?token=${token}`;
       console.log("url:", url);
@@ -108,9 +108,7 @@ controllers.register = async (req, res) => {
 controllers.setupPassword = async (req, res) => {
   const {password } = req.body;
 
-//   if (!validator.isJWT(token)) {
-//     return res.status(400).json({ success: false, message: "Invalid token" });
-//   }
+
   if (!validator.isStrongPassword(password)) {
     return res
       .status(400)
@@ -144,12 +142,10 @@ controllers.setupPassword = async (req, res) => {
   }
 };
 
+// TODO to test
 controllers.UpdatePassword = async (req, res) => {
   const {password} = req.body;
 
-//   if (!validator.isJWT(token)) {
-//     return res.status(400).json({ success: false, message: "Invalid token" });
-//   }
   if (!validator.isStrongPassword(password)) {
     return res
       .status(400)
@@ -159,12 +155,7 @@ controllers.UpdatePassword = async (req, res) => {
     console.log("req.user:", req.user.id);
     const userId = req.user.id;
 
-    const salt = bcrypt.genSalt(12);
-
-    const hashedPassword = bcrypt.hash(password, salt);
-
-    // await (userId, hashedPassword, salt);
-    
+    await spChangeUserPassword(userId, password);;
 
     const user = await sp_findUserById(userId);
     console.log("user:", user);
@@ -330,18 +321,6 @@ controllers.getUserByToken = async (req, res) => {
   }
 }
 
-controllers.updateLastAccess = async (req, res) => {
-  const user_id = req.user.id;
 
-  try {
-    await sp_updateLastAccess(user_id);
-    res.status(200).json({ success: true, message: "Last access updated" });
-
-    
-  } catch (error) {
-    console.error("Error updating last access:", error);
-    res.status(500).json({ success: false, message: "Internal server error" });
-  }
-}
 
 module.exports = controllers;
