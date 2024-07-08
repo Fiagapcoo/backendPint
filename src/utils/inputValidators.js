@@ -28,6 +28,7 @@ const validateInput_register =(email, firstName, lastName) => {
   ) {
     return {valid: false, message: "Invalid last name" };
   }
+  return { valid: true };
 }
 
   module.exports = {

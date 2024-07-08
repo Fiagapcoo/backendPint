@@ -42,7 +42,7 @@ function mashupAndRandomize(email, firstName, lastName) {
     }
     return array;
   }
-
+  
   const shuffledArray = shuffleArray(charArray);
   return shuffledArray.join("");
 }
@@ -72,7 +72,8 @@ controllers.register = async (req, res) => {
         expiresIn: "1h",
       });
        //await sp_insertUserAccDetails(user[0].user_id);
-      const random_sub_url = mashupAndRandomize(email, firstName, lastName) 
+      const random_sub_url = mashupAndRandomize(email, firstName, lastName);
+      
       const url = `${process.env.CLIENT_URL}/setup-password/${random_sub_url}?token=${token}`;
       console.log("url:", url);
       console.log("user:", user);
@@ -113,10 +114,10 @@ controllers.register_admin = async (req, res) => {
 
     console.log("user:", user);
 
-    // Assegure que 'user' seja um objeto simples
+    // makes sure user is a simple object
     if (Array.isArray(user) && user.length > 0) {
       const userPayload = {
-        id: user[0].user_id, // Acesse o primeiro elemento do array
+        id: user[0].user_id, // access 1st elemnt of arrat
       };
       console.log("userPayload:", userPayload);
 
