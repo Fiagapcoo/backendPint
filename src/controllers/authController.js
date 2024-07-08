@@ -10,7 +10,7 @@ const { generateToken,
 } = require("../utils/tokenUtils");
 
 const { validateInput_Login, 
-        validateInput_Register,
+        validateInput_register,
 
 } = require("../utils/inputValidators");
 
