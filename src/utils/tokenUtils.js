@@ -7,37 +7,38 @@ const algorithm = "aes-256-cbc";
 const key = Buffer.from(process.env.ENCRYPTION_KEY, "base64");
 // const iv = Buffer.from(process.env.ENCRYPTION_IV, "base64");
 //const key = crypto.randomBytes(32); // 256-bit key
-const iv = crypto.randomBytes(16);  // 128-bit IV
+const iv = crypto.randomBytes(16); // 128-bit IV
 
 const encrypt = (text) => {
-    const cipher = crypto.createCipheriv(algorithm, key, iv);
-    let encrypted = cipher.update(text);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    console.log('Encrypting:');
-    console.log('IV:', iv.toString("hex"));
-    console.log('Encrypted Data:', encrypted.toString("hex"));
-    return { iv: iv.toString("hex"), encryptedData: encrypted.toString("hex") };
-  };
-  const decrypt = (text) => {
-    console.log('Decrypting:', text);
-    try {
-      if (!text || !text.iv || !text.encryptedData) {
-        throw new Error('Invalid input for decryption');
-      }
-      let iv = Buffer.from(text.iv, "hex");
-      let encryptedText = Buffer.from(text.encryptedData, "hex");
-      let decipher = crypto.createDecipheriv(algorithm, key, iv);
-      let decrypted = decipher.update(encryptedText);
-      decrypted = Buffer.concat([decrypted, decipher.final()]);
-      console.log('After decrypting: ' + decrypted);
-      return decrypted.toString();
-    } catch (e) {
-      console.error('Decryption error:', e);
-      return null;
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+  let encrypted = cipher.update(text);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  console.log("Encrypting:");
+  console.log("IV:", iv.toString("hex"));
+  console.log("Encrypted Data:", encrypted.toString("hex"));
+  return { iv: iv.toString("hex"), encryptedData: encrypted.toString("hex") };
+};
+const decrypt = (text) => {
+  console.log("Decrypting:", text);
+  try {
+    if (!text || !text.iv || !text.encryptedData) {
+      throw new Error("Invalid input for decryption");
     }
-  };
+    let iv = Buffer.from(text.iv, "hex");
+    let encryptedText = Buffer.from(text.encryptedData, "hex");
+    let decipher = crypto.createDecipheriv(algorithm, key, iv);
+    let decrypted = decipher.update(encryptedText);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    console.log("After decrypting: " + decrypted);
+    return decrypted.toString();
+  } catch (e) {
+    console.error("Decryption error:", e);
+    return null;
+  }
+};
 const generateToken = (id, expiresIn) => {
-  const token = jwt.sign({ id }, process.env.JWT_SECRET, {expiresIn},);
+  const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn });
+  console.log(token);
   return encrypt(token);
 };
 
@@ -49,15 +50,15 @@ const generateRefreshToken = (id) => {
 };
 
 const verifyToken = (encryptedToken) => {
-    try {
-      console.log('Verifying Token:', encryptedToken);
-      const decryptedToken = decrypt(encryptedToken);
-      return jwt.verify(decryptedToken, process.env.JWT_SECRET);
-    } catch (error) {
-      console.error('Verification error:', error);
-      return null;
-    }
-  };
+  try {
+    console.log("Verifying Token:", encryptedToken);
+    const decryptedToken = decrypt(encryptedToken);
+    return jwt.verify(decryptedToken, process.env.JWT_SECRET);
+  } catch (error) {
+    console.error("Verification error:", error);
+    return null;
+  }
+};
 
 const verifyRefreshToken = (token) => {
   try {
