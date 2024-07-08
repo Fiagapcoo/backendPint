@@ -38,7 +38,7 @@ const decrypt = (text) => {
 };
 const generateToken = (id, expiresIn) => {
   const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn });
-  console.log(token);
+  console.log('token gerado: ' + token);
   return encrypt(token);
 };
 
