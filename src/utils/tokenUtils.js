@@ -10,14 +10,25 @@ const key = Buffer.from(process.env.ENCRYPTION_KEY, "base64");
 const iv = crypto.randomBytes(16); // 128-bit IV
 
 const encrypt = (text) => {
-  const cipher = crypto.createCipheriv(algorithm, key, iv);
-  let encrypted = cipher.update(text);
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-  console.log("Encrypting:");
-  console.log("IV:", iv.toString("hex"));
-  console.log("Encrypted Data:", encrypted.toString("hex"));
-  return { iv: iv.toString("hex"), encryptedData: encrypted.toString("hex") };
-};
+    const cipher = crypto.createCipheriv(algorithm, key, iv);
+    let encrypted = cipher.update(text, 'utf8', 'base64');
+    encrypted += cipher.final('base64');
+  
+    console.log("Encrypting:");
+    console.log("IV:", iv.toString("hex"));
+    console.log("Encrypted Data:", encrypted);
+  
+    return { iv: iv.toString("hex"), encryptedData: encrypted };
+  };
+// const encrypt = (text) => {
+//     const cipher = crypto.createCipheriv(algorithm, key, iv);
+//     let encrypted = cipher.update(text);
+//     encrypted = Buffer.concat([encrypted, cipher.final()]);
+//     console.log("Encrypting:");
+//     console.log("IV:", iv.toString("hex"));
+//     console.log("Encrypted Data:", encrypted.toString("hex"));
+//     return { iv: iv.toString("hex"), encryptedData: encrypted.toString("hex") };
+//   };
 const decrypt = (text) => {
   console.log("Decrypting:", text);
   try {
