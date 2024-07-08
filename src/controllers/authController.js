@@ -4,6 +4,7 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const { sendMail } = require("./emailController");
 
+
 const { generateToken, 
         generateRefreshToken, 
         verifyRefreshToken 
@@ -265,7 +266,8 @@ const authenticateUser = async (email, password) => {
 
 const handleResponseBasedOnRole = async (user, res) => {
   if (user.role_id != 1) {
-    const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, { expiresIn: "4h" });
+    //const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, { expiresIn: "4h" });
+    const token = generateToken(user.user_id, "4h" );
     await sp_updateLastAccess(user.user_id);
     res.status(200).json({ token, success: true, message: "Login successful" });
   } else {
