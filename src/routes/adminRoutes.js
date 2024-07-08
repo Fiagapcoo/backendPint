@@ -14,6 +14,6 @@ router.get('/active-warnings', validation, controller.getActiveWarnings);
 router.get('/content-center-to-be-validated/:center_id', validation, controller.getContentCenterToBeValidated);
 router.post('/create-center', validation, controller.createCenter);
 router.delete('/delete-center/:center_id', validation, controller.deleteCenter);
-router.get('/get-all-centers', validation, validation, controller.getCenters);
+router.get('/get-all-centers', controller.getCenters);
 
 module.exports = router;

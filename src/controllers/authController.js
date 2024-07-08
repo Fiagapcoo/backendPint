@@ -10,7 +10,8 @@ const {
   spRegisterNewUser,
   spCreatePassword,
   sp_findUserById,
-  sp_findUserByEmail
+  sp_findUserByEmail,
+  sp_insertUserAccDetails
 } = require("../database/logic_objects/securityProcedures");
 
 const controllers = {};
@@ -33,6 +34,7 @@ function mashupAndRandomize(email, firstName, lastName) {
 
 controllers.register = async (req, res) => {
   const { email, firstName, lastName, centerId } = req.body;
+  console.log("req.body:", req.body);
 
   if (!validator.isEmail(email)) {
     return res.status(400).json({ message: "Invalid email" });
@@ -65,6 +67,7 @@ controllers.register = async (req, res) => {
       const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
+       await sp_insertUserAccDetails(user[0].user_id);
       const random_sub_url = mashupAndRandomize(email, firstName, lastName) 
       const url = `${process.env.CLIENT_URL}/setup-password/${random_sub_url}?token=${token}`;
       console.log("url:", url);

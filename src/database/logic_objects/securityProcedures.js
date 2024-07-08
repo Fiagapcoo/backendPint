@@ -8,9 +8,10 @@ const db = require('../../models');
 const sp_findUserById = async (userId) => {
   try {
       const [user] = await db.sequelize.query(
-          `SELECT "user_id", "first_name", "last_name", "email", "last_access", "profile_pic"
-           FROM "hr"."users" 
-           WHERE "user_id" = :userId`,
+          `SELECT hr."user_id", hr."first_name", hr."last_name", hr."email", hr."last_access", hr."profile_pic", oa."office_id"
+           FROM "hr"."users" hr
+           LEFT JOIN "centers"."office_admins" oa ON hr."user_id" = oa."manager_id"
+           WHERE hr."user_id" = :userId`,
           {
               replacements: { userId },
               type: QueryTypes.SELECT
@@ -22,6 +23,7 @@ const sp_findUserById = async (userId) => {
       throw error;
   }
 };
+
 
 const spCreatePassword = async (userId, Password) => {
   const transaction = await db.sequelize.transaction();
@@ -393,7 +395,20 @@ const sp_findUserByEmail = async (email) => {
     }
 };
 
-  
+const sp_insertUserAccDetails = async (userId) => {
+    try {
+        await db.sequelize.query(
+            `INSERT INTO "security"."user_account_details" ("user_id", "account_status", "account_restriction")
+             VALUES (:userId, false, false)`,
+            {
+                replacements: { userId },
+                type: QueryTypes.INSERT
+            }
+        );
+    } catch (error) {
+        throw error;
+    }
+};
   
   
 
@@ -410,5 +425,6 @@ module.exports = {
     spSetCenterAdmin,
     spCheckPasswordExpiry,
     spSendPasswordExpiryNotification,
-    spCreatePassword
+    spCreatePassword,
+    sp_insertUserAccDetails
 }
