@@ -36,17 +36,37 @@ const decrypt = (text) => {
       throw new Error("Invalid input for decryption");
     }
     let iv = Buffer.from(text.iv, "hex");
-    let encryptedText = Buffer.from(text.encryptedData, "hex");
+    let encryptedText = Buffer.from(text.encryptedData, "base64");
     let decipher = crypto.createDecipheriv(algorithm, key, iv);
-    let decrypted = decipher.update(encryptedText);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    let decrypted = decipher.update(encryptedText, 'base64', 'utf8');
+    decrypted += decipher.final('utf8');
     console.log("After decrypting: " + decrypted);
-    return decrypted.toString();
+    return decrypted;
   } catch (e) {
     console.error("Decryption error:", e);
     return null;
   }
 };
+// const decrypt = (text) => {
+//     console.log("Decrypting:", text);
+//     try {
+//       if (!text || !text.iv || !text.encryptedData) {
+//         throw new Error("Invalid input for decryption");
+//       }
+//       let iv = Buffer.from(text.iv, "hex");
+//       let encryptedText = Buffer.from(text.encryptedData, "hex");
+//       let decipher = crypto.createDecipheriv(algorithm, key, iv);
+//       let decrypted = decipher.update(encryptedText);
+//       decrypted = Buffer.concat([decrypted, decipher.final()]);
+//       console.log("After decrypting: " + decrypted);
+//       return decrypted.toString();
+//     } catch (e) {
+//       console.error("Decryption error:", e);
+//       return null;
+//     }
+//   };
+
+
 const generateToken = (id, expiresIn) => {
   const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn });
   console.log('token gerado: ' + token);
