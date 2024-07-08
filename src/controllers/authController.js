@@ -9,6 +9,11 @@ const { generateToken,
         verifyRefreshToken 
 } = require("../utils/tokenUtils");
 
+const { validateInput_Login, 
+        validateInput_Register,
+
+} = require("../utils/inputValidators");
+
 const { logUserAction, 
         updateAccessOnLogin, 
         sp_verifyUser, 
@@ -46,20 +51,61 @@ controllers.register = async (req, res) => {
   const { email, firstName, lastName, centerId } = req.body;
   console.log("req.body:", req.body);
 
-  if (!validator.isEmail(email)) {
-    return res.status(400).json({ message: "Invalid email" });
+  const validationResult = validateInput_register(email, firstName, lastName);
+  if (!validationResult.valid) {
+    return res.status(400).json({ success: false, message: validationResult.message });
   }
-  if (
-    validator.isEmpty(firstName) ||
-    !validator.isAlpha(firstName, "en-US", { ignore: " " })
-  ) {
-    return res.status(400).json({ message: "Invalid first name" });
+
+  try {
+    const user = await spRegisterNewUser(firstName, lastName, email, centerId);
+
+    console.log("user:", user);
+
+    // Assegure que 'user' seja um objeto simples
+    if (Array.isArray(user) && user.length > 0) {
+      const userPayload = {
+        id: user[0].user_id, // Acesse o primeiro elemento do array
+      };
+      console.log("userPayload:", userPayload);
+
+      const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+       //await sp_insertUserAccDetails(user[0].user_id);
+      const random_sub_url = mashupAndRandomize(email, firstName, lastName) 
+      const url = `${process.env.CLIENT_URL}/setup-password/${random_sub_url}?token=${token}`;
+      console.log("url:", url);
+      console.log("user:", user);
+
+      await sendMail({
+        to: email,
+        subject: "Set up your new password",
+        body: `Link: ${url}`,
+      });
+
+      res
+        .status(201)
+        .json({
+          success: true,
+          message:
+            "User registered successfully. Please check your email to set up your password.",
+        });
+    }
+  } catch (error) {
+    console.error("CONSOLE LOG REGISTER:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Internal server error: " + error });
   }
-  if (
-    validator.isEmpty(lastName) ||
-    !validator.isAlpha(lastName, "en-US", { ignore: " " })
-  ) {
-    return res.status(400).json({ message: "Invalid last name" });
+};
+
+controllers.register_admin = async (req, res) => {
+  const { email, firstName, lastName, centerId, password } = req.body;
+  console.log("req.body:", req.body);
+
+  const validationResult = validateInput_register(email, firstName, lastName);
+  if (!validationResult.valid) {
+    return res.status(400).json({ success: false, message: validationResult.message });
   }
 
   try {
@@ -194,15 +240,7 @@ controllers.UpdatePassword = async (req, res) => {
 
 // });
 
-const validateInput = (email, password) => {
-  if (!validator.isEmail(email)) {
-    return { valid: false, message: "Invalid email" };
-  }
-  if (validator.isEmpty(password)) {
-    return { valid: false, message: "Password cannot be empty" };
-  }
-  return { valid: true };
-};
+
 
 const authenticateUser = async (email, password) => {
   const user = await sp_findUserByEmail(email);
@@ -237,7 +275,7 @@ const handleResponseBasedOnRole = async (user, res) => {
 controllers.login_web = async (req, res) => {
   const { email, password } = req.body;
 
-  const validationResult = validateInput(email, password);
+  const validationResult = validateInput_Login(email, password);
 
   if (!validationResult.valid) {
     return res.status(400).json({ success: false, message: validationResult.message });
@@ -259,7 +297,7 @@ controllers.login_web = async (req, res) => {
 
 controllers.login_mobile = async (req, res) => {
   const { email, password } = req.body;
-  const validationResult = validateInput(email, password);
+  const validationResult = validateInput_Login(email, password);
 
   if (!validationResult.valid) {
     return res.status(400).json({ success: false, message: validationResult.message });
@@ -320,6 +358,9 @@ controllers.getUserByToken = async (req, res) => {
     console.error("Error getting user by token:", error);
   }
 }
+
+
+
 
 
 
