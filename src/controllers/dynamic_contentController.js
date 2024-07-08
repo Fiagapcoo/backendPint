@@ -91,7 +91,7 @@ controllers.getPostById = async (req, res) => {
                 { model: db.Users, as: 'Publisher' },
                 { model: db.Users, as: 'Admin' },
                 { model: db.SubArea },
-                { model: db.OfficeAdmins, as: 'Office' },
+                { model: db.OfficeAdmins, as: 'Office_admin' },
                 { model: db.Scores, as: 'Score', attributes: ['score', 'num_of_evals'] }
             ]
         });
@@ -157,7 +157,7 @@ controllers.getEventById = async (req, res) => {
         const event = await db.Events.findByPk(event_id, {
             include: [
                 { model: db.Users, as: 'Publisher' },
-                { model: db.OfficeAdmins, as: 'Office' },
+                { model: db.OfficeAdmins, as: 'Office_admin' },
                 { model: db.Users, as: 'Admin' },
                 { model: db.Scores, as: 'Score', attributes: ['score', 'num_of_evals'] }
             ]
