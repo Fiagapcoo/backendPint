@@ -352,7 +352,7 @@ controllers.validateToken = async (req, res) => {
 
 controllers.getUserByToken = async (req, res) => {
   const user_id = req.user.id;
-
+  
   try {
     const user = await sp_findUserById(user_id);
     res.status(200).json({ success: true, user });
