@@ -4,9 +4,9 @@ const crypto = require("crypto");
 
 //for mobile
 const algorithm = "aes-256-cbc";
-// const key = Buffer.from(process.env.ENCRYPTION_KEY, "base64");
+const key = Buffer.from(process.env.ENCRYPTION_KEY, "base64");
 // const iv = Buffer.from(process.env.ENCRYPTION_IV, "base64");
-const key = crypto.randomBytes(32); // 256-bit key
+//const key = crypto.randomBytes(32); // 256-bit key
 const iv = crypto.randomBytes(16);  // 128-bit IV
 
 const encrypt = (text) => {
