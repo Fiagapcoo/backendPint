@@ -8,7 +8,7 @@ controllers.validation = async (req, res, next) => {
   // console.log('req.body:', JSON.stringify(req.body, null, 2));
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1]; // Bearer <token>
-  console.log('aaaaaaaaaaaa' + token);
+  
   if (!token) {
     return res.status(401).json({ message: "Not authorized, no token" });
   }
