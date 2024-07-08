@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const dynamicController = require('../controllers/dynamic_contentController');
-const {validation} = require('../controllers/middlewareController');
+const {validation} = require('../controllers/jwt_middlewareController');
 const { route } = require('./uploadRoute');
 
 router.get('/posts-by-city/:city_id', validation, dynamicController.getPostsByCity);

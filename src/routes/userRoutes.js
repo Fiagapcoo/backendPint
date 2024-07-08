@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/usersController.js');
-const {validation} = require('../controllers/middlewareController');
+const {validation} = require('../controllers/jwt_middlewareController.js');
 
 router.post('/add-bookmark/:userID/:contentType/:contentID', validation, controller.add_bookmark);
 router.get('/get-bookmarks/:userID', validation, controller.get_user_bookmarks);

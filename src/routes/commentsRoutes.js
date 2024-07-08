@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {validation} = require('../controllers/middlewareController');
+const {validation} = require('../controllers/jwt_middlewareController.js');
 const controller = require('../controllers/commentsController.js');
 
 router.post('/add-comment', validation, controller.add_comment);

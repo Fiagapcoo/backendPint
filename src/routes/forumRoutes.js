@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {validation} = require('../controllers/middlewareController');
+const {validation} = require('../controllers/jwt_middlewareController.js');
 const controller = require('../controllers/ForumController.js');
 
 router.post('/create', validation, controller.create_forum);

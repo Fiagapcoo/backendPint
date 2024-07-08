@@ -1,5 +1,5 @@
 const express = require('express');
-const {validation} = require("../controllers/middlewareController");
+const {validation} = require("../controllers/jwt_middlewareController");
 const router = express.Router();
 const authController = require('../controllers/authController');
 

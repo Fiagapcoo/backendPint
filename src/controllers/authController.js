@@ -3,7 +3,17 @@ const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const { sendMail } = require("./emailController");
-const { logUserAction, updateAccessOnLogin, sp_verifyUser, sp_updateLastAccess} = require('../database/logic_objects/usersProcedures');
+
+const { generateToken, 
+        generateRefreshToken, 
+        verifyRefreshToken 
+} = require("../utils/tokenUtils");
+
+const { logUserAction, 
+        updateAccessOnLogin, 
+        sp_verifyUser, 
+        sp_updateLastAccess
+} = require('../database/logic_objects/usersProcedures');
 
 
 const {
@@ -193,73 +203,63 @@ controllers.UpdatePassword = async (req, res) => {
 
 // });
 
+const validateInput = (email, password) => {
+  if (!validator.isEmail(email)) {
+    return { valid: false, message: "Invalid email" };
+  }
+  if (validator.isEmpty(password)) {
+    return { valid: false, message: "Password cannot be empty" };
+  }
+  return { valid: true };
+};
+
+const authenticateUser = async (email, password) => {
+  const user = await sp_findUserByEmail(email);
+  if (!user) {
+    return { authenticated: false, message: "Invalid email or password" };
+  }
+
+  const validation = await sp_verifyUser(user.user_id);
+  if (validation.account_status == false || validation.account_restriction == true) {
+    return { authenticated: false, message: "Account is not active or restricted! Contact your admin!" };
+  }
+
+  const isMatch = await bcrypt.compare(password, user.hashed_password);
+  if (!isMatch) {
+    await updateAccessOnLogin(user.user_id);
+    return { authenticated: false, message: "Invalid email or password" };
+  }
+
+  return { authenticated: true, user };
+};
+
+const handleResponseBasedOnRole = async (user, res) => {
+  if (user.role_id != 1) {
+    const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, { expiresIn: "4h" });
+    await sp_updateLastAccess(user.user_id);
+    res.status(200).json({ token, success: true, message: "Login successful" });
+  } else {
+    res.status(403).json({ success: false, message: "Don't have permission to access! Contact your admin!" });
+  }
+};
+
 controllers.login_web = async (req, res) => {
   const { email, password } = req.body;
 
-  if (!validator.isEmail(email)) {
-    return res.status(400).json({ success: false, message: "Invalid email" });
-  }
-  if (validator.isEmpty(password)) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Password cannot be empty" });
+  const validationResult = validateInput(email, password);
+
+  if (!validationResult.valid) {
+    return res.status(400).json({ success: false, message: validationResult.message });
   }
 
   try {
-    const user = await sp_findUserByEmail(email);
-    console.log("user:", user);
- 
-    if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid email or password" });
+    const authResult = await authenticateUser(email, password);
+
+    if (!authResult.authenticated) {
+      return res.status(401).json({ success: false, message: authResult.message });
     }
 
-    const validation = await sp_verifyUser(user.user_id);
-    console.log("validation:", validation);
-
-    if(validation.account_status == false || validation.account_restriction == true){
-      return res
-        .status(401)
-        .json({ success: false, message: "Account is not active or restricted! Contact your admin!" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.hashed_password);
-
-    if (!isMatch) {
-      await updateAccessOnLogin(user.user_id);
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid email or password" });
-    }
-    if (user.role_id != 1)
-    {    
-      // jwt with encryption
-      // var payload = {
-      //   username: user.user_id,
-      //   type: 'access'
-      // };
-
-      // var csrfPayload = {
-      //   username: user.user_id,
-      //   type: 'csrf'
-      // };
-
-      // var token = jwt.sign(payload, KEY, {algorithm: 'HS256', expiresIn: "4h"});
-      // var csrf = jwt.sign(csrfPayload, KEY, {algorithm: 'HS256', expiresIn: "4h"});
-      // console.log("Success");
-      // res.cookie('jwt', token, {magAge: 4*60*60*1000, httpOnly: true/*, secure: true */});
-      // res.send(csrf);
-      
-      const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, {
-            expiresIn: "4h",
-            });
-            
-        await sp_updateLastAccess(user.user_id); //TODO - check this
-        res.status(200).json({ token, success: true, message: "Login successful" });
-    }
-    else res.status(403).json({ success: false, message: "Dont have permission to access! Contact your admin!" });
-    
+    await handleResponseBasedOnRole(authResult.user, res);
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -268,46 +268,21 @@ controllers.login_web = async (req, res) => {
 
 controllers.login_mobile = async (req, res) => {
   const { email, password } = req.body;
+  const validationResult = validateInput(email, password);
 
-  if (!validator.isEmail(email)) {
-    return res.status(400).json({ success: false, message: "Invalid email" });
-  }
-  if (validator.isEmpty(password)) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Password cannot be empty" });
+  if (!validationResult.valid) {
+    return res.status(400).json({ success: false, message: validationResult.message });
   }
 
   try {
-    const user = await sp_findUserByEmail(email);
+    const authResult = await authenticateUser(email, password);
 
-    if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid email or password" });
+    if (!authResult.authenticated) {
+      return res.status(401).json({ success: false, message: authResult.message });
     }
 
-    const validation = await sp_verifyUser(user.user_id);
-    console.log("validation:", validation);
-
-    if(validation.account_status == false || validation.account_restriction == true){
-      return res
-        .status(401)
-        .json({ success: false, message: "Account is not active or restricted! Contact your admin!" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.hashed_password);
-
-    if (!isMatch) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid email or password" });
-    }
-
-    const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-    await sp_updateLastAccess(user.user_id); //TODO - check this
+    const token = generateToken(authResult.user.user_id, "7d");
+    await sp_updateLastAccess(authResult.user.user_id); //TODO check this
     res.status(200).json({ token, success: true, message: "Login successful" });
   } catch (error) {
     console.error("Error logging in:", error);

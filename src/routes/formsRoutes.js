@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/formsController.js');
-const {validation} = require('../controllers/middlewareController');
+const {validation} = require('../controllers/jwt_middlewareController.js');
 
 router.post('/create-form', controller.create_event_form);
 router.post('/add-fields-to-form/event/:eventID/fields/:customFieldsJson', validation, controller.add_fields_event_form);
