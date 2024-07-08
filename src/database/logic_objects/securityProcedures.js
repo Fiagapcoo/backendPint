@@ -39,6 +39,8 @@ const spCreatePassword = async (userId, Password) => {
       }
     );
 
+    const user = await sp_findUserById(userId);
+
     // await db.sequelize.query(
     //   `INSERT INTO "security"."user_passwords_dictionary" ("user_id", "hashed_passwd", "salt")
     //     VALUES (:userId, :hashedPassword, :salt)`,
@@ -49,7 +51,7 @@ const spCreatePassword = async (userId, Password) => {
     //   );
 
     await sendMail({
-      to: email,
+      to: user.email,
       subject: 'SOFTSHARES - Account Status',
       body: 'Your password has been set successfully! Please await for your account to be activated by an admin! You will receive the update by email! Thank you for your patiente!'
     });
