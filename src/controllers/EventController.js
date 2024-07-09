@@ -1,3 +1,4 @@
+
 const { spCreateEvent, 
     spEventParticipationCleanup,
     spRegisterUserForEvent,
@@ -5,11 +6,13 @@ const { spCreateEvent,
     fnGetEventState,
     spEditEvent,
     spGetEvent } = require('../database/logic_objects/eventProcedures');
-
+const validator = require("validator");
 const controllers = {};
 
 controllers.create_event = async (req, res) => {
     const { officeId, subAreaId, name, description, eventDate, recurring=false, recurring_pattern='{"key": ""}', max_participants=null, location, publisher_id, filePath } = req.body; 
+    console.log(publisher_id.toString());
+    console.log('no tosrtring: ' + publisher_id.toString());
     
     if (!validator.isInt(publisher_id.toString())) {
         return res.status(400).json({ success: false, message: 'Invalid admin ID' });

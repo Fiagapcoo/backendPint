@@ -8,6 +8,7 @@ router.get('/posts-by-city/:city_id', validation, dynamicController.getPostsByCi
 router.get('/forums-by-city/:city_id', validation, dynamicController.getForumsByCity);
 router.get('/events-by-city/:city_id', validation, dynamicController.getEventsByCity);
 router.get('/all-content', validation, dynamicController.getAllContent);
+router.get('/all-content-per/:city_id', validation, dynamicController.getAllContentByCity);
 router.get('/get-post/:post_id', validation, dynamicController.getPostById);
 router.get('/get-event/:event_id', validation, dynamicController.getEventById);
 router.get('/get-event-by-date/:date', validation, dynamicController.getEventByDate);
