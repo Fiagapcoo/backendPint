@@ -1,5 +1,6 @@
 const { spCreateCategory,spCreateSubArea } = require('../database/logic_objects/categoryProcedures');
 const db = require('../models');
+const { QueryTypes } = require("sequelize");
 const controllers = {};
 
 controllers.create_category = async (req, res) => {
@@ -25,18 +26,30 @@ controllers.create_sub_category = async (req, res) => {
 
 controllers.get_all_areas = async (req, res) => {
     try {
-        const areas = await db.Area.findAll({ order: [['area_id']] });
+        const areas = await db.sequelize.query(
+            `SELECT * FROM "static_content"."area"`,
+            { 
+                type: QueryTypes.SELECT 
+            }
+    );
         res.status(200).json({success:true, data: areas });
     } catch (error) {
+        console.log('WTF IS WRONG: ' + error);
         res.status(500).json({success:false, message:'Error retrieving content: ' + error.message});
     }
 };
 
 controllers.get_all_sub_areas = async (req, res) => {
     try {
-        const sub_areas = await db.SubArea.findAll({ order: [['sub_area_id']] });
+        const sub_areas = await db.sequelize.query(
+            `SELECT * FROM "static_content"."sub_area"`,
+            { 
+                type: QueryTypes.SELECT 
+            }
+    );
         res.status(200).json({success:true, data: sub_areas });
     } catch (error) {
+        console.log('WTF IS WRONG V2: ' + error);
         res.status(500).json({success:true, message:'Error retrieving content: ' + error.message});
     }
 };
