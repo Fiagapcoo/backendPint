@@ -248,7 +248,7 @@ async function bulkInsert() {
         VALUES
         (1, 2, 1001, 'Volunteering', 'Viseu hospital will be hosting an auction to gain funding for children in need', '40.65056885039045 -7.905631258488603','2023-11-15', false,CURRENT_TIMESTAMP),
         (2, 2, 2001, 'Marathon', 'Next Friday Alves Martins school will host a marathon in support of cancer', '40.65434224001848 -7.916687987324942','2023-12-01', false,CURRENT_TIMESTAMP),
-        (3, 3, 3002, 'Football tournament', 'Every Sunday we will be playing football until the end of the tournament', ,'2023-12-10', false,CURRENT_TIMESTAMP),
+        (3, 3, 3002, 'Football tournament', 'Every Sunday we will be playing football until the end of the tournament', '40.146181639547116 -7.483017349363566','2023-12-10', false,CURRENT_TIMESTAMP),
         (4, 2, 4003, 'Rafael Mariano Live', 'Rafael Mariano will be hosting a live show in Old School Bar','40.11331582264235 -7.600471037595766' ,'2023-12-31', false,CURRENT_TIMESTAMP),
         (5, 5, 6002, 'The Lord Of the Rings live', 'Nosso Shopping will be playing the OST of The Lord of the Rings with the movie', '41.29696712221882 -7.734768146829981','2024-01-05', false,CURRENT_TIMESTAMP),
         (6, 1, 4001, 'Company dinner', 'We are celebrating a closed deal and will be having dinner at Canoa Wine Bar', '39.6048610997216 -8.414854011912372','2024-01-15', false,CURRENT_TIMESTAMP),
