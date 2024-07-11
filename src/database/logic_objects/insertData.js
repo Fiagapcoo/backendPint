@@ -230,7 +230,7 @@ async function bulkInsert() {
         VALUES
         (1001, 2, 2, 'CUF', 'This is a description', '40.64538746001789 -7.911339742327035' ,CURRENT_TIMESTAMP),
         (2002, 2, 3, 'ESTGV', 'I have finally finished my degree!!','40.64428390013725 -7.920937078897956',CURRENT_TIMESTAMP),
-        (3001, 3, 4, 'Crossfit in Fundão', 'Link to gym: ','40.19671415803123 -7.486179137001208,CURRENT_TIMESTAMP),
+        (3001, 3, 4, 'Crossfit in Fundão', 'Link to gym: ','40.19671415803123 -7.486179137001208',CURRENT_TIMESTAMP),
         (5001, 4, 6, 'One Bedroom', 'One bedroom apartment in the center of the city for rent','39.606339401281865 -8.420089558257569',CURRENT_TIMESTAMP),
         (6001, 2, 7, 'Cinemas', 'Forum Viseu is going to display Star Wars the original trilogy','40.6619963279803 -7.914111529651657',CURRENT_TIMESTAMP),
         (7001, 2, 8, 'Flixbus Strike', 'On the 9th of August, flixbus will be on strike','40.661834384758485 -7.915667269409799',CURRENT_TIMESTAMP),
