@@ -45,10 +45,6 @@ const createTriggerFunction_trg_moderate_post_content_after_insert = async () =>
                                               error_state = PG_EXCEPTION_DETAIL;
                       RAISE NOTICE 'Error: %', error_message;
 
-                      -- Correct the conditional check from TG_OP to TG_OP()
-                      IF TG_OP() = 'INSERT' THEN
-                          DELETE FROM dynamic_content.posts WHERE post_id = post_record.post_id;
-                      END IF;
                       RETURN NULL;
               END;
           END LOOP;
