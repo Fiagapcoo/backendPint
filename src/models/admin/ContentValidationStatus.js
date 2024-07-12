@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
     const ContentValidationStatus = sequelize.define('ContentValidationStatus', {
-        content_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+        content_id: { type: DataTypes.INTEGER, primaryKey: true,},
         content_type: { type: DataTypes.STRING(50), allowNull: false },
         content_status: { type: DataTypes.STRING(50), defaultValue: 'Pending' },
         validation_date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
