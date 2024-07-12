@@ -3,8 +3,8 @@ const router = express.Router();
 const {validation} = require('../controllers/jwt_middlewareController.js');
 const controller = require('../controllers/adminController.js');
 
-router.patch('/validate-content/:contentType/:contentID/:adminID', controller.validate_content);
-router.patch('/reject-content/:contentType/:contentID/:adminID', controller.reject_content);
+router.patch('/validate-content/:contentType/:contentID/:adminID', validation ,controller.validate_content);
+router.patch('/reject-content/:contentType/:contentID/:adminID', validation ,controller.reject_content);
 
 router.get('/user-engagement-metrics', validation, controller.getUserEngagementMetrics);
 router.get('/content-validation-status/admin/:adminID', validation, controller.getContentValidationStatusByadmin);

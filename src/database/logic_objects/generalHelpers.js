@@ -66,53 +66,53 @@ async function spInsertEvaluation(contentType, contentId, criticId, evaluation) 
 }
 
 //Function to Calculate New Average Rating
-async function fnReverseRating(avgRating, numOfRatings, newRating) {
-    const totalOfRatings = avgRating * numOfRatings + newRating;
-    const newAvgRating = totalOfRatings / (numOfRatings + 1);
-    return newAvgRating;
-}
+// async function fnReverseRating(avgRating, numOfRatings, newRating) {
+//     const totalOfRatings = avgRating * numOfRatings + newRating;
+//     const newAvgRating = totalOfRatings / (numOfRatings + 1);
+//     return newAvgRating;
+// }
 
 
 //Trigger to Update Average Score on Content
-async function trgUpdateAverageScore() {
-    const transaction = await db.sequelize.transaction();
-    try {
-        const insertedRows = await db.sequelize.query(
-            `SELECT "event_id", "post_id"
-        FROM INSERTED`,
-            { type: QueryTypes.SELECT, transaction }
-        );
+// async function trgUpdateAverageScore() {
+//     const transaction = await db.sequelize.transaction();
+//     try {
+//         const insertedRows = await db.sequelize.query(
+//             `SELECT "event_id", "post_id"
+//         FROM INSERTED`,
+//             { type: QueryTypes.SELECT, transaction }
+//         );
 
-        for (const row of insertedRows) {
-            const { event_id: eventId, post_id: postId } = row;
-            const table = postId ? 'post_id' : 'event_id';
-            const contentId = postId || eventId;
+//         for (const row of insertedRows) {
+//             const { event_id: eventId, post_id: postId } = row;
+//             const table = postId ? 'post_id' : 'event_id';
+//             const contentId = postId || eventId;
 
-            const [currentAvgScore] = await sequelize.query(
-                `SELECT "score", "num_of_evals"
-          FROM "dynamic_content"."scores"
-          WHERE "${table}" = :contentId`,
-                { replacements: { contentId }, type: QueryTypes.SELECT, transaction }
-            );
+//             const [currentAvgScore] = await sequelize.query(
+//                 `SELECT "score", "num_of_evals"
+//           FROM "dynamic_content"."scores"
+//           WHERE "${table}" = :contentId`,
+//                 { replacements: { contentId }, type: QueryTypes.SELECT, transaction }
+//             );
 
-            if (currentAvgScore) {
-                const newAvgRating = await fnReverseRating(currentAvgScore.score, currentAvgScore.num_of_evals, newRating);
+//             if (currentAvgScore) {
+//                 const newAvgRating = await fnReverseRating(currentAvgScore.score, currentAvgScore.num_of_evals, newRating);
 
-                await db.sequelize.query(
-                    `UPDATE "dynamic_content"."scores"
-            SET "score" = :newAvgRating, "num_of_evals" = "num_of_evals" + 1
-            WHERE "${table}" = :contentId`,
-                    { replacements: { newAvgRating, contentId }, type: QueryTypes.UPDATE, transaction }
-                );
-            }
-        }
+//                 await db.sequelize.query(
+//                     `UPDATE "dynamic_content"."scores"
+//             SET "score" = :newAvgRating, "num_of_evals" = "num_of_evals" + 1
+//             WHERE "${table}" = :contentId`,
+//                     { replacements: { newAvgRating, contentId }, type: QueryTypes.UPDATE, transaction }
+//                 );
+//             }
+//         }
 
-        await transaction.commit();
-    } catch (error) {
-        await transaction.rollback();
-        throw error;
-    }
-}
+//         await transaction.commit();
+//     } catch (error) {
+//         await transaction.rollback();
+//         throw error;
+//     }
+// }
 
 async function fnIsPublisherOfficeAdmin(publisherID) {
     const result = await db.sequelize.query(
@@ -148,8 +148,8 @@ module.exports = {
     //spValidateContent,
     //spRejectContent,
     spInsertEvaluation,
-    fnReverseRating,
-    trgUpdateAverageScore,
+    // fnReverseRating,
+    // trgUpdateAverageScore,
     fnIsPublisherOfficeAdmin,
     logError
     

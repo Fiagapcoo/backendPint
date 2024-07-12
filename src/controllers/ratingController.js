@@ -1,5 +1,5 @@
 const { spInsertEvaluation,
-        trgUpdateAverageScore
+        //trgUpdateAverageScore
   } = require('../database/logic_objects/generalHelpers');
 
 const controllers = {};
@@ -11,7 +11,7 @@ controllers.add_evaluation = async (req, res) => { //Only "Post" and "Event" for
     try {
         await spInsertEvaluation(contentType, contentId, criticId, evaluation);
 
-        await trgUpdateAverageScore(evaluation);
+        //await trgUpdateAverageScore(evaluation);
 
         res.status(201).json({success:ture ,message:'Eval added successfully.'});
     } catch (error) {

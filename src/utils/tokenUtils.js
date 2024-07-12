@@ -14,9 +14,9 @@ const encrypt = (text) => {
     let encrypted = cipher.update(text, 'utf8', 'base64');
     encrypted += cipher.final('base64');
   
-    console.log("Encrypting:");
-    console.log("IV:", iv.toString("hex"));
-    console.log("Encrypted Data:", encrypted);
+    // console.log("Encrypting:");
+    // console.log("IV:", iv.toString("hex"));
+    // console.log("Encrypted Data:", encrypted);
   
     return { iv: iv.toString("hex"), encryptedData: encrypted };
   };
@@ -40,7 +40,7 @@ const decrypt = (text) => {
     let decipher = crypto.createDecipheriv(algorithm, key, iv);
     let decrypted = decipher.update(encryptedText, 'base64', 'utf8');
     decrypted += decipher.final('utf8');
-    console.log("After decrypting: " + decrypted);
+    //console.log("After decrypting: " + decrypted);
     return decrypted;
   } catch (e) {
     console.error("Decryption error:", e);
@@ -82,7 +82,7 @@ const generateRefreshToken = (id) => {
 
 const verifyToken = (encryptedToken) => {
   try {
-    console.log("Verifying Token:", encryptedToken);
+    //console.log("Verifying Token:", encryptedToken);
     const decryptedToken = decrypt(encryptedToken);
     return jwt.verify(decryptedToken, process.env.JWT_SECRET);
   } catch (error) {

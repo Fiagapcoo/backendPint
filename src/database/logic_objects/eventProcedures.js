@@ -1,6 +1,7 @@
 const { QueryTypes } = require('sequelize');
-const { fnIsPublisherOfficeAdmin } = require('./generalHelpers');
 const db = require('../../models'); 
+const { fnIsPublisherOfficeAdmin } = require('./generalHelpers');
+const { spCreateForumForEvent } = require('./forumProcedures');
 
 //Procedure to Create an Event
 async function spCreateEvent(officeId, subAreaId, name, description, eventDate, recurring, recurring_pattern, max_participants, location, publisher_id, filePath) {
@@ -10,33 +11,38 @@ async function spCreateEvent(officeId, subAreaId, name, description, eventDate, 
 
     const transaction = await db.sequelize.transaction();
     try {
-        const [eventResult] = await  db.sequelize.query(
+        const [eventResult] = await db.sequelize.query(
             `INSERT INTO "dynamic_content"."events" 
-        ("office_id", "sub_area_id", "publisher_id", "admin_id", "creation_date", "name", "description", "event_date", "recurring", "recurring_pattern", "max_participants", "event_location", "validated", "filepath")
-        VALUES (:officeId, :subAreaId, :publisher_id, :admin_id, CURRENT_TIMESTAMP, :name, :description, :eventDate, :recurring, :recurring_pattern, :max_participants, :location, :validated, :filePath)
-        RETURNING "event_id"`,
+            ("office_id", "sub_area_id", "publisher_id", "admin_id", "creation_date", "name", "description", "event_date", "recurring", "recurring_pattern", "max_participants", "event_location", "validated", "filepath")
+            VALUES (:officeId, :subAreaId, :publisher_id, :admin_id, CURRENT_TIMESTAMP, :name, :description, :eventDate, :recurring, :recurring_pattern, :max_participants, :location, :validated, :filePath)
+            RETURNING "event_id"`,
             {
                 replacements: { officeId, subAreaId, publisher_id, admin_id, name, description, eventDate, recurring, recurring_pattern, max_participants, location, validated, filePath },
-                type: QueryTypes.RAW,
+                type: QueryTypes.INSERT, // Use INSERT query type
                 transaction
             }
         );
 
-        const eventId = eventResult[0].event_id;
+        console.log('Event Result:', eventResult); // Debug log
+
+        const eventId = eventResult[0].event_id; // Assuming eventResult[0] contains the result
         // Create the forum associated with the event
         const [forumResult] = await db.sequelize.query(
             `INSERT INTO "dynamic_content"."forums" 
             ("office_id", "sub_area_id", "title", "content", "creation_date", "publisher_id", "admin_id", "event_id", "validated")
-            VALUES (:officeId, :subAreaId, :title, :description, CURRENT_TIMESTAMP, :publisher_id, :admin_id, :eventId, :validated)
+            VALUES (:officeId, :subAreaId, :name, :description, CURRENT_TIMESTAMP, :publisher_id, :admin_id, :eventId, :validated)
             RETURNING "forum_id"`,
             {
-                replacements: { officeId, subAreaId, title: name, description, publisher_id, admin_id, eventId, validated },
-                type: QueryTypes.INSERT,
+                replacements: { officeId, subAreaId, name, description, publisher_id, admin_id, eventId, validated },
+                type: QueryTypes.INSERT, // Use INSERT query type
                 transaction
             }
         );
 
-        const forumId = forumResult[0].forum_id;
+        console.log('Forum Result:', forumResult); // Debug log
+
+        const forumId = forumResult[0].forum_id; // Assuming forumResult[0] contains the result
+        console.log(forumId);
         // Grant access to the publisher for the created forum
         await db.sequelize.query(
             `INSERT INTO "control"."event_forum_access" ("user_id", "forum_id")
@@ -44,13 +50,14 @@ async function spCreateEvent(officeId, subAreaId, name, description, eventDate, 
             { replacements: { publisher_id, forumId }, type: QueryTypes.INSERT, transaction }
         );
 
-
         await transaction.commit();
     } catch (error) {
+        console.error('Transaction Error:', error); // Log the detailed error
         await transaction.rollback();
         throw error;
     }
 }
+
 
 //Procedure to Clean Up Event Participation
 async function spEventParticipationCleanup() {
@@ -209,20 +216,20 @@ async function spEditEvent(eventId, subAreaId = null, officeId = null, adminId =
         if (event.length && event[0].validated === false) {
             await db.sequelize.query(
                 `UPDATE "dynamic_content"."events"
-          SET
-            "subarea_id" = COALESCE(:subAreaId, "subarea_id"),
-            "office_id" = COALESCE(:officeId, "office_id"),
-            "admin_id" = COALESCE(:adminId, "admin_id"),
-            "name" = COALESCE(:name, "name"),
-            "description" = COALESCE(:description, "description"),
-            "event_date" = COALESCE(:eventDate, "event_date"),
-            "event_location" = COALESCE(:eventLocation, "event_location"),
-            "filepath" = COALESCE(:filePath, "filepath"),
-            "recurring" = COALESCE(:recurring, "recurring"),
-            "recurring_pattern" = COALESCE(:recurringPattern, "recurring_pattern"),
-            "max_participants" = COALESCE(:maxParticipants, "max_participants"),
-            "current_participants" = COALESCE(:currentParticipants, "current_participants")
-          WHERE "event_id" = :eventId`,
+                SET
+                    "subarea_id" = COALESCE(:subAreaId, "subarea_id"),
+                    "office_id" = COALESCE(:officeId, "office_id"),
+                    "admin_id" = COALESCE(:adminId, "admin_id"),
+                    "name" = COALESCE(:name, "name"),
+                    "description" = COALESCE(:description, "description"),
+                    "event_date" = COALESCE(:eventDate, "event_date"),
+                    "event_location" = COALESCE(:eventLocation, "event_location"),
+                    "filepath" = COALESCE(:filePath, "filepath"),
+                    "recurring" = COALESCE(:recurring, "recurring"),
+                    "recurring_pattern" = COALESCE(:recurringPattern, "recurring_pattern"),
+                    "max_participants" = COALESCE(:maxParticipants, "max_participants"),
+                    "current_participants" = COALESCE(:currentParticipants, "current_participants")
+                WHERE "event_id" = :eventId`,
                 {
                     replacements: { eventId, subAreaId, officeId, adminId, name, description, eventDate, eventLocation, filePath, recurring, recurringPattern, maxParticipants, currentParticipants },
                     type: QueryTypes.UPDATE,

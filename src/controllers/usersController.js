@@ -6,7 +6,9 @@ const { getUserPreferences,
         removeBookmark, 
         getUserBookmarks,
         getUserByRole,
-        updateAccStatus } = require('../database/logic_objects/usersProcedures');
+        updateAccStatus,
+        createUserPreferences,
+     } = require('../database/logic_objects/usersProcedures');
 
 
 const controllers = {};
@@ -29,11 +31,23 @@ controllers.update_user_preferences = async (req, res) => {
     console.log(req.query);
     try {
         await updateUserPreferences(userID, preferredLanguageID, preferredAreas, preferredSubAreas, receiveNotifications);
-        res.status(201).send('Forum created successfully.');
+        res.status(201).send('Updated User successfully.');
     } catch (error) {
-        res.status(500).send('Error creating Forum: ' + error.message);
+        res.status(500).send('Error updating user preferences: ' + error.message);
     }
 };
+controllers.createUserPreferences = async(req,res) => {
+    const { userID} = req.params; 
+    const { areas, subAreas, receiveNotifications, languageID = null, additionalPreferences = null} = req.body; 
+    
+    console.log(req.query);
+    try {
+        await createUserPreferences(userID, areas, subAreas, receiveNotifications, languageID, additionalPreferences)
+        res.status(201).send('User preferences created successfully.');
+    } catch (error) {
+        res.status(500).send('Error creating user preferences: ' + error.message);
+    }
+}
 
 //change this controller later as to not be a controller maybe?
 controllers.update_access_on_login = async (req, res) => {

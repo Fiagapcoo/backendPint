@@ -343,6 +343,54 @@ async function updateAccStatus(userID, accountStatus) {
       throw error;
     }
 };
+
+async function createUserPreferences(userID, areas=null, subAreas=null, receiveNotifications=null, languageID = null, additionalPreferences = null) {
+  try {
+    await sequelize.transaction(async (transaction) => {
+      // Check if the user preferences already exist
+      const [results] = await sequelize.query(
+        `SELECT 1 FROM "user_interactions"."user_pref" WHERE "user_id" = :userID`,
+        {
+          replacements: { userID },
+          type: QueryTypes.SELECT,
+          transaction
+        }
+      );
+
+      if (!results) {
+        // Insert the new user preferences
+        await sequelize.query(
+          `INSERT INTO "user_interactions"."user_pref" (
+            "user_id", "areas", "sub_areas", "receive_notifications", "language_id", "additional_preferences"
+          ) VALUES (
+            :userID, :areas, :subAreas, :receiveNotifications, :languageID, :additionalPreferences
+          )`,
+          {
+            replacements: { userID, areas, subAreas, receiveNotifications, languageID, additionalPreferences },
+            type: QueryTypes.INSERT,
+            transaction
+          }
+        );
+
+        // Log the user action
+        await sequelize.query(
+          `EXEC "user_interactions"."spLogUserAction" :userID, 'Created User Preferences', 'User Created preferences'`,
+          {
+            replacements: { userID },
+            type: QueryTypes.RAW,
+            transaction
+          }
+        );
+      } else {
+        console.log('User preferences already exist.');
+      }
+    });
+  } catch (error) {
+    console.error('Error creating user preferences:', error);
+    throw error;
+  }
+}
+
   
   module.exports = {
     logUserAction,
@@ -356,5 +404,6 @@ async function updateAccStatus(userID, accountStatus) {
     getUserBookmarks,
     sp_verifyUser,
     sp_updateLastAccess,
-    updateAccStatus
+    updateAccStatus,
+    createUserPreferences
 }

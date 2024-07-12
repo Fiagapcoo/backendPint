@@ -91,9 +91,10 @@ controllers.getPostsByCity = async (req, res) => {
   try {
     const posts = await db.sequelize.query(
       `
-            SELECT p.*, o.city
+            SELECT p.*, o.city, s.score
             FROM "dynamic_content"."posts" p
             JOIN "centers"."offices" o ON p.office_id = o.office_id
+            JOIN "dynamic_content"."scores" s ON p.post_id = s.post_id
             WHERE o.office_id = :city_id
             ORDER BY p.creation_date DESC
         `,

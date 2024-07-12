@@ -1,11 +1,11 @@
 module.exports = (sequelize, DataTypes) => {
     const UserPref = sequelize.define('UserPref', {
         user_id: { type: DataTypes.INTEGER, primaryKey: true },
-        areas: { type: DataTypes.JSONB },
-        sub_areas: { type: DataTypes.JSONB },
-        receive_notifications: { type: DataTypes.BOOLEAN, allowNull: false },
-        language_id: { type: DataTypes.INTEGER },
-        additional_preferences: { type: DataTypes.JSONB }
+        areas: { type: DataTypes.JSONB, allowNull: true },
+        sub_areas: { type: DataTypes.JSONB, allowNull: true },
+        receive_notifications: { type: DataTypes.BOOLEAN, allowNull: true },
+        language_id: { type: DataTypes.INTEGER , allowNull: true},
+        additional_preferences: { type: DataTypes.JSONB, allowNull: true }
     }, {
         schema: 'user_interactions',
         tableName: 'user_pref',

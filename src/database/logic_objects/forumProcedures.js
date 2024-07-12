@@ -24,15 +24,15 @@ async function spCreateForum(officeID, subAreaId, title, description, publisher_
             }
         );
 
-        const forumId = result[0].forum_id;
-        await db.sequelize.query(
-            `INSERT INTO "control"."event_forum_access" ("user_id", "forum_id")
-            VALUES (:publisher_id, :forumId)`,
-            { replacements: { publisher_id, forumId },
-             type: QueryTypes.RAW,
-              transaction
-            }
-        );
+        // const forumId = result[0].forum_id;
+        // await db.sequelize.query(
+        //     `INSERT INTO "control"."event_forum_access" ("user_id", "forum_id")
+        //     VALUES (:publisher_id, :forumId)`,
+        //     { replacements: { publisher_id, forumId },
+        //      type: QueryTypes.RAW,
+        //       transaction
+        //     }
+        // );
 
         await transaction.commit();
     } catch (error) {
@@ -43,20 +43,20 @@ async function spCreateForum(officeID, subAreaId, title, description, publisher_
 
 
 //Procedure to Create a Forum for an Event
-async function spCreateForumForEvent(subAreaId, title, description, publisher_id, eventId) {
-    const isOfficeAdmin = await fnIsPublisherOfficeAdmin(publisher_id);
-    const validated = isOfficeAdmin ? true : false;
-    let adminId = isOfficeAdmin ? publisher_id : null;
+async function spCreateForumForEvent(officeId, subAreaId, title, description, publisher_id,adminId, eventId, transaction) {
+    //const isOfficeAdmin = await fnIsPublisherOfficeAdmin(publisher_id);
+    // const validated = isOfficeAdmin ? true : false;
+    // let adminId = isOfficeAdmin ? publisher_id : null;
 
-    const transaction = await db.sequelize.transaction();
+    //const transaction = await db.sequelize.transaction();
     try {
         const [result] = await db.sequelize.query(
             `INSERT INTO "dynamic_content"."forums" 
         ("office_id", "sub_area_id", "title", "content", "creation_date", "publisher_id", "admin_id", "event_id", "validated")
-        VALUES (:officeID, :subAreaId, :title, :description, CURRENT_TIMESTAMP, :publisher_id, :adminId, :eventId, :validated)
+        VALUES (:officeId, :subAreaId, :title, :description, CURRENT_TIMESTAMP, :publisher_id, :adminId, :eventId, :validated)
         RETURNING "forum_id"`,
             {
-                replacements: { subAreaId, title, description, createdBy, adminId, eventId, validated },
+                replacements: { officeId, subAreaId, title, description, publisher_id, adminId, eventId, validated },
                 type: QueryTypes.RAW,
                 transaction
             }

@@ -4,13 +4,15 @@ const { getUserEngagementMetrics,
         getContentValidationStatusByadmin,
         getContentValidationStatus,
         getActiveDiscussions,
-        validateContent,
+        spValidateContent,
         rejectContent,
         getActiveWarnings,
         getContentCenterToBeValidated,
         createCenter,
         deleteCenter,
-        getCenters } = require('../database/logic_objects/adminProcedures');
+        getCenters ,
+        makeCenterAdmin,
+      } = require('../database/logic_objects/adminProcedures');
 
 const controllers = {};
 
@@ -29,7 +31,7 @@ controllers.validate_content = async (req, res) => {
     }
     console.log(req.params);
     try {
-        await validateContent(contentType,contentID, adminID);
+        await spValidateContent(contentType,contentID, adminID);
 
 
         res.status(201).json({success:true, message:'Content validated successfully.'});
@@ -174,5 +176,15 @@ controllers.getCenters = async (req, res) => {
       res.status(500).json({success:false, message:'Error fetching centers: ' + error.message});
     }
 };
+//WIP
+controllers.makeCenterAdmin = async (req,res) => {
+  try {
+    const { office_id, admin_id } = req.params;
+    const results = await makeCenterAdmin(office_id, admin_id);
+      res.status(200).json({success:true, data:results});
+  } catch (error) {
+    res.status(500).json({success:false, message:'Error setting admin: ' + error.message});
+  }
+}
 
 module.exports = controllers;
