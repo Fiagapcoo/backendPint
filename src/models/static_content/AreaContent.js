@@ -10,8 +10,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     AreaContent.associate = function(models) {
-        AreaContent.belongsTo(models.Language, { foreignKey: 'language_id' });
-        AreaContent.belongsTo(models.Area, { foreignKey: 'area_id' });
+        AreaContent.belongsTo(models.Language, { foreignKey: 'language_id', targetKey: 'language_id', schema: 'static_content' });
+        AreaContent.belongsTo(models.Area, { foreignKey: 'area_id', targetKey: 'area_id', schema: 'static_content' });
     };
 
     return AreaContent;

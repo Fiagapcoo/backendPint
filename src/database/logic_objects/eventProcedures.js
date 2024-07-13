@@ -18,14 +18,14 @@ async function spCreateEvent(officeId, subAreaId, name, description, eventDate, 
             RETURNING "event_id"`,
             {
                 replacements: { officeId, subAreaId, publisher_id, admin_id, name, description, eventDate, recurring, recurring_pattern, max_participants, location, validated, filePath },
-                type: QueryTypes.INSERT, // Use INSERT query type
+                type: QueryTypes.INSERT, 
                 transaction
             }
         );
 
         console.log('Event Result:', eventResult); // Debug log
 
-        const eventId = eventResult[0].event_id; // Assuming eventResult[0] contains the result
+        const eventId = eventResult[0].event_id; 
         // Create the forum associated with the event
         const [forumResult] = await db.sequelize.query(
             `INSERT INTO "dynamic_content"."forums" 
@@ -34,20 +34,28 @@ async function spCreateEvent(officeId, subAreaId, name, description, eventDate, 
             RETURNING "forum_id"`,
             {
                 replacements: { officeId, subAreaId, name, description, publisher_id, admin_id, eventId, validated },
-                type: QueryTypes.INSERT, // Use INSERT query type
+                type: QueryTypes.INSERT, 
                 transaction
             }
         );
 
         console.log('Forum Result:', forumResult); // Debug log
 
-        const forumId = forumResult[0].forum_id; // Assuming forumResult[0] contains the result
+        const forumId = forumResult[0].forum_id; 
         console.log(forumId);
         // Grant access to the publisher for the created forum
         await db.sequelize.query(
             `INSERT INTO "control"."event_forum_access" ("user_id", "forum_id")
             VALUES (:publisher_id, :forumId)`,
             { replacements: { publisher_id, forumId }, type: QueryTypes.INSERT, transaction }
+        );
+
+        await db.sequelize.query(
+            `INSERT INTO "control"."participation"("user_id", "event_id", "entry_date")
+             VALUES ( :publisher_id, :eventId, CURRENT_TIMESTAMP);`,
+             {replacements: {publisher_id, eventId },
+             type: QueryTypes.INSERT, 
+                transaction},
         );
 
         await transaction.commit();

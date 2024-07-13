@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
         join_date: { type: DataTypes.DATE, allowNull: false },
-        last_access: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
+        last_access: { type: DataTypes.DATE, defaultValue: sequelize.literal('CURRENT_TIMESTAMP') }
     }, {
         schema: 'hr',
         tableName: 'users',
@@ -52,8 +52,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Users.associate = function(models) {
-        Users.belongsTo(models.AccPermissions, { foreignKey: 'role_id' });
-        Users.hasOne(models.OfficeWorkers, { foreignKey: 'user_id' });
+        Users.belongsTo(models.AccPermissions, { foreignKey: 'role_id',  targetKey: 'role_id', schema: 'security' });
+        Users.hasOne(models.OfficeWorkers, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr' });
     };
 
     return Users;

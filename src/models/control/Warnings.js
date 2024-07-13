@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
         warning_level: { type: DataTypes.INTEGER, allowNull: false },
         description: { type: DataTypes.TEXT, allowNull: false },
         state: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
-        creation_date: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
+        creation_date: { type: DataTypes.DATE, allowNull: false, defaultValue: sequelize.literal('CURRENT_TIMESTAMP') },
         admin_id: { type: DataTypes.INTEGER, allowNull: false },
         office_id: { type: DataTypes.INTEGER, allowNull: false }
     }, {
@@ -14,8 +14,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Warnings.associate = function(models) {
-        Warnings.belongsTo(models.Users, { foreignKey: 'admin_id' });
-        Warnings.belongsTo(models.OfficeAdmins, { foreignKey: 'office_id' });
+        Warnings.belongsTo(models.Users, { foreignKey: 'admin_id', targetKey: 'user_id', schema: 'hr' });
+        Warnings.belongsTo(models.OfficeAdmins, { foreignKey: 'office_id', targetKey: 'office_id', schema: 'centers' });
     };
 
     return Warnings;

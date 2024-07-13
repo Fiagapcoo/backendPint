@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
         user_id: { type: DataTypes.INTEGER, allowNull: false },
         content_id: { type: DataTypes.INTEGER, allowNull: false },
         content_type: { type: DataTypes.STRING(50) },
-        bookmark_date: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW }
+        bookmark_date: { type: DataTypes.DATE, allowNull: false, defaultValue: sequelize.literal('CURRENT_TIMESTAMP') }
     }, {
         schema: 'user_interactions',
         tableName: 'bookmarks',
@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Bookmarks.associate = function(models) {
-        Bookmarks.belongsTo(models.Users, { foreignKey: 'user_id' });
+        Bookmarks.belongsTo(models.Users, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr' });
     };
 
     return Bookmarks;

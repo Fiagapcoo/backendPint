@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
         event_id: { type: DataTypes.INTEGER },
         post_id: { type: DataTypes.INTEGER },
         notification_text: { type: DataTypes.TEXT, allowNull: false },
-        create_date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+        create_date: { type: DataTypes.DATE, defaultValue: sequelize.literal('CURRENT_TIMESTAMP') },
         is_read: { type: DataTypes.BOOLEAN, defaultValue: false }
     }, {
         schema: 'user_interactions',
@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Notifications.associate = function(models) {
-        Notifications.belongsTo(models.Users, { foreignKey: 'user_id' });
+        Notifications.belongsTo(models.Users, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr' });
     };
 
     return Notifications;

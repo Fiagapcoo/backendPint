@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
         forum_id: { type: DataTypes.INTEGER },
         post_id: { type: DataTypes.INTEGER },
         publisher_id: { type: DataTypes.INTEGER, allowNull: false },
-        comment_date: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
+        comment_date: { type: DataTypes.DATE, allowNull: false, defaultValue: sequelize.literal('CURRENT_TIMESTAMP') },
         content: { type: DataTypes.TEXT, allowNull: false }
     }, {
         schema: 'communication',
@@ -13,9 +13,9 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Comments.associate = function(models) {
-        Comments.belongsTo(models.Users, { foreignKey: 'publisher_id' });
-        Comments.belongsTo(models.Posts, { foreignKey: 'post_id' });
-        Comments.belongsTo(models.Forums, { foreignKey: 'forum_id' });
+        Comments.belongsTo(models.Users, { foreignKey: 'publisher_id', targetKey: 'user_id', schema: 'hr' });
+        Comments.belongsTo(models.Posts, { foreignKey: 'post_id', targetKey: 'post_id', schema: 'dynamic_content' });
+        Comments.belongsTo(models.Forums, { foreignKey: 'forum_id', targetKey: 'forum_id', schema: 'dynamic_content' });
     };
 
     return Comments;

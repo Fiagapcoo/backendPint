@@ -11,6 +11,8 @@ controllers.create_post = async (req, res) => {
         await spCreatePost(subAreaId, officeId, publisher_id, title, content, pLocation, filePath, type, rating);
         res.status(201).json({success:true, message:'Post created successfully.'});
     } catch (error) {
+        console.log('Error: ' + error);
+        exit(-1);
         res.status(500).json({success:false, message:'Error creating Post: ' + error.message});
     }
 };

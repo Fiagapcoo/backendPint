@@ -12,8 +12,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Scores.associate = function(models) {
-        Scores.belongsTo(models.Posts, { foreignKey: 'post_id' });
-        Scores.belongsTo(models.Events, { foreignKey: 'event_id' });
+        Scores.belongsTo(models.Posts, { foreignKey: 'post_id', targetKey: 'post_id', schema: 'dynamic_content' });
+        Scores.belongsTo(models.Events, { foreignKey: 'event_id', targetKey: 'event_id', schema: 'dynamic_content' });
     };
 
     return Scores;

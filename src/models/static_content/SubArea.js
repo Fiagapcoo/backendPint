@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     SubArea.associate = function(models) {
-        SubArea.belongsTo(models.Area, { foreignKey: 'area_id' });
+        SubArea.belongsTo(models.Area, { foreignKey: 'area_id', targetKey: 'area_id', schema: 'static_content' });
     };
 
     return SubArea;

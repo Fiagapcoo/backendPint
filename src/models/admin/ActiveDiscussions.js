@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     ActiveDiscussions.associate = function(models) {
-        ActiveDiscussions.belongsTo(models.Forums, { foreignKey: 'forum_id' });
+        ActiveDiscussions.belongsTo(models.Forums, { foreignKey: 'forum_id', targetKey: 'forum_id', schema: 'dynamic_content' });
     };
 
     return ActiveDiscussions;

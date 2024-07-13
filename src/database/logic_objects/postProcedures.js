@@ -24,7 +24,7 @@ async function spCreatePost(subAreaId, officeId, publisher_id, title, content, p
         console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
         console.log(result);
         const postId = result[0].post_id; // Extracting post_id from result
-        console.log('aaaaaaaaaaaaaaaaaaadasdasdasdasdasd' + result[0]);
+        console.log('aaaaaaaaaaaaaaaaaaadasdasdasdasdasd' );
 
         if(type === 'P') {
             await db.sequelize.query(

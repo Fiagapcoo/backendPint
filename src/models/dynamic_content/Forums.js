@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
         office_id: { type: DataTypes.INTEGER, allowNull: false },
         admin_id: { type: DataTypes.INTEGER },
         sub_area_id: { type: DataTypes.INTEGER },
-        creation_date: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
+        creation_date: { type: DataTypes.DATE, allowNull: false, defaultValue: sequelize.literal('CURRENT_TIMESTAMP') },
         title: { type: DataTypes.STRING(255), allowNull: false },
         content: { type: DataTypes.TEXT, allowNull: false},
         event_id: { type: DataTypes.INTEGER },
@@ -18,12 +18,12 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Forums.associate = function(models) {
-        Forums.belongsTo(models.OfficeAdmins, {as: 'Office_admin', foreignKey: 'office_id' });
-        Forums.belongsTo(models.Offices, {as: 'Office', foreignKey: 'office_id' });
-        Forums.belongsTo(models.SubArea, { foreignKey: 'sub_area_id' });
-        Forums.belongsTo(models.Users, { as: 'Publisher', foreignKey: 'publisher_id' });
-        Forums.belongsTo(models.Users, { as: 'Admin', foreignKey: 'admin_id' });
-        Forums.belongsTo(models.Events, { foreignKey: 'event_id' });
+        Forums.belongsTo(models.OfficeAdmins, {as: 'Office_admin', foreignKey: 'office_id', targetKey: 'office_id', schema: 'centers' });
+        Forums.belongsTo(models.Offices, {as: 'Office', foreignKey: 'office_id', targetKey: 'office_id', schema: 'centers' });
+        Forums.belongsTo(models.SubArea, { foreignKey: 'sub_area_id', targetKey: 'sub_area_id', schema: 'static_content' });
+        Forums.belongsTo(models.Users, { as: 'Publisher', foreignKey: 'publisher_id', targetKey: 'user_id', schema: 'hr' });
+        Forums.belongsTo(models.Users, { as: 'Admin', foreignKey: 'admin_id', targetKey: 'user_id', schema: 'hr' });
+        Forums.belongsTo(models.Events, { foreignKey: 'event_id', targetKey: 'event_id', schema: 'dynamic_content' });
     };
 
     return Forums;

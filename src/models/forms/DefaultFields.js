@@ -4,8 +4,8 @@ module.exports = (sequelize, DataTypes) => {
         field_name: { type: DataTypes.STRING(60), allowNull: false },
         field_type: { type: DataTypes.STRING(255), allowNull: false },
         field_value: { type: DataTypes.TEXT, allowNull: false },
-        max_value: { type: DataTypes.INTEGER },
-        min_value: { type: DataTypes.INTEGER }
+        max_value: { type: DataTypes.INTEGER, allowNull: true },
+        min_value: { type: DataTypes.INTEGER, allowNull: true }
     }, {
         schema: 'forms',
         tableName: 'default_fields',

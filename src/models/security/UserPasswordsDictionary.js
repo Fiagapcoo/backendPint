@@ -40,6 +40,9 @@ module.exports = (sequelize, DataTypes) => {
         //     }
         // }
     });
+    UserPasswordsDictionary.associate = function(models) {
+        UserPasswordsDictionary.belongsTo(models.Users, {as: 'User', foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr' });
+    };
 
     return UserPasswordsDictionary;
 };

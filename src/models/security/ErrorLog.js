@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
         error_message: { type: DataTypes.STRING(4000), allowNull: false },
         error_severity: { type: DataTypes.INTEGER, allowNull: false },
         error_state: { type: DataTypes.INTEGER, allowNull: false },
-        error_time: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW }
+        error_time: { type: DataTypes.DATE, allowNull: false, defaultValue: sequelize.literal('CURRENT_TIMESTAMP') }
     }, {
         schema: 'security',
         tableName: 'error_log',

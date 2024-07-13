@@ -10,8 +10,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     CommentPath.associate = function(models) {
-        CommentPath.belongsTo(models.Comments, { as: 'Ancestor', foreignKey: 'ancestor_id' });
-        CommentPath.belongsTo(models.Comments, { as: 'Descendant', foreignKey: 'descendant_id' });
+        CommentPath.belongsTo(models.Comments, { as: 'Ancestor', foreignKey: 'ancestor_id', targetKey: 'comment_id', schema: 'communication' });
+        CommentPath.belongsTo(models.Comments, { as: 'Descendant', foreignKey: 'descendant_id', targetKey: 'comment_id', schema: 'communication' });
     };
 
     return CommentPath;

@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
         office_id: { type: DataTypes.INTEGER, allowNull: false },
         admin_id: { type: DataTypes.INTEGER },
         publisher_id: { type: DataTypes.INTEGER, allowNull: false },
-        creation_date: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
+        creation_date: { type: DataTypes.DATE, allowNull: false, defaultValue: sequelize.literal('CURRENT_TIMESTAMP') },
         type: { type: DataTypes.CHAR(1), allowNull: false, defaultValue: 'N' },
         validated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
         title: { type: DataTypes.STRING(255), allowNull: false },
@@ -20,12 +20,12 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Posts.associate = function(models) {
-        Posts.belongsTo(models.OfficeAdmins, {as: 'Office_admin', foreignKey: 'office_id' });
-        Posts.belongsTo(models.Offices, {as: 'Office', foreignKey: 'office_id' });
-        Posts.belongsTo(models.SubArea, { foreignKey: 'sub_area_id' });
-        Posts.belongsTo(models.Users, { as: 'Publisher', foreignKey: 'publisher_id' });
-        Posts.belongsTo(models.Users, { as: 'Admin', foreignKey: 'admin_id' });
-        Posts.hasOne(models.Scores, { as: 'Score', foreignKey: 'post_id' });
+        Posts.belongsTo(models.OfficeAdmins, {as: 'Office_admin', foreignKey: 'office_id', targetKey: 'office_id', schema: 'centers' });
+        Posts.belongsTo(models.Offices, {as: 'Office', foreignKey: 'office_id', targetKey: 'office_id', schema: 'centers' });
+        Posts.belongsTo(models.SubArea, { foreignKey: 'sub_area_id', targetKey: 'sub_area_id', schema: 'static_content' });
+        Posts.belongsTo(models.Users, { as: 'Publisher', foreignKey: 'publisher_id', targetKey: 'user_id', schema: 'hr' });
+        Posts.belongsTo(models.Users, { as: 'Admin', foreignKey: 'admin_id', targetKey: 'user_id', schema: 'hr' });
+        Posts.hasOne(models.Scores, { as: 'Score', foreignKey: 'post_id', targetKey: 'post_id', schema: 'dynamic_content' });
 
     };
 

@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     UserAccountDetails.associate = function(models) {
-        UserAccountDetails.belongsTo(models.Users, { foreignKey: 'user_id' });
+        UserAccountDetails.belongsTo(models.Users, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr' });
     };
 
     return UserAccountDetails;

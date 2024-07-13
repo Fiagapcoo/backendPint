@@ -13,8 +13,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     UserPref.associate = function(models) {
-        UserPref.belongsTo(models.Users, { foreignKey: 'user_id' });
-        UserPref.belongsTo(models.Language, { foreignKey: 'language_id' });
+        UserPref.belongsTo(models.Users, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr' });
+        UserPref.belongsTo(models.Language, { foreignKey: 'language_id', targetKey: 'language_id', schema: 'static_content' });
     };
 
     return UserPref;
