@@ -34,6 +34,7 @@ const userRoutes = require('./routes/userRoutes');
 const dynamicRoutes = require('./routes/dynamic_contentRoutes');
 const notificationsRoutes = require('./routes/notificationRoutes');
 const authRoutes = require('./routes/authRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 
 
@@ -67,9 +68,11 @@ app.use('/api/user', userRoutes);
 app.use('/api/dynamic', dynamicRoutes);
 app.use('/api/notification', notificationsRoutes);authRoutes
 app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/upload', uploadRoute);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/email', emailRoute);
+
 
 app.listen(app.get('port'), () => {
     console.log("Server started on port " + app.get('port'));
