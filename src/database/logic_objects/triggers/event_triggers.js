@@ -3,46 +3,53 @@ const db = require('../../../models');
 const createTriggerFunction_trg_moderate_event_content = async () => {
     await db.sequelize.query(`
         CREATE OR REPLACE FUNCTION dynamic_content.trg_moderate_event_content()
-        RETURNS TRIGGER AS $$
-        DECLARE
-            error_message TEXT;
-            error_severity TEXT;
-            error_state TEXT;
-        BEGIN
-            BEGIN
-                IF NEW.admin_id IS NULL THEN
-                    INSERT INTO admin.content_validation_status (content_real_id, content_type)
-                    VALUES (NEW.event_id, 'Event');
-                ELSE
-                    INSERT INTO admin.content_validation_status (content_real_id, content_type, content_status, validator_id, validation_date)
-                    VALUES (NEW.event_id, 'Event', 'Approved', NEW.admin_id, CURRENT_TIMESTAMP);
+RETURNS TRIGGER AS $$
+DECLARE
+    error_message TEXT;
+    error_severity TEXT;
+    error_state TEXT;
+BEGIN
+    RAISE NOTICE 'Trigger function started for event_id: %', NEW.event_id;
 
-                    -- Update the event record with the admin ID
-                    UPDATE dynamic_content.events
-                    SET admin_id = NEW.admin_id
-                    WHERE event_id = NEW.event_id;
+    BEGIN
+        IF NEW.admin_id IS NULL THEN
+            RAISE NOTICE 'Admin ID is NULL, inserting validation status';
+            INSERT INTO admin.content_validation_status (content_real_id, content_type)
+            VALUES (NEW.event_id, 'Event');
+        ELSE
+            RAISE NOTICE 'Admin ID is NOT NULL, inserting approved validation status';
+            INSERT INTO admin.content_validation_status (content_real_id, content_type, content_status, validator_id, validation_date)
+            VALUES (NEW.event_id, 'Event', 'Approved', NEW.admin_id, CURRENT_TIMESTAMP);
 
-                    INSERT INTO control.participation(user_id, event_id)
-                    VALUES (NEW.publisher_id, NEW.event_id);
+            RAISE NOTICE 'Updating event record with admin ID';
+            UPDATE dynamic_content.events
+            SET admin_id = NEW.admin_id
+            WHERE event_id = NEW.event_id;
 
-                    -- Insert the score for the new event
-                    INSERT INTO dynamic_content.scores(event_id, score)
-                    VALUES (NEW.event_id, 0);
-                END IF;
+            RAISE NOTICE 'Inserting into control.participation';
+            INSERT INTO control.participation(user_id, event_id)
+            VALUES (NEW.publisher_id, NEW.event_id);
 
-            EXCEPTION
-                WHEN OTHERS THEN
-                    GET STACKED DIAGNOSTICS error_message = MESSAGE_TEXT,
-                                            error_severity = RETURNED_SQLSTATE,
-                                            error_state = PG_EXCEPTION_DETAIL;
-                    RAISE NOTICE 'Error: %', error_message;
+            RAISE NOTICE 'Inserting score for the new event';
+            INSERT INTO dynamic_content.scores(event_id, score)
+            VALUES (NEW.event_id, 0);
+        END IF;
 
-                    RETURN NULL;
-            END;
+    EXCEPTION
+        WHEN OTHERS THEN
+            GET STACKED DIAGNOSTICS error_message = MESSAGE_TEXT,
+                                    error_severity = RETURNED_SQLSTATE,
+                                    error_state = PG_EXCEPTION_DETAIL;
+            RAISE NOTICE 'Error: %', error_message;
 
-            RETURN NEW;
-        END;
-        $$ LANGUAGE plpgsql;
+            RETURN NULL;
+    END;
+
+    RAISE NOTICE 'Trigger function completed for event_id: %', NEW.event_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
     `);
 };
 
@@ -51,15 +58,15 @@ const createTriggerFunction_trg_moderate_event_content = async () => {
 const createTrigger_createEvent = async () => {
     await db.sequelize.query(`
       DO $$ 
-      BEGIN
-        IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_moderate_event_content') THEN
-          DROP TRIGGER trg_moderate_event_content ON dynamic_content.events;
-        END IF;
-        CREATE TRIGGER trg_moderate_event_content
-        AFTER INSERT ON dynamic_content.events
-        FOR EACH ROW
-        EXECUTE FUNCTION dynamic_content.trg_moderate_event_content();
-      END $$;
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_moderate_event_content') THEN
+    DROP TRIGGER trg_moderate_event_content ON dynamic_content.events;
+  END IF;
+  CREATE TRIGGER trg_moderate_event_content
+  AFTER INSERT ON dynamic_content.events
+  FOR EACH ROW
+  EXECUTE FUNCTION dynamic_content.trg_moderate_event_content();
+END $$;
     `);
 };
 
