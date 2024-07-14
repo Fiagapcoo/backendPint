@@ -14,7 +14,7 @@ controllers.add_comment = async (req, res) => {
     if (!validator.isInt(contentID.toString())) {
         return res.status(400).json({ success: false, message: 'Invalid content ID' });
     }
-    if (!validator.isIn(contentType, ['post', 'forum'])) {
+    if (!validator.isIn(contentType, ['Post', 'Forum'])) {
         return res.status(400).json({ success: false, message: 'Invalid content type' });
     }
     if (!validator.isInt(userID.toString())) {

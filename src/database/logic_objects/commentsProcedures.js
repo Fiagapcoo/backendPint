@@ -91,7 +91,7 @@ async function spAddComment({
 
     try {
       await db.sequelize.query(
-        `SELECT security.log_error(:errorMessage, :errorSeverity, :errorState)`,
+        `SELECT security.error_log(:errorMessage, :errorSeverity, :errorState)`,
         {
           replacements: {
             errorMessage: error.message,
