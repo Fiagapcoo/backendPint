@@ -275,6 +275,7 @@ const spActivateUser = async (userId) => {
           transaction
         }
       );
+      
   
       const [user] = await db.sequelize.query(
         `SELECT "email" FROM "hr"."users" WHERE "user_id" = :userId`,
@@ -301,6 +302,7 @@ const spActivateUser = async (userId) => {
 };
   //to set route
 const spSetCenterAdmin = async (userId, officeId) => {
+  var _role_id;
     const transaction = await db.sequelize.transaction();
     try {
       const [userExists] = await db.sequelize.query(
@@ -335,6 +337,17 @@ const spSetCenterAdmin = async (userId, officeId) => {
         {
           replacements: { officeId, userId },
           type: QueryTypes.INSERT,
+          transaction
+        }
+      );
+      if( officeId === 0){
+        _role_id = 3;
+      } else _role_id = 2;
+      await db.sequelize.query(
+        `UPDATE "hr"."users" SET "role_id" = :_role_id WHERE "user_id" = :userId`,
+        {
+          replacements: { _role_id, userId },
+          type: QueryTypes.UPDATE,
           transaction
         }
       );
