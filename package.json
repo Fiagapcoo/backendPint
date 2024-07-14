@@ -5,8 +5,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon src/server.js",
-    "sync": "node src/syncModels.js",
-    "insert": "node src/insertFakeData.js"
+    "sync": "node src/start/syncModels.js",
+    "insert": "node src/start/insertFakeData.js",
+    "admin": "node src/start/insertAdmins.js"
   },
   "keywords": [],
   "author": "",

@@ -148,7 +148,7 @@ async function bulkInsert() {
         ON CONFLICT (email) DO NOTHING;
     `);
     await db.sequelize.query(`
-        ALTER SEQUENCE hr.users_user_id_seq RESTART WITH 20;  
+        ALTER SEQUENCE hr.users_user_id_seq RESTART WITH 16;  
     `)
 
 

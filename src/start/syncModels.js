@@ -1,4 +1,4 @@
-const db = require('./models');
+const db = require('../models');
 
  function createSchemas() {
     const schemas = [
