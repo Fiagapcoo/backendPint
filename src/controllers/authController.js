@@ -4,30 +4,30 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const { sendMail } = require("./emailController");
 
-
-const { generateToken, 
-        generateRefreshToken, 
-        verifyRefreshToken 
+const {
+  generateToken,
+  generateRefreshToken,
+  verifyRefreshToken,
 } = require("../utils/tokenUtils");
 
-const { validateInput_Login, 
-        validateInput_register,
-
+const {
+  validateInput_Login,
+  validateInput_register,
 } = require("../utils/inputValidators");
 
-const { logUserAction, 
-        updateAccessOnLogin, 
-        sp_verifyUser, 
-        sp_updateLastAccess
-} = require('../database/logic_objects/usersProcedures');
-
+const {
+  logUserAction,
+  updateAccessOnLogin,
+  sp_verifyUser,
+  sp_updateLastAccess,
+} = require("../database/logic_objects/usersProcedures");
 
 const {
   spRegisterNewUser,
   spCreatePassword,
   sp_findUserById,
   sp_findUserByEmail,
-  spChangeUserPassword
+  spChangeUserPassword,
 } = require("../database/logic_objects/securityProcedures");
 
 const controllers = {};
@@ -43,7 +43,7 @@ function mashupAndRandomize(email, firstName, lastName) {
     }
     return array;
   }
-  
+
   const shuffledArray = shuffleArray(charArray);
   return shuffledArray.join("");
 }
@@ -54,7 +54,9 @@ controllers.register = async (req, res) => {
 
   const validationResult = validateInput_register(email, firstName, lastName);
   if (!validationResult.valid) {
-    return res.status(400).json({ success: false, message: validationResult.message });
+    return res
+      .status(400)
+      .json({ success: false, message: validationResult.message });
   }
 
   try {
@@ -72,9 +74,9 @@ controllers.register = async (req, res) => {
       const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
-       //await sp_insertUserAccDetails(user[0].user_id);
+      //await sp_insertUserAccDetails(user[0].user_id);
       const random_sub_url = mashupAndRandomize(email, firstName, lastName);
-      
+
       const url = `${process.env.CLIENT_URL}/setup-password/${random_sub_url}?token=${token}`;
       console.log("url:", url);
       console.log("user:", user);
@@ -85,13 +87,11 @@ controllers.register = async (req, res) => {
         body: `Link: ${url}`,
       });
 
-      res
-        .status(201)
-        .json({
-          success: true,
-          message:
-            "User registered successfully. Please check your email to set up your password.",
-        });
+      res.status(201).json({
+        success: true,
+        message:
+          "User registered successfully. Please check your email to set up your password.",
+      });
     }
   } catch (error) {
     console.error("CONSOLE LOG REGISTER:", error);
@@ -107,7 +107,9 @@ controllers.register_admin = async (req, res) => {
 
   const validationResult = validateInput_register(email, firstName, lastName);
   if (!validationResult.valid) {
-    return res.status(400).json({ success: false, message: validationResult.message });
+    return res
+      .status(400)
+      .json({ success: false, message: validationResult.message });
   }
 
   try {
@@ -125,8 +127,8 @@ controllers.register_admin = async (req, res) => {
       const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
-       //await sp_insertUserAccDetails(user[0].user_id);
-      const random_sub_url = mashupAndRandomize(email, firstName, lastName) 
+      //await sp_insertUserAccDetails(user[0].user_id);
+      const random_sub_url = mashupAndRandomize(email, firstName, lastName);
       const url = `${process.env.CLIENT_URL}/setup-password/${random_sub_url}?token=${token}`;
       console.log("url:", url);
       console.log("user:", user);
@@ -137,13 +139,11 @@ controllers.register_admin = async (req, res) => {
         body: `Link: ${url}`,
       });
 
-      res
-        .status(201)
-        .json({
-          success: true,
-          message:
-            "User registered successfully. Please check your email to set up your password.",
-        });
+      res.status(201).json({
+        success: true,
+        message:
+          "User registered successfully. Please check your email to set up your password.",
+      });
     }
   } catch (error) {
     console.error("CONSOLE LOG REGISTER:", error);
@@ -154,8 +154,7 @@ controllers.register_admin = async (req, res) => {
 };
 
 controllers.setupPassword = async (req, res) => {
-  const {password } = req.body;
-
+  const { password } = req.body;
 
   if (!validator.isStrongPassword(password)) {
     return res
@@ -165,10 +164,7 @@ controllers.setupPassword = async (req, res) => {
   try {
     const userId = req.user.id;
 
-
-
     await spCreatePassword(userId, password);
-    
 
     const user = await sp_findUserById(userId);
     console.log("user:", user);
@@ -179,8 +175,11 @@ controllers.setupPassword = async (req, res) => {
       body: "Your password has been set up successfully.",
     });
 
-    
-    await logUserAction(userId, 'PASSWORD CREATED', 'Created user account password');
+    await logUserAction(
+      userId,
+      "PASSWORD CREATED",
+      "Created user account password"
+    );
     res
       .status(200)
       .json({ success: true, message: "Password set up successfully." });
@@ -192,7 +191,7 @@ controllers.setupPassword = async (req, res) => {
 
 // TODO to test
 controllers.UpdatePassword = async (req, res) => {
-  const {password} = req.body;
+  const { password } = req.body;
 
   if (!validator.isStrongPassword(password)) {
     return res
@@ -203,7 +202,7 @@ controllers.UpdatePassword = async (req, res) => {
     console.log("req.user:", req.user.id);
     const userId = req.user.id;
 
-    await spChangeUserPassword(userId, password);;
+    await spChangeUserPassword(userId, password);
 
     const user = await sp_findUserById(userId);
     console.log("user:", user);
@@ -242,8 +241,6 @@ controllers.UpdatePassword = async (req, res) => {
 
 // });
 
-
-
 const authenticateUser = async (email, password) => {
   const user = await sp_findUserByEmail(email);
   if (!user) {
@@ -251,8 +248,14 @@ const authenticateUser = async (email, password) => {
   }
 
   const validation = await sp_verifyUser(user.user_id);
-  if (validation.account_status == false || validation.account_restriction == true) {
-    return { authenticated: false, message: "Account is not active or restricted! Contact your admin!" };
+  if (
+    validation.account_status == false ||
+    validation.account_restriction == true
+  ) {
+    return {
+      authenticated: false,
+      message: "Account is not active or restricted! Contact your admin!",
+    };
   }
 
   const isMatch = await bcrypt.compare(password, user.hashed_password);
@@ -267,11 +270,16 @@ const authenticateUser = async (email, password) => {
 const handleResponseBasedOnRole = async (user, res) => {
   if (user.role_id != 1) {
     //const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, { expiresIn: "4h" });
-    const token = generateToken(user.user_id, "4h" );
+    const token = generateToken(user.user_id);
     await sp_updateLastAccess(user.user_id);
     res.status(200).json({ token, success: true, message: "Login successful" });
   } else {
-    res.status(403).json({ success: false, message: "Don't have permission to access! Contact your admin!" });
+    res
+      .status(403)
+      .json({
+        success: false,
+        message: "Don't have permission to access! Contact your admin!",
+      });
   }
 };
 
@@ -281,14 +289,18 @@ controllers.login_web = async (req, res) => {
   const validationResult = validateInput_Login(email, password);
 
   if (!validationResult.valid) {
-    return res.status(400).json({ success: false, message: validationResult.message });
+    return res
+      .status(400)
+      .json({ success: false, message: validationResult.message });
   }
 
   try {
     const authResult = await authenticateUser(email, password);
 
     if (!authResult.authenticated) {
-      return res.status(401).json({ success: false, message: authResult.message });
+      return res
+        .status(401)
+        .json({ success: false, message: authResult.message });
     }
 
     await handleResponseBasedOnRole(authResult.user, res);
@@ -303,29 +315,36 @@ controllers.login_mobile = async (req, res) => {
   const validationResult = validateInput_Login(email, password);
 
   if (!validationResult.valid) {
-    return res.status(400).json({ success: false, message: validationResult.message });
+    return res
+      .status(400)
+      .json({ success: false, message: validationResult.message });
   }
 
   try {
     const authResult = await authenticateUser(email, password);
 
     if (!authResult.authenticated) {
-      return res.status(401).json({ success: false, message: authResult.message });
+      return res
+        .status(401)
+        .json({ success: false, message: authResult.message });
     }
 
-    const token = generateToken(authResult.user.user_id, "7d");
+    const token = generateToken(authResult.user.user_id);
+    const refreshToken = generateRefreshToken(authResult.user.user_id);
     await sp_updateLastAccess(authResult.user.user_id); //TODO check this
-    res.status(200).json({ token, success: true, message: "Login successful" });
+    res
+      .status(200)
+      .json({
+        token,
+        refreshToken,
+        success: true,
+        message: "Login successful",
+      });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-
-
-
-
-
 
 controllers.testjwt = async (req, res) => {
   const info = {
@@ -340,7 +359,7 @@ controllers.testjwt = async (req, res) => {
 controllers.validateToken = async (req, res) => {
   const { token } = req.body;
 
-   try {
+  try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log("decoded:", decoded);
     res.status(200).json({ success: true, message: "Token is valid" });
@@ -348,23 +367,30 @@ controllers.validateToken = async (req, res) => {
     console.error("Error validating token:", error);
     res.status(401).json({ success: false, message: "Invalid token" });
   }
-}
+};
 
 controllers.getUserByToken = async (req, res) => {
   const user_id = req.user.id;
-  
+
   try {
     const user = await sp_findUserById(user_id);
     res.status(200).json({ success: true, user });
-    
   } catch (error) {
     console.error("Error getting user by token:", error);
   }
-}
+};
 
-
-
-
-
+controllers.refreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+  try {
+    //console.log("ionside refresh" + refreshToken);
+    const decoded = verifyRefreshToken(JSON.parse(refreshToken));
+    //console.log(decoded);
+    const accessToken = generateToken(decoded.id);
+    res.status(200).json({ accessToken, success: true });
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+  }
+};
 
 module.exports = controllers;

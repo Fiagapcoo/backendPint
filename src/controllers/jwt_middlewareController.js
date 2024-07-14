@@ -6,10 +6,11 @@ controllers.validation = async (req, res, next) => {
   //console.log('req.headers:', JSON.stringify(req.headers, null, 2));
   // console.log('req.query:', JSON.stringify(req.query, null, 2));
   // console.log('req.body:', JSON.stringify(req.body, null, 2));
+  try{
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1]; // Bearer <token>
   //console.log('inside token: ' + token);
-  
+ 
   if (!token) {
     return res.status(401).json({ message: "Not authorized, no token" });
   }
@@ -23,7 +24,15 @@ controllers.validation = async (req, res, next) => {
   }
 
   req.user = user;
-  next();
+  next();}
+  catch (error ){
+    if(error instanceof jwt.TokenExpiredError){
+      console.error("validation error:", error);
+      return res.status(401).json({ message: "token expired"  });
+    }
+    console.error("internal error:", error);
+    return res.status(500).json({message: "Internal server error"});
+  }
 };
 
 // controllers.validation_admin = async (req, res, next) => {

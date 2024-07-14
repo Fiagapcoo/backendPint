@@ -67,11 +67,13 @@ const decrypt = (text) => {
 //   };
 
 
-const generateToken = (id, expiresIn) => {
-  const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn });
+const generateToken = (id) => {
+  const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn:  process.env.JWT_TOKEN_EXPIRATION});
   console.log('token gerado: ' + token);
   return encrypt(token);
 };
+
+
 
 const generateRefreshToken = (id) => {
   const token = jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
@@ -85,97 +87,38 @@ const verifyToken = (encryptedToken) => {
     //console.log("Verifying Token:", encryptedToken);
     const decryptedToken = decrypt(encryptedToken);
     return jwt.verify(decryptedToken, process.env.JWT_SECRET);
-  } catch (error) {
+  }
+   catch (error) {
+    if(error instanceof jwt.TokenExpiredError){
+      console.log("Token expired");
+      throw error;
+    }
     console.error("Verification error:", error);
     return null;
   }
 };
 
-const verifyRefreshToken = (token) => {
+const verifyRefreshToken = (encryptedToken) => {
   try {
-    const decryptedToken = decrypt(token);
+    const decryptedToken = decrypt(encryptedToken);
+
+    if (!decryptedToken) {
+      throw new Error("Decryption failed");
+    }
+
     return jwt.verify(decryptedToken, process.env.JWT_REFRESH_SECRET);
   } catch (error) {
+    console.log('Error inside verifyRefresh:', error);
     return null;
   }
 };
-/* 
-
-
-
-const generateToken = (id) => {
-  const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
-  return encrypt(token);
-};
-
-const generateRefreshToken = (id) => {
-  const token = jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRATION });
-  return encrypt(token);
-};
-
-const verifyToken = (token) => {
-  try {
-    const decryptedToken = decrypt(token);
-    return jwt.verify(decryptedToken, process.env.JWT_SECRET);
-  } catch (error) {
-    return null;
-  }
-};
-
-const verifyRefreshToken = (token) => {
-  try {
-    const decryptedToken = decrypt(token);
-    return jwt.verify(decryptedToken, process.env.JWT_REFRESH_SECRET);
-  } catch (error) {
-    return null;
-  }
-};
-
-*/
-// const generateToken = (id, _expires_in) => {
-//   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: _expires_in });
-// };
-
-// const generateRefreshToken = (id, _expires_in) => {
-//   return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, { expiresIn: _expires_in });
-// };
-
-// const verifyToken = (token) => {
-//   try {
-//     return jwt.verify(token, process.env.JWT_SECRET);
-//   } catch (error) {
-//     return null;
-//   }
-// };
-
-// const verifyRefreshToken = (token) => {
-//   try {
-//     return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-//   } catch (error) {
-//     return null;
-//   }
-// };
 
 module.exports = {
   generateToken,
   generateRefreshToken,
   verifyToken,
   verifyRefreshToken,
+  generateToken2
 };
 
-// jwt with encryption
-// var payload = {
-//   username: user.user_id,
-//   type: 'access'
-// };
 
-// var csrfPayload = {
-//   username: user.user_id,
-//   type: 'csrf'
-// };
-
-// var token = jwt.sign(payload, KEY, {algorithm: 'HS256', expiresIn: "4h"});
-// var csrf = jwt.sign(csrfPayload, KEY, {algorithm: 'HS256', expiresIn: "4h"});
-// console.log("Success");
-// res.cookie('jwt', token, {magAge: 4*60*60*1000, httpOnly: true/*, secure: true */});
-// res.send(csrf);

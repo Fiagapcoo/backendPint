@@ -66,7 +66,7 @@ app.use('/api/form', formsRoutes);
 app.use('/api/comment', commentsRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/dynamic', dynamicRoutes);
-app.use('/api/notification', notificationsRoutes);authRoutes
+app.use('/api/notification', notificationsRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/upload', uploadRoute);
