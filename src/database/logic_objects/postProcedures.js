@@ -21,16 +21,16 @@ async function spCreatePost(subAreaId, officeId, publisher_id, title, content, p
                 transaction
             }
         );
-        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+        //console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
         console.log(result);
         const postId = result[0].post_id; // Extracting post_id from result
-        console.log('aaaaaaaaaaaaaaaaaaadasdasdasdasdasd' );
+        //console.log('aaaaaaaaaaaaaaaaaaadasdasdasdasdasd' );
 
-        if(type === 'P') {
+        if(type === 'P' && rating!=null ) {
             await db.sequelize.query(
                 `INSERT INTO "dynamic_content"."ratings" 
-                ("post_id", "event_id", "critic_id", "evaluation", "evaluation_date")
-                VALUES (:postId, NULL, :publisher_id, :rating, CURRENT_TIMESTAMP)`,
+                ( "event_id", "post_id", "critic_id", "evaluation", "evaluation_date")
+                VALUES ( NULL, :postId, :publisher_id, :rating, CURRENT_TIMESTAMP)`,
                 { 
                     replacements: { postId, publisher_id, rating }, 
                     type: QueryTypes.RAW, 

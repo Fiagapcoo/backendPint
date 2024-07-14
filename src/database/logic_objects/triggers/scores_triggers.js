@@ -27,68 +27,72 @@ const createFunction_reverseRating = async () => {
   const createTriggerFunction_updateAVG_Score = async () => {
     await db.sequelize.query(`
         CREATE OR REPLACE FUNCTION dynamic_content.trg_update_average_score()
-        RETURNS TRIGGER AS $$
-        DECLARE
-            record RECORD;
-            event_id INT;
-            post_id INT;
-            rating INT;
-            avg_score DECIMAL(3, 1);
-            new_avg_rating DECIMAL(3, 1);
-            num_of_evals INT;
-            error_message TEXT;
-            error_severity TEXT;
-            error_state TEXT;
-        BEGIN
-            -- Iterate over inserted rows
-            FOR record IN 
-                SELECT event_id, post_id, evaluation
-                FROM dynamic_content.evaluations
-                WHERE event_id = NEW.event_id OR post_id = NEW.post_id
-            LOOP
-                event_id := record.event_id;
-                post_id := record.post_id;
-                rating := record.evaluation;
+RETURNS TRIGGER AS $$
+DECLARE
+    _event_id INT;
+    _post_id INT;
+    rating INT;
+    avg_score DECIMAL(3, 1);
+    new_avg_rating DECIMAL(3, 1);
+    _num_of_evals INT;
+    error_message TEXT;
+    error_severity TEXT;
+    error_state TEXT;
+BEGIN
+    RAISE NOTICE 'Trigger function started for event_id: % and post_id: %', NEW.event_id, NEW.post_id;
 
-                BEGIN
-                    IF post_id IS NOT NULL THEN
-                        SELECT score, num_of_evals INTO avg_score, num_of_evals
-                        FROM dynamic_content.scores
-                        WHERE post_id = post_id;
+    -- Assign values from NEW to local variables
+    _event_id := NEW.event_id;
+    _post_id := NEW.post_id;
+    rating := NEW.evaluation;
 
-                        new_avg_rating := dynamic_content.fn_reverse_rating(avg_score, num_of_evals, rating);
+    BEGIN
+        IF _post_id IS NOT NULL THEN
+            -- Fetch the current average score and number of evaluations for the post
+            SELECT s.score, s.num_of_evals INTO avg_score, _num_of_evals
+            FROM dynamic_content.scores s
+            WHERE s.post_id = _post_id;
 
-                        UPDATE dynamic_content.scores
-                        SET score = new_avg_rating,
-                            num_of_evals = num_of_evals + 1
-                        WHERE post_id = post_id;
+            -- Calculate the new average rating
+            new_avg_rating := dynamic_content.fn_reverse_rating(avg_score, _num_of_evals, rating);
 
-                    ELSIF event_id IS NOT NULL THEN
-                        SELECT score, num_of_evals INTO avg_score, num_of_evals
-                        FROM dynamic_content.scores
-                        WHERE event_id = event_id;
+            -- Update the scores table with the new average rating and increment the number of evaluations
+            UPDATE dynamic_content.scores 
+            SET score = new_avg_rating,
+                num_of_evals = _num_of_evals + 1
+            WHERE post_id = _post_id;
 
-                        new_avg_rating := dynamic_content.fn_reverse_rating(avg_score, num_of_evals, rating);
+        ELSIF _event_id IS NOT NULL THEN
+            -- Fetch the current average score and number of evaluations for the event
+            SELECT s.score, s.num_of_evals INTO avg_score, _num_of_evals
+            FROM dynamic_content.scores s
+            WHERE s.event_id = _event_id;
 
-                        UPDATE dynamic_content.scores
-                        SET score = new_avg_rating,
-                            num_of_evals = num_of_evals + 1
-                        WHERE event_id = event_id;
-                    END IF;
+            -- Calculate the new average rating
+            new_avg_rating := dynamic_content.fn_reverse_rating(avg_score, _num_of_evals, rating);
 
-                EXCEPTION
-                    WHEN OTHERS THEN
-                        GET STACKED DIAGNOSTICS error_message = MESSAGE_TEXT,
-                                                error_severity = RETURNED_SQLSTATE,
-                                                error_state = PG_EXCEPTION_DETAIL;
-                        RAISE NOTICE 'Error: %', error_message;
-                        RETURN NULL;
-                END;
-            END LOOP;
+            -- Update the scores table with the new average rating and increment the number of evaluations
+            UPDATE dynamic_content.scores
+            SET score = new_avg_rating,
+                num_of_evals = _num_of_evals + 1
+            WHERE event_id = _event_id;
+        END IF;
 
-            RETURN NEW;
-        END;
-        $$ LANGUAGE plpgsql;
+    EXCEPTION
+        WHEN OTHERS THEN
+            GET STACKED DIAGNOSTICS error_message = MESSAGE_TEXT,
+                                    error_severity = RETURNED_SQLSTATE,
+                                    error_state = PG_EXCEPTION_DETAIL;
+            RAISE NOTICE 'Error: %', error_message;
+            RETURN NULL;
+    END;
+
+    RAISE NOTICE 'Trigger function completed for event_id: % and post_id: %', _event_id, _post_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
     `);
 };
 
