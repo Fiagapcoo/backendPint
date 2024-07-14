@@ -263,7 +263,7 @@ const spDeactivateUser = async (userId) => {
       throw error;
     }
 };
-  
+  //to set route
 const spActivateUser = async (userId) => {
     const transaction = await db.sequelize.transaction();
     try {
@@ -299,8 +299,8 @@ const spActivateUser = async (userId) => {
       throw error;
     }
 };
-  
-const spSetCenterAdmin = async (userId, officeId, city) => {
+  //to set route
+const spSetCenterAdmin = async (userId, officeId) => {
     const transaction = await db.sequelize.transaction();
     try {
       const [userExists] = await db.sequelize.query(
