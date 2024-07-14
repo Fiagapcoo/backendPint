@@ -49,14 +49,16 @@ async function spCreateEvent(officeId, subAreaId, name, description, eventDate, 
             VALUES (:publisher_id, :forumId)`,
             { replacements: { publisher_id, forumId }, type: QueryTypes.INSERT, transaction }
         );
-
+        console.log ('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+        /*
         await db.sequelize.query(
-            `INSERT INTO "control"."participation"("user_id", "event_id", "entry_date")
-             VALUES ( :publisher_id, :eventId, CURRENT_TIMESTAMP);`,
+            `INSERT INTO "control"."participation"("user_id", "event_id")
+             VALUES ( :publisher_id, :eventId);`,
              {replacements: {publisher_id, eventId },
              type: QueryTypes.INSERT, 
                 transaction},
         );
+        */
 
         await transaction.commit();
     } catch (error) {

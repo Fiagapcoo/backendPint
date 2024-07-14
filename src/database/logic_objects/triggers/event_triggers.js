@@ -167,16 +167,17 @@ const createTriggerFunction_event_part_count= async () => {
             CREATE OR REPLACE FUNCTION control.trg_event_participation_count()
             RETURNS TRIGGER AS $$
             BEGIN
-                -- Update participation count for each event in the NEW table
+                -- Update participation count for the event referenced in NEW
                 UPDATE dynamic_content.events e
                 SET current_participants = p.participant_count
                 FROM (
                     SELECT event_id, COUNT(*) AS participant_count
                     FROM control.participation 
-                    WHERE event_id IN (SELECT DISTINCT event_id FROM NEW)
+                    WHERE event_id = NEW.event_id
                     GROUP BY event_id
                 ) p
                 WHERE e.event_id = p.event_id;
+
                 RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;

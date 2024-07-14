@@ -1,4 +1,4 @@
-const { Sequilize } = require('sequelize');
+
 const db = require('../../models'); 
 
 
@@ -128,25 +128,30 @@ async function bulkInsert() {
         ON CONFLICT (translated_title) DO NOTHING;
     `);
     await db.sequelize.query(`
-        INSERT INTO "hr"."users" ("first_name", "last_name", "email", "join_date", "role_id")
+        INSERT INTO "hr"."users" ("user_id","first_name", "last_name", "email", "join_date", "role_id")
         VALUES 
-        ('John', 'Doe', 'john.doe@example.com', '2023-01-15', 1),
-        ('Jane', 'Smith', 'jane.smith@example.com', '2023-02-20', 2),
-        ('Emily', 'Johnson', 'emily.johnson@example.com', '2023-03-25', 2),
-        ('Michael', 'Brown', 'michael.brown@example.com', '2023-04-30', 2),
-        ('Sarah', 'Davis', 'sarah.davis@example.com', '2023-05-15', 2),
-        ('David', 'Miller', 'david.miller@example.com', '2023-06-10', 1),
-        ('Linda', 'Wilson', 'linda.wilson@example.com', '2023-07-05', 1),
-        ('James', 'Moore', 'james.moore@example.com', '2023-08-01', 2),
-        ('Barbara', 'Taylor', 'barbara.taylor@example.com', '2023-09-10', 1),
-        ('Richard', 'Anderson', 'richard.anderson@example.com', '2023-10-20', 1),
-        ('Guilhermo', 'Pedrinho', 'pv25215@alunos.estgv.ipv.pt', '2024-06-22', 3),
-        ('Jose', 'Machado', 'pv26900@alunos.estgv.ipv.pt', '2024-06-22', 3),
-        ('Filipe', 'Correia', 'pv25005@alunos.estgv.ipv.pt', '2024-6-22', 3),
-        ('Tio', 'Patinhas', 'tio.patinhas@examples.com', '2024-06-22', 3),
-        ('CENTRAL', 'ADMIN', 'god@example.com', '2023-01-15', 3)
+        (1,'John', 'Doe', 'john.doe@example.com', '2023-01-15', 1),
+        (2,'Jane', 'Smith', 'jane.smith@example.com', '2023-02-20', 2),
+        (3,'Emily', 'Johnson', 'emily.johnson@example.com', '2023-03-25', 2),
+        (4,'Michael', 'Brown', 'michael.brown@example.com', '2023-04-30', 2),
+        (5,'Sarah', 'Davis', 'sarah.davis@example.com', '2023-05-15', 2),
+        (6,'David', 'Miller', 'david.miller@example.com', '2023-06-10', 1),
+        (7,'Linda', 'Wilson', 'linda.wilson@example.com', '2023-07-05', 1),
+        (8,'James', 'Moore', 'james.moore@example.com', '2023-08-01', 2),
+        (9,'Barbara', 'Taylor', 'barbara.taylor@example.com', '2023-09-10', 1),
+        (10,'Richard', 'Anderson', 'richard.anderson@example.com', '2023-10-20', 1),
+        (11,'Guilhermo', 'Pedrinho', 'pv25215@alunos.estgv.ipv.pt', '2024-06-22', 3),
+        (12,'Jose', 'Machado', 'pv26900@alunos.estgv.ipv.pt', '2024-06-22', 3),
+        (13,'Filipe', 'Correia', 'pv25005@alunos.estgv.ipv.pt', '2024-6-22', 3),
+        (14,'Tio', 'Patinhas', 'tio.patinhas@examples.com', '2024-06-22', 3),
+        (15,'CENTRAL', 'ADMIN', 'god@example.com', '2023-01-15', 3)
         ON CONFLICT (email) DO NOTHING;
     `);
+    await db.sequelize.query(`
+        ALTER SEQUENCE hr.users_user_id_seq RESTART WITH 20;  
+    `)
+
+
     await db.sequelize.query(`
         INSERT INTO "user_interactions"."user_actions_log" ("user_id", "action_type", "action_description", "action_date")
         VALUES
@@ -297,7 +302,13 @@ async function bulkInsert() {
         ON CONFLICT ("field_id") DO NOTHING; 
     `);
 
-
+    
+    
 }
 
 bulkInsert();
+
+
+
+    
+

@@ -1,4 +1,4 @@
-const { QueryTypes } = require("sequelize");
+
 const db = require("../../../models");
 const { createFunction_logError } = require("./logSP");
 const {
