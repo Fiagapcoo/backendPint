@@ -72,7 +72,7 @@ controllers.register = async (req, res) => {
       console.log("userPayload:", userPayload);
 
       const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
-        expiresIn: "1h",
+        expiresIn: "3600",
       });
       //await sp_insertUserAccDetails(user[0].user_id);
       const random_sub_url = mashupAndRandomize(email, firstName, lastName);
@@ -125,7 +125,7 @@ controllers.register_admin = async (req, res) => {
       console.log("userPayload:", userPayload);
 
       const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
-        expiresIn: "1h",
+        expiresIn: "3600",
       });
       //await sp_insertUserAccDetails(user[0].user_id);
       const random_sub_url = mashupAndRandomize(email, firstName, lastName);
