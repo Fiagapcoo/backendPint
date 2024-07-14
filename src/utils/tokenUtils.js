@@ -118,7 +118,7 @@ module.exports = {
   generateRefreshToken,
   verifyToken,
   verifyRefreshToken,
-  generateToken2
+
 };
 
 
