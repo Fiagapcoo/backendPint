@@ -112,6 +112,7 @@ controllers.getPostsByCity = async (req, res) => {
   }
 };
 
+
 controllers.getForumsByCity = async (req, res) => {
   const { city_id } = req.params;
   if (!validator.isInt(city_id)) {
@@ -455,6 +456,69 @@ controllers.getEventByDate = async (req, res) => {
       where: { event_date: date },
       order: [["creation_date", "DESC"]],
     });
+    res.status(200).json({ success: true, data: events });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving events: " + error.message,
+    });
+  }
+};
+
+controllers.getPosts = async (req, res) => {
+  try {
+    const posts = await db.sequelize.query(
+      `
+            SELECT p.*, s.score
+            FROM "dynamic_content"."posts" p
+            JOIN "dynamic_content"."scores" s ON p.post_id = s.post_id
+            ORDER BY p.creation_date DESC
+        `,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    res.status(200).json({ success: true, data: posts });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving posts: " + error.message,
+    });
+  }
+};
+controllers.getForums = async (req, res) => {
+
+  try {
+    const forums = await db.sequelize.query(
+      `
+            SELECT f.*
+            FROM "dynamic_content"."forums" f
+            ORDER BY f.creation_date DESC
+        `,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    res.status(200).json({ success: true, data: forums });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving forums: " + error.message,
+    });
+  }
+};
+controllers.getEvents = async (req, res) => {
+  try {
+    const events = await db.sequelize.query(
+      `
+            SELECT e.*
+            FROM "dynamic_content"."events" e
+            ORDER BY e.creation_date DESC
+        `,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
     res.status(200).json({ success: true, data: events });
   } catch (error) {
     res.status(500).json({

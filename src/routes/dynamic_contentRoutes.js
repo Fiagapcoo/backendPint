@@ -18,7 +18,9 @@ router.get('/get-users', validation, dynamicController.getUsers);
 router.post('/update-user-office', validation, dynamicController.updateUserOffice);
 //router.get('/user-preferences', dynamicController.getUserPreferences);
 
-
+router.get('/posts', validation, dynamicController.getPosts);
+router.get('/forums', validation, dynamicController.getForums);
+router.get('/events', validation, dynamicController.getEvents);
 
 router.get('/test/get-event/:event_id', dynamicController.getEventByIdNoRawQuery);
 

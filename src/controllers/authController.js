@@ -72,7 +72,7 @@ controllers.register = async (req, res) => {
       console.log("userPayload:", userPayload);
 
       const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
-        expiresIn: 3600,
+        expiresIn: 1300,
       });
       //await sp_insertUserAccDetails(user[0].user_id);
       const random_sub_url = mashupAndRandomize(email, firstName, lastName);
@@ -100,9 +100,9 @@ controllers.register = async (req, res) => {
       .json({ success: false, message: "Internal server error: " + error });
   }
 };
-
+//TO ALTER - nao enviar email, dar set the password aqui.
 controllers.register_admin = async (req, res) => {
-  const { email, firstName, lastName, centerId, password } = req.body;
+  const { email, firstName, lastName, centerId } = req.body;
   console.log("req.body:", req.body);
 
   const validationResult = validateInput_register(email, firstName, lastName);
@@ -125,7 +125,7 @@ controllers.register_admin = async (req, res) => {
       console.log("userPayload:", userPayload);
 
       const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
-        expiresIn: 3600,
+        expiresIn: 1300,
       });
       //await sp_insertUserAccDetails(user[0].user_id);
       const random_sub_url = mashupAndRandomize(email, firstName, lastName);
@@ -389,8 +389,14 @@ controllers.refreshToken = async (req, res) => {
     const accessToken = generateToken(decoded.id);
     res.status(200).json({ accessToken, success: true });
   } catch (error) {
+    if(error instanceof jwt.TokenExpiredError){
+      console.error("validation error:", error);
+      return res.status(401).json({ message: "refresh token expired"  });
+    }
     console.error("Error refreshing token:", error);
   }
 };
+
+
 
 module.exports = controllers;

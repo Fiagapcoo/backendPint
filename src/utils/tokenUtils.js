@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-//require('dotenv').config();
+require('dotenv').config();
 
 //for mobile
 const algorithm = "aes-256-cbc";
@@ -68,8 +68,11 @@ const decrypt = (text) => {
 
 
 const generateToken = (id) => {
+  console.log(process.env.JWT_TOKEN_EXPIRATION);
+
   const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn:  process.env.JWT_TOKEN_EXPIRATION});
-  console.log('token gerado: ' + token);
+
+  console.log('token gerado: ' + token);   
   return encrypt(token);
 };
 
