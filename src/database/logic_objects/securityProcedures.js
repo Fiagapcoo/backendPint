@@ -268,7 +268,7 @@ const spActivateUser = async (userId) => {
     const transaction = await db.sequelize.transaction();
     try {
       await db.sequelize.query(
-        `UPDATE "security"."user_account_details" SET "account_status" = 1 WHERE "user_id" = :userId`,
+        `UPDATE "security"."user_account_details" SET "account_status" = true WHERE "user_id" = :userId`,
         {
           replacements: { userId },
           type: QueryTypes.UPDATE,
