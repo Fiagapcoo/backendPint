@@ -1,5 +1,5 @@
 const db = require("../models");
-const { QueryTypes } = require("sequelize");
+const { QueryTypes, Op } = require("sequelize");
 const validator = require("validator");
 const controllers = {};
 
@@ -448,14 +448,30 @@ controllers.updateUserOffice = async (req, res) => {
 
 controllers.getEventByDate = async (req, res) => {
   const { date } = req.params;
-  if (!validator.isDate(date)) {
-    return res.status(400).json({ success: false, message: "Invalid date" });
+
+  // Validate the date format (assuming YYYY-MM-DD)
+  if (!validator.isISO8601(date)) {
+    return res.status(400).json({ success: false, message: "Invalid date format. Please use YYYY-MM-DD." });
   }
+
   try {
+    console.log(date);
+
+    // Ensure that the event_date is compared correctly considering timezones
+    const startDate = new Date(date);
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 1);
+
     const events = await db.Events.findAll({
-      where: { event_date: date },
+      where: {
+        event_date: {
+          [Op.gte]: startDate,
+          [Op.lt]: endDate,
+        },
+      },
       order: [["creation_date", "DESC"]],
     });
+
     res.status(200).json({ success: true, data: events });
   } catch (error) {
     res.status(500).json({
