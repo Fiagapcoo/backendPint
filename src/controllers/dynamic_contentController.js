@@ -472,7 +472,9 @@ controllers.getEventByDate = async (req, res) => {
       order: [["creation_date", "DESC"]],
     });
 
-    res.status(200).json({ success: true, data: events });
+    const newEvents = events.filter(event => event.validated === true);
+
+    res.status(200).json({ success: true, data: newEvents });
   } catch (error) {
     res.status(500).json({
       success: false,
