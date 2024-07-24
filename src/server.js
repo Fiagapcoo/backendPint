@@ -11,9 +11,8 @@ const app = express();
 
 
 //por a correr 1 vez unica
-
-
-
+const {server} = require('./websockets');
+var admin = require("firebase-admin");
 
 
 
@@ -74,7 +73,44 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/email', emailRoute);
 
 
+const serviceAccount = require("../softshares-000515-firebase-adminsdk-ds8og-d6087d42e3.json");
+
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+
+  async function sendNotification(token, title, body) {
+    const message = {
+      notification: {
+        title: title,
+        body: body,
+      },
+      token: token,
+    };
+  
+    try {
+      const response = await admin.messaging().send(message);
+      console.log('Successfully sent message:', response);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  }
+  
+  // Example route to trigger notifications
+  app.post('/api/notify', async (req, res) => {
+    const { token, title, body } = req.body;
+    await sendNotification(token, title, body);
+    res.status(200).send('Notification sent');
+  });
+
+
+
 app.listen(app.get('port'), () => {
     console.log("Server started on port " + app.get('port'));
     //console.log(process.env.ENCRYPTION_KEY);
+});
+
+server.listen(5000, () => {
+    console.log("WebSocket server started on port 5000");
 });
