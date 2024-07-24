@@ -14,8 +14,8 @@ module.exports = (sequelize, DataTypes) => {
 
     Comments.associate = function(models) {
         Comments.belongsTo(models.Users, { foreignKey: 'publisher_id', targetKey: 'user_id', schema: 'hr' });
-        Comments.belongsTo(models.Posts, { foreignKey: 'post_id', targetKey: 'post_id', schema: 'dynamic_content' });
-        Comments.belongsTo(models.Forums, { foreignKey: 'forum_id', targetKey: 'forum_id', schema: 'dynamic_content' });
+        Comments.belongsTo(models.Posts, { foreignKey: 'post_id', targetKey: 'post_id', schema: 'dynamic_content',  onDelete: 'CASCADE' });
+        Comments.belongsTo(models.Forums, { foreignKey: 'forum_id', targetKey: 'forum_id', schema: 'dynamic_content',  onDelete: 'CASCADE' });
     };
 
     return Comments;

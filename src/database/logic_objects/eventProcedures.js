@@ -61,6 +61,7 @@ async function spCreateEvent(officeId, subAreaId, name, description, eventDate, 
         */
 
         await transaction.commit();
+        return eventId;
     } catch (error) {
         console.error('Transaction Error:', error); // Log the detailed error
         await transaction.rollback();
@@ -259,7 +260,7 @@ async function spEditEvent(eventId, subAreaId = null, officeId = null, adminId =
 
 async function spGetEvent(eventId) {
     const event = await db.sequelize.query(
-        `SELECT * FROM "dynamic_content"."events" WHERE "event_id" = :eventId`,
+        `SELECT * FROM "dynamic_content"."events" WHERE "event_id" = :eventId` ,
         { replacements: { eventId }, type: QueryTypes.SELECT }
     );
 

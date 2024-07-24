@@ -100,7 +100,8 @@ controllers.register = async (req, res) => {
       .json({ success: false, message: "Internal server error: " + error });
   }
 };
-//TO ALTER - nao enviar email, dar set the password aqui.
+//TO ALTER - nao enviar email, dar set the password aqui. 
+// so server admin pode usar
 controllers.register_admin = async (req, res) => {
   const { email, firstName, lastName, centerId } = req.body;
   console.log("req.body:", req.body);
@@ -260,10 +261,10 @@ const authenticateUser = async (email, password) => {
 
   const isMatch = await bcrypt.compare(password, user.hashed_password);
   if (!isMatch) {
-    await updateAccessOnLogin(user.user_id);
+    
     return { authenticated: false, message: "Invalid email or password" };
   }
-
+  await updateAccessOnLogin(user.user_id);
   return { authenticated: true, user };
 };
 
@@ -271,8 +272,9 @@ const handleResponseBasedOnRole = async (user, res) => {
   if (user.role_id != 1) {
     //const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, { expiresIn: "4h" });
     const token = generateToken(user.user_id);
+    const refreshToken = generateRefreshToken(authResult.user.user_id);
     await sp_updateLastAccess(user.user_id);
-    res.status(200).json({ token, success: true, message: "Login successful" });
+    res.status(200).json({ token, refreshToken,success: true, message: "Login successful" });
   } else {
     res
       .status(403)
@@ -346,28 +348,28 @@ controllers.login_mobile = async (req, res) => {
   }
 };
 
-controllers.testjwt = async (req, res) => {
-  const info = {
-    id: 1,
-    email: "abc@gmail.com",
-  };
+// controllers.testjwt = async (req, res) => {
+//   const info = {
+//     id: 1,
+//     email: "abc@gmail.com",
+//   };
 
-  const token = jwt.sign(info, process.env.JWT_SECRET, { expiresIn: "1h" });
-  console.log("token:", token);
-};
+//   const token = jwt.sign(info, process.env.JWT_SECRET, { expiresIn: "1h" });
+//   console.log("token:", token);
+// };
 
-controllers.validateToken = async (req, res) => {
-  const { token } = req.body;
+// controllers.validateToken = async (req, res) => {
+//   const { token } = req.body;
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("decoded:", decoded);
-    res.status(200).json({ success: true, message: "Token is valid" });
-  } catch (error) {
-    console.error("Error validating token:", error);
-    res.status(401).json({ success: false, message: "Invalid token" });
-  }
-};
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//     console.log("decoded:", decoded);
+//     res.status(200).json({ success: true, message: "Token is valid" });
+//   } catch (error) {
+//     console.error("Error validating token:", error);
+//     res.status(401).json({ success: false, message: "Invalid token" });
+//   }
+// };
 
 controllers.getUserByToken = async (req, res) => {
   const user_id = req.user.id;

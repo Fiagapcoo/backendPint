@@ -85,6 +85,7 @@ async function spAddComment({
     }
 
     await t.commit();
+    return newCommentID;
   } catch (error) {
     await t.rollback();
     console.error("Error adding comment:", error.message);

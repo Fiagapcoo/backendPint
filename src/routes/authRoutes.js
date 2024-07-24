@@ -15,7 +15,7 @@ router.post(
 );
 router.post("/login", authController.login_web);
 router.post("/login_mobile", authController.login_mobile);
-router.post("/token-test", authController.testjwt);
+//router.post("/token-test", authController.testjwt);
 
 router.get("/get-user-by-token", validation, authController.getUserByToken);
 router.post("/refresh-token", authController.refreshToken);

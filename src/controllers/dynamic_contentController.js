@@ -42,36 +42,36 @@ controllers.getAllContentByCity = async (req, res) => {
   }
   try {
     const posts = await db.sequelize.query(
-            `SELECT * FROM "dynamic_content"."posts" p 
+      `SELECT * FROM "dynamic_content"."posts" p 
             JOIN "centers"."offices" o ON p.office_id = o.office_id
             WHERE o.office_id = :city_id
             ORDER BY p.creation_date DESC `,
-            { 
-                replacements: { city_id }, 
-                type: QueryTypes.SELECT 
-            }
+      {
+        replacements: { city_id },
+        type: QueryTypes.SELECT,
+      }
     );
 
     const forums = await db.sequelize.query(
-            `SELECT * FROM "dynamic_content"."forums" f 
+      `SELECT * FROM "dynamic_content"."forums" f 
             JOIN "centers"."offices" o ON f.office_id = o.office_id
             WHERE o.office_id = :city_id
             ORDER BY f.creation_date DESC `,
-            {   
-                replacements: { city_id },   
-                type: QueryTypes.SELECT 
-            }
+      {
+        replacements: { city_id },
+        type: QueryTypes.SELECT,
+      }
     );
 
     const events = await db.sequelize.query(
-            `SELECT * FROM "dynamic_content"."events" e 
+      `SELECT * FROM "dynamic_content"."events" e 
             JOIN "centers"."offices" o ON e.office_id = o.office_id
             WHERE o.office_id = :city_id
             ORDER BY e.creation_date DESC `,
-        { 
-            replacements: { city_id },
-            type: QueryTypes.SELECT 
-        }
+      {
+        replacements: { city_id },
+        type: QueryTypes.SELECT,
+      }
     );
 
     res.status(200).json({ posts, forums, events });
@@ -111,7 +111,6 @@ controllers.getPostsByCity = async (req, res) => {
     });
   }
 };
-
 
 controllers.getForumsByCity = async (req, res) => {
   const { city_id } = req.params;
@@ -451,7 +450,12 @@ controllers.getEventByDate = async (req, res) => {
 
   // Validate the date format (assuming YYYY-MM-DD)
   if (!validator.isISO8601(date)) {
-    return res.status(400).json({ success: false, message: "Invalid date format. Please use YYYY-MM-DD." });
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "Invalid date format. Please use YYYY-MM-DD.",
+      });
   }
 
   try {
@@ -472,7 +476,7 @@ controllers.getEventByDate = async (req, res) => {
       order: [["creation_date", "DESC"]],
     });
 
-    const newEvents = events.filter(event => event.validated === true);
+    const newEvents = events.filter((event) => event.validated === true);
 
     res.status(200).json({ success: true, data: newEvents });
   } catch (error) {
@@ -505,7 +509,6 @@ controllers.getPosts = async (req, res) => {
   }
 };
 controllers.getForums = async (req, res) => {
-
   try {
     const forums = await db.sequelize.query(
       `
