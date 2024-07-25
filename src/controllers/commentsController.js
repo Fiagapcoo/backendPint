@@ -2,7 +2,7 @@ const { spAddComment,
         getCommentTree } = require('../database/logic_objects/commentsProcedures');
 const validator = require('validator');
 const controllers = {};
-
+const {sendCommentforumNotif, sendCommentpostNotif} = require('../websockets');
 controllers.add_comment = async (req, res) => {
     const { parentCommentID = null, contentID, contentType, userID, commentText } = req.body; 
     console.log(req.query);
@@ -25,7 +25,9 @@ controllers.add_comment = async (req, res) => {
     }
     //const intContID = parseInt(contentID);
     try {
-        await spAddComment({ parentCommentID, contentID, contentType, userID, commentText });
+        var id = await spAddComment({ parentCommentID, contentID, contentType, userID, commentText });
+        if(contentType=='Post'){sendCommentpostNotif({post_id: contentID,comment_id: id, content:commentText });}
+        if(contentType=='Forum'){sendCommentforumNotif({forum_id: contentID, comment_id: id, content:commentText });}
         res.status(201).json({success:true, message:'Comment added successfully.'});
     } catch (error) {
         res.status(500).json({success:false, message:'Error adding Comment: ' + error.message});
