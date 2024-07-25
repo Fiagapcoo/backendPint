@@ -72,7 +72,7 @@ app.use('/upload', uploadRoute);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/email', emailRoute);
 
-
+/*
 const serviceAccount = require("../softshares-000515-firebase-adminsdk-ds8og-d6087d42e3.json");
 
 
@@ -103,6 +103,8 @@ admin.initializeApp({
     await sendNotification(token, title, body);
     res.status(200).send('Notification sent');
   });
+
+*/
 
 
 
