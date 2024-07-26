@@ -272,7 +272,7 @@ const handleResponseBasedOnRole = async (user, res) => {
   if (user.role_id != 1) {
     //const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, { expiresIn: "4h" });
     const token = generateToken(user.user_id);
-    const refreshToken = generateRefreshToken(authResult.user.user_id);
+    const refreshToken = generateRefreshToken(user.user_id);
     await sp_updateLastAccess(user.user_id);
     res.status(200).json({ token, refreshToken,success: true, message: "Login successful" });
   } else {
