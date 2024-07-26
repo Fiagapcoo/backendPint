@@ -18,7 +18,7 @@ const controllers = {};
 
 controllers.validate_content = async (req, res) => { 
     const { contentType, contentID, adminID } = req.params; 
-
+    console.log (req.params);
     // Validate inputs
     if (!validator.isIn(contentType, ['post', 'event', 'forum'])) {
       return res.status(400).json({ success: false, message: 'Invalid content type' });

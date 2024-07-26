@@ -30,6 +30,10 @@ controllers.validation = async (req, res, next) => {
       console.error("validation error:", error);
       return res.status(401).json({ message: "token expired"  });
     }
+    if(error instanceof jwt.JsonWebTokenError){
+      console.error("token error error:", error);
+    return res.status(401).json({message: "Token error"});
+    }
     console.error("internal error:", error);
     return res.status(500).json({message: "Internal server error"});
   }

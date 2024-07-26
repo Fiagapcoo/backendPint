@@ -127,19 +127,19 @@ async function validateContent(contentType, contentID, adminID) {
     // Determine the appropriate table and column for validation
     let updateQuery;
     switch (contentType) {
-      case "Post":
+      case "post":
         updateQuery = `
           UPDATE "dynamic_content"."posts"
           SET "validated" = true, "admin_id" = :adminID
           WHERE "post_id" = :contentID`;
         break;
-      case "Event":
+      case "event":
         updateQuery = `
           UPDATE "dynamic_content"."events"
           SET "validated" = true, "admin_id" = :adminID
           WHERE "event_id" = :contentID`;
         break;
-      case "Forum":
+      case "forum":
         updateQuery = `
           UPDATE "dynamic_content"."forums"
           SET "validated" = true, "admin_id" = :adminID
@@ -373,10 +373,10 @@ async function spValidateContentHELPER(contentType, contentID, adminID) {
     );
 
     // Validate content based on the content type
-    if (contentType === "Post") {
+    if (contentType === "post") {
       await db.sequelize.query(
         `UPDATE "dynamic_content"."posts"
-         SET "validated" = 1, "admin_id" = :adminID
+         SET "validated" = true, "admin_id" = :adminID
          WHERE "post_id" = :contentID`,
         {
           replacements: { adminID, contentID },
@@ -384,10 +384,10 @@ async function spValidateContentHELPER(contentType, contentID, adminID) {
           transaction,
         }
       );
-    } else if (contentType === "Event") {
+    } else if (contentType === "event") {
       await db.sequelize.query(
         `UPDATE "dynamic_content"."events"
-         SET "validated" = 1, "admin_id" = :adminID
+         SET "validated" = true, "admin_id" = :adminID
          WHERE "event_id" = :contentID`,
         {
           replacements: { adminID, contentID },
@@ -395,10 +395,10 @@ async function spValidateContentHELPER(contentType, contentID, adminID) {
           transaction,
         }
       );
-    } else if (contentType === "Forum") {
+    } else if (contentType === "forum") {
       await db.sequelize.query(
         `UPDATE "dynamic_content"."forums"
-         SET "validated" = 1, "admin_id" = :adminID
+         SET "validated" = true, "admin_id" = :adminID
          WHERE "forum_id" = :contentID`,
         {
           replacements: { adminID, contentID },
@@ -408,7 +408,7 @@ async function spValidateContentHELPER(contentType, contentID, adminID) {
       );
     } else {
       throw new Error(
-        'Invalid ContentType. Only "Post", "Event", and "Forum" are allowed.'
+        'Invalid ContentType. Only "post", "event", and "forum" are allowed.'
       );
     }
 

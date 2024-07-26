@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         join_date: { type: DataTypes.DATE, allowNull: false },
         last_access: { type: DataTypes.DATE, defaultValue: sequelize.literal('CURRENT_TIMESTAMP') },
-        fcmToken: { type: DataTypes.STRING, allowNull:true}
+       // fcmToken: { type: DataTypes.STRING, allowNull:true}
     }, {
         schema: 'hr',
         tableName: 'users',

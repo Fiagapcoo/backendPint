@@ -129,7 +129,7 @@ async function fnIsPublisherOfficeAdmin(publisherID) {
 const logError = async (errorMessage, errorSeverity, errorState) => {
     try {
       await db.sequelize.query(
-        `INSERT INTO "security"."error_log" ("ErrorMessage", "ErrorSeverity", "ErrorState", "ErrorTime")
+        `INSERT INTO "security"."error_log" ("error_message", "error_severity", "error_state", "error_time")
          VALUES (:errorMessage, :errorSeverity, :errorState, NOW())`,
         {
           replacements: { errorMessage, errorSeverity, errorState },
