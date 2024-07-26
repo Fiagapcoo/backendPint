@@ -443,12 +443,32 @@ async function spValidateContent(contentID, contentType, validatorID) {
       // Admin has permission to validate content globally
       await spValidateContentHELPER(contentID, contentType, validatorID);
     } else {
+      let tableName;
+      let additionalCondition;
+
+      // Determine table name and additional condition based on content type
+      switch (contentType) {
+        case "event":
+          tableName = '"dynamic_content"."events"';
+          additionalCondition = 'p."event_id"'; // Replace with actual condition for type1
+          break;
+        case "forum":
+          tableName = '"dynamic_content"."forums"';
+          additionalCondition = 'p."forum_id"'; // Replace with actual condition for type2
+          break;
+        default:
+          tableName = '"dynamic_content"."posts"';
+          additionalCondition = 'p."post_id"'; // Replace with actual default condition
+          break;
+      }
+
       // Check if the content belongs to the admin's designated center
       const isAuthorized = await db.sequelize.query(
-        `SELECT 1
-         FROM "dynamic_content"."posts" p
-         JOIN "centers"."office_admins" ro ON p."office_id" = ro."office_id"
-         WHERE p."post_id" = :contentID AND ro."office_id" = :officeCenterID`,
+          `SELECT 1
+          FROM ${tableName} p
+          JOIN "centers"."office_admins" ro ON p."office_id" = ro."office_id"
+          WHERE ${additionalCondition} = :contentID
+          AND ro."office_id" = :officeCenterID`,
         {
           replacements: { contentID, officeCenterID },
           type: QueryTypes.SELECT,
@@ -456,13 +476,12 @@ async function spValidateContent(contentID, contentType, validatorID) {
         }
       );
 
-      if (!isAuthorized.length) {
-        throw new Error("Unauthorized validation attempt.");
+      if (isAuthorized.length > 0) {
+        await spValidateContentHELPER(contentID, contentType, validatorID);
+      } else {
+        throw new Error('Not authorized to validate this content');
       }
-
-      await spValidateContentHELPER(contentID, contentType, validatorID);
     }
-
     await transaction.commit();
   } catch (error) {
     await transaction.rollback();
