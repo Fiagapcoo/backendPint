@@ -60,16 +60,16 @@ async function createEventForm(eventID, customFieldsJson) {
   const t = await db.sequelize.transaction();
   try {
     // Copy default fields to the new event form
-    await db.sequelize.query(
-      `INSERT INTO "forms"."fields" ("event_id", "field_name", "field_type", "field_value", "max_value", "min_value", "def_field_id")
-         SELECT :eventID, "field_name", "field_type", "field_value", "max_value", "min_value", "field_id"
-         FROM "forms"."default_fields"`,
-      {
-        replacements: { eventID },
-        type: QueryTypes.INSERT,
-        transaction: t,
-      }
-    );
+    // await db.sequelize.query(
+    //   `INSERT INTO "forms"."fields" ("event_id", "field_name", "field_type", "field_value", "max_value", "min_value", "def_field_id")
+    //      SELECT :eventID, "field_name", "field_type", "field_value", "max_value", "min_value", "field_id"
+    //      FROM "forms"."default_fields"`,
+    //   {
+    //     replacements: { eventID },
+    //     type: QueryTypes.INSERT,
+    //     transaction: t,
+    //   }
+    // );
     // Log the JSON string before parsing
     console.log('Original JSON string:', customFieldsJson);
     // Parse the JSON string twice for some reason...

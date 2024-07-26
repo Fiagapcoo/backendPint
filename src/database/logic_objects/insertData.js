@@ -297,8 +297,8 @@ async function bulkInsert() {
         (2,'Last Name', 'Text', ''),
         (3,'Age', 'Int', '0'),
         (4,'Date of Birth', 'Date', '1970-01-01'),
-        (5,'Gender', 'Check Box', 'M;F;O'),
-        (6,'Agree to Terms', 'Checkbox', 'Y;N')
+        (5,'Gender', 'Check Box', "[M,F,O]"),
+        (6,'Agree to Terms', 'Checkbox', "[Y,N]")
         ON CONFLICT ("field_id") DO NOTHING; 
     `);
 
