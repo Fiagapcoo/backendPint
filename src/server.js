@@ -12,7 +12,7 @@ const app = express();
 
 //por a correr 1 vez unica
 const {server} = require('./websockets');
-var admin = require("firebase-admin");
+//var admin = require("firebase-admin");
 
 
 
