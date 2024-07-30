@@ -267,6 +267,17 @@ async function spGetEvent(eventId) {
     return event.length ? event[0] : null;
 }
 
+async function spGetParticipants(eventId) {
+    const participants = await db.sequelize.query(
+        `SELECT u.user_id, u.first_name, u.last_name, u.profile_pic from "control".participation p 
+         JOIN hr.users u on p.user_id = u.user_id 
+         WHERE  event_id = :eventId`,
+        { replacements: { eventId }, type: QueryTypes.SELECT }
+    );
+
+    return participants;
+};
+
 module.exports = {
     spCreateEvent,
     spEventParticipationCleanup,
@@ -274,5 +285,6 @@ module.exports = {
     spRegisterUserForEvent,
     fnGetEventState,
     spEditEvent,
-    spGetEvent
+    spGetEvent,
+    spGetParticipants
 }

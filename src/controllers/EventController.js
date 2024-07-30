@@ -5,6 +5,7 @@ const { spCreateEvent,
     spUnregisterUserFromEvent,
     fnGetEventState,
     spEditEvent,
+    spGetParticipants,
     spGetEvent } = require('../database/logic_objects/eventProcedures');
 const validator = require("validator");
 const controllers = {};
@@ -102,6 +103,17 @@ controllers.get_event = async (req, res) => {
         res.status(201).json({success:true, message:'Got event successfully.', data: event});
     } catch (error) {
         res.status(500).json({success:false, message:'Error getting event: ' + error.message});
+    }
+}
+
+controllers.get_participants = async (req, res) => {
+    const { eventId } = req.params; 
+    console.log(req.params);
+    try {
+        const participants = await spGetParticipants(eventId);
+        res.status(201).json({success:true, message:'Got participants successfully.', data: participants});
+    } catch (error) {
+        res.status(500).json({success:false, message:'Error getting participants: ' + error.message});
     }
 }
 
