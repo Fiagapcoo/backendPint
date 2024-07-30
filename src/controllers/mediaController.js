@@ -1,6 +1,6 @@
 const { spCreateAlbum, 
         spAddPhotograph, 
-          } = require('../database/logic_objects/mediaProcedures');
+        spGetAlbums  } = require('../database/logic_objects/mediaProcedures');
 
 const controllers = {};
 
@@ -24,6 +24,16 @@ controllers.add_photograph = async (req, res) => {
         res.status(201).json({success:true, message:'Photograph added successfully.'});
     } catch (error) {
         res.status(500).json({success:false, message:'Error adding photograph: ' + error.message});
+    }
+};
+
+controllers.get_albums = async (req, res) => {
+
+    try {
+        const albums = await spGetAlbums();
+        res.status(200).json({success:true, albums});
+    } catch (error) {
+        res.status(500).json({success:false, message:'Error fetching albums: ' + error.message});
     }
 };
 

@@ -35,7 +35,17 @@ async function spAddPhotograph(albumId, publisherId, filePath) {
     }
 }
 
+async function spGetAlbums(){
+    const albums = await db.sequelize.query(
+        `SELECT * FROM "dynamic_content"."albuns"`,
+        { type: QueryTypes.SELECT }
+    );
+
+    return albums;
+}
+
 module.exports = {
     spCreateAlbum,
-    spAddPhotograph
+    spAddPhotograph,
+    spGetAlbums
 }
