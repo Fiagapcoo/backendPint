@@ -1,7 +1,7 @@
 const { QueryTypes } = require('sequelize');
 const db = require('../../models'); 
 
-//Procedure to Create an Album
+
 async function spCreateAlbum(eventId, subAreaId, title) {
     const transaction = await db.sequelize.transaction();
     try {
