@@ -68,8 +68,8 @@ app.use('/api/dynamic', dynamicRoutes);
 app.use('/api/notification', notificationsRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-app.use('/upload', uploadRoute);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api/upload', uploadRoute);
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/email', emailRoute);
 
 /*
