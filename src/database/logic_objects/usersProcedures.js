@@ -390,6 +390,23 @@ async function createUserPreferences(userID, areas=null, subAreas=null, receiveN
     throw error;
   }
 }
+async function getUsersToValidate() {
+  try {
+    const results = await db.sequelize.query(
+      `SELECT *
+      FROM "hr"."users" u
+      JOIN "security".user_account_details uad on u.user_id = uad.user_id 
+      WHERE uad.account_status = false;`,
+      {
+        type: QueryTypes.SELECT
+      }
+    );
+    return results;
+  } catch (error) {
+    console.error('Error fetching users to validate:', error);
+    throw error;
+  }
+};
 
   
   module.exports = {
@@ -405,5 +422,6 @@ async function createUserPreferences(userID, areas=null, subAreas=null, receiveN
     sp_verifyUser,
     sp_updateLastAccess,
     updateAccStatus,
-    createUserPreferences
+    createUserPreferences,
+    getUsersToValidate
 }

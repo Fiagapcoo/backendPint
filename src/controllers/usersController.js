@@ -8,6 +8,7 @@ const { getUserPreferences,
         getUserByRole,
         updateAccStatus,
         createUserPreferences,
+        getUsersToValidate,
      } = require('../database/logic_objects/usersProcedures');
 
 
@@ -124,6 +125,15 @@ controllers.update_acc_status = async (req, res) => {
     try {
         await updateAccStatus(user, status);
         res.status(201).send('User updated successfully.');
+    } catch (error) {
+        res.status(500).send('Error creating Forum: ' + error.message);
+    }
+}
+
+controllers.get_users_to_validate = async (req, res) => {
+    try {
+        const aux = await getUsersToValidate();
+        res.status(200).json({success:true, data:aux, message:'Got users to validate successfully.'});
     } catch (error) {
         res.status(500).send('Error creating Forum: ' + error.message);
     }

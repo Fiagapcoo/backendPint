@@ -13,6 +13,7 @@ router.get('/get-user-role/:userID', validation, controller.get_user_role);
 router.get('/get-user-by-role/:role', validation, controller.get_user_by_role);
 router.patch('/update-acess-on-login/:userID', validation, controller.update_access_on_login); 
 router.put('/update-acc-status', validation, controller.update_acc_status);
+router.get('/get-users-to-validate', validation, controller.get_users_to_validate);
 
 
 
