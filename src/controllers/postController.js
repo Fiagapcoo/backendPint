@@ -5,10 +5,10 @@ const { spCreatePost,
 const controllers = {};
 
 controllers.create_post = async (req, res) => {
-    const { subAreaId, officeId, publisher_id, title, content=null, pLocation=null, filePath=null, type='N', rating=null } = req.body; 
+    const { subAreaId, officeId, publisher_id, title, content=null, pLocation=null, filePath=null, type='N', rating=null, price=null } = req.body; 
     console.log(req.body);
     try {
-        await spCreatePost(subAreaId, officeId, publisher_id, title, content, pLocation, filePath, type, rating);
+        await spCreatePost(subAreaId, officeId, publisher_id, title, content, pLocation, filePath, type, rating, price);
         res.status(201).json({success:true, message:'Post created successfully.'});
     } catch (error) {
         console.log('Error: ' + error);
@@ -19,7 +19,7 @@ controllers.create_post = async (req, res) => {
 
 controllers.edit_post = async (req, res) => {
     const { postId } = req.params
-    const {  subAreaId = null, officeId = null, adminId = null, title = null, content = null, pLocation = null, filePath = null, type = null } = req.body; 
+    const {  subAreaId = null, officeId = null, adminId = null, title = null, content = null, pLocation = null, filePath = null, type = null, price=null } = req.body; 
     console.log(req.query);
     try {
         await spEditPost(postId, subAreaId, officeId, adminId, title, content, pLocation, filePath, type);

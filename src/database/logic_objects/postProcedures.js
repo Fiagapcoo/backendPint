@@ -3,7 +3,7 @@ const db = require('../../models');
 const { fnIsPublisherOfficeAdmin } = require('./generalHelpers');
 
 //Procedure to Create a Post
-async function spCreatePost(subAreaId, officeId, publisher_id, title, content, pLocation, filePath, type='N', rating=null) {
+async function spCreatePost(subAreaId, officeId, publisher_id, title, content, pLocation, filePath, type='N', rating=null, price=null) {
     const isOfficeAdmin = await fnIsPublisherOfficeAdmin(publisher_id);
     const validated = isOfficeAdmin ? true : false;
     let adminId = isOfficeAdmin ? publisher_id : null;
@@ -12,11 +12,11 @@ async function spCreatePost(subAreaId, officeId, publisher_id, title, content, p
     try {
         const [result] = await db.sequelize.query(
             `INSERT INTO "dynamic_content"."posts" 
-            ("sub_area_id", "office_id", "admin_id", "publisher_id", "creation_date", "type", "title", "content", "p_location", "filepath", "validated")
-            VALUES (:subAreaId, :officeId, :adminId, :publisher_id, CURRENT_TIMESTAMP, :type, :title, :content, :pLocation, :filePath, :validated)
+            ("sub_area_id", "office_id", "admin_id", "publisher_id", "creation_date", "type", "title", "content", "p_location", "filepath", "price", "validated")
+            VALUES (:subAreaId, :officeId, :adminId, :publisher_id, CURRENT_TIMESTAMP, :type, :title, :content, :pLocation, :filePath, :price, :validated)
             RETURNING "post_id"`,
             {
-                replacements: { subAreaId, officeId, adminId, publisher_id, type, title, content, pLocation, filePath, validated },
+                replacements: { subAreaId, officeId, adminId, publisher_id, type, title, content, pLocation, filePath, price, validated },
                 type: QueryTypes.RAW,
                 transaction
             }
@@ -61,7 +61,7 @@ async function fnGetPostState(postId) {
 }
 
 //Procedure to Edit a Post
-async function spEditPost(postId, subAreaId = null, officeId = null, adminId = null, title = null, content = null, pLocation = null, filePath = null, type = null) {
+async function spEditPost(postId, subAreaId = null, officeId = null, adminId = null, title = null, content = null, pLocation = null, filePath = null, type = null, price=null) {
     const transaction = await db.sequelize.transaction();
     try {
         const post = await db.sequelize.query(
@@ -80,10 +80,11 @@ async function spEditPost(postId, subAreaId = null, officeId = null, adminId = n
             "content" = COALESCE(:content, "content"),
             "p_location" = COALESCE(:pLocation, "p_location"),
             "filepath" = COALESCE(:filePath, "filepath"),
-            "type" = COALESCE(:type, "type")
+            "type" = COALESCE(:type, "type"),
+            "price" = COALESCE(:price, "price")
           WHERE "post_id" = :postId`,
                 {
-                    replacements: { postId, subAreaId, officeId, adminId, title, content, pLocation, filePath, type },
+                    replacements: { postId, subAreaId, officeId, adminId, title, content, pLocation, filePath, type, price },
                     type: QueryTypes.UPDATE,
                     transaction
                 }
