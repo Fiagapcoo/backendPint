@@ -264,6 +264,7 @@ controllers.getEventById = async (req, res) => {
       include: [
         { model: db.Users, as: "Publisher" },
         { model: db.OfficeAdmins, as: "Office_admin" },
+        { model: db.SubArea },
         { model: db.Users, as: "Admin" },
         {
           model: db.Scores,
