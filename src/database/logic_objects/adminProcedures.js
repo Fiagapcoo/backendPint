@@ -177,7 +177,7 @@ async function rejectContent(contentType, contentID, adminID) {
       throw new Error(
         'Invalid ContentType. Only "Post", "Event", and "Forum" are allowed.'
       );
-    }
+    }post
 
     // Update content validation status to 'Rejected'
     await db.sequelize.query(

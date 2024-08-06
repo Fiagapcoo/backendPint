@@ -43,7 +43,7 @@ controllers.validate_content = async (req, res) => {
 controllers.reject_content = async (req, res) => { 
     const { contentType, contentID, adminID } = req.params; 
     // Validate inputs
-    if (!validator.isIn(contentType, ['post', 'event', 'forum'])) {
+    if (!validator.isIn(contentType, ['Post', 'event', 'forum'])) {
       return res.status(400).json({ success: false, message: 'Invalid content type' });
     }
     if (!validator.isInt(contentID.toString())) {
@@ -54,7 +54,7 @@ controllers.reject_content = async (req, res) => {
     }
     console.log(req.params);
     try {
-        await rejectContent(contentType, contentId, adminID);
+        await rejectContent(contentType, contentID, adminID);
 
 
         res.status(201).json({success:true, message:'Content rejected successfully.'});
