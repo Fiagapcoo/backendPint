@@ -5,7 +5,8 @@ module.exports = (sequelize, DataTypes) => {
         post_id: { type: DataTypes.INTEGER },
         publisher_id: { type: DataTypes.INTEGER, allowNull: false },
         comment_date: { type: DataTypes.DATE, allowNull: false, defaultValue: sequelize.literal('CURRENT_TIMESTAMP') },
-        content: { type: DataTypes.TEXT, allowNull: false }
+        content: { type: DataTypes.TEXT, allowNull: false },
+        likes: {type: DataTypes.INTEGER, defaultValue: 0}
     }, {
         schema: 'communication',
         tableName: 'comments',
