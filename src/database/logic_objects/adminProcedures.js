@@ -172,12 +172,12 @@ async function rejectContent(contentType, contentID, adminID) {
   const transaction = await db.sequelize.transaction();
 
   try {
-    const validContentTypes = ["Post", "Event", "Forum"];
+    const validContentTypes = ["post", "event", "forum"];
     if (!validContentTypes.includes(contentType)) {
       throw new Error(
-        'Invalid ContentType. Only "Post", "Event", and "Forum" are allowed.'
+        'Invalid ContentType. Only "post", "event", and "forum" are allowed.'
       );
-    }post
+    }
 
     // Update content validation status to 'Rejected'
     await db.sequelize.query(
