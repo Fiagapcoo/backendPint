@@ -104,21 +104,26 @@ const contentTables = {
   forum: "forums",
 };
 
+function capitalizeFirstLetter(str) {
+  if (!str) return str; // Handle empty strings
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 async function validateContent(contentType, contentID, adminID) {
   const transaction = await db.sequelize.transaction();
 
   try {
     const currentTimestamp = new Date();
-
+    const contentTypeCapitalized = capitalizeFirstLetter(contentType);
     // Update content validation status
     await db.sequelize.query(
       `UPDATE "admin"."content_validation_status"
        SET "validator_id" = :adminID,
            "validation_date" = :currentTimestamp,
            "content_status" = 'Approved'
-       WHERE "content_id" = :contentID AND "content_type" = :contentType`,
+       WHERE "content_real_id" = :contentID AND "content_type" = :contentTypeCapitalized`,
       {
-        replacements: { contentID, contentType, adminID, currentTimestamp },
+        replacements: { contentID, contentTypeCapitalized, adminID, currentTimestamp },
         type: QueryTypes.UPDATE,
         transaction,
       }
@@ -147,7 +152,7 @@ async function validateContent(contentType, contentID, adminID) {
         break;
       default:
         throw new Error(
-          'Invalid content type. Only "Post", "Event", and "Forum" are allowed.'
+          'Invalid content type. Only "post", "event", and "forum" are allowed.'
         );
     }
 
@@ -178,16 +183,16 @@ async function rejectContent(contentType, contentID, adminID) {
         'Invalid ContentType. Only "post", "event", and "forum" are allowed.'
       );
     }
-
+    const contentTypeCapitalized = capitalizeFirstLetter(contentType);
     // Update content validation status to 'Rejected'
     await db.sequelize.query(
       `UPDATE "admin"."content_validation_status"
        SET "validator_id" = :adminID, 
            "validation_date" = CURRENT_TIMESTAMP, 
            "content_status" = 'Rejected'
-       WHERE "content_id" = :contentID AND "content_type" = :contentType`,
+       WHERE "content_real_id" = :contentID AND "content_type" = :contentTypeCapitalized`,
       {
-        replacements: { contentID, contentType, adminID },
+        replacements: { contentID, contentTypeCapitalized, adminID },
         type: QueryTypes.UPDATE,
         transaction,
       }

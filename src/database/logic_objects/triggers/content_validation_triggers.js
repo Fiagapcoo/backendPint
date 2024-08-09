@@ -16,17 +16,17 @@ const createTriggerFunction_trg_content_validation = async () => {
             -- Check if CONTENT_STATUS is updated to 'Approved'
             IF EXISTS (
                 SELECT 1
-                FROM inserted i
-                JOIN deleted d ON i.content_real_id = d.content_real_id
-                WHERE i.content_status = 'Approved'
-                AND d.content_status <> 'Approved'
-                AND i.content_type = 'Event'
+                FROM admin.content_validation_status
+                WHERE NEW.content_real_id = OLD.content_real_id
+                AND NEW.content_status = 'Approved'
+                AND OLD.content_status <> 'Approved'
+                AND NEW.content_type = 'Event'
             ) THEN
                 BEGIN
                     BEGIN
                         SELECT i.content_real_id, i.content_type, i.content_status
                         INTO content_real_id, content_type, content_status
-                        FROM inserted i
+                        FROM NEW i
                         WHERE i.content_status = 'Approved'
                         AND i.content_type = 'Event';
 
@@ -78,35 +78,35 @@ const createTrigger_validateContent = async () => {
 const createTriggerFunction_trg_update_content_admin_id = async () => {
   await db.sequelize.query(`
     CREATE OR REPLACE FUNCTION admin.trg_update_content_admin_id()
-RETURNS TRIGGER AS $$
-DECLARE
-    content_id INT;
-    content_type TEXT;
-    admin_id INT;
-BEGIN
-    -- Get values from NEW row
-    content_id := NEW.content_real_id;
-    content_type := NEW.content_type;
-    admin_id := NEW.validator_id;
+    RETURNS TRIGGER AS $$
+    DECLARE
+        content_id INT;
+        content_type TEXT;
+        new_admin_id INT;
+    BEGIN
+        -- Get values from NEW row
+        content_id := NEW.content_real_id;
+        content_type := NEW.content_type;
+        new_admin_id := NEW.validator_id;
 
-    -- Depending on the content type, update the respective table
-    IF content_type = 'Post' THEN
-        UPDATE dynamic_content.posts
-        SET admin_id = admin_id
-        WHERE post_id = content_id;
-    ELSIF content_type = 'Event' THEN
-        UPDATE dynamic_content.events
-        SET admin_id = admin_id
-        WHERE event_id = content_id;
-    ELSIF content_type = 'Forum' THEN
-        UPDATE dynamic_content.forums
-        SET admin_id = admin_id
-        WHERE forum_id = content_id;
-    END IF;
+        -- Depending on the content type, update the respective table
+        IF content_type = 'Post' THEN
+            UPDATE dynamic_content.posts
+            SET admin_id = new_admin_id
+            WHERE post_id = content_id;
+        ELSIF content_type = 'Event' THEN
+            UPDATE dynamic_content.events
+            SET admin_id = new_admin_id
+            WHERE event_id = content_id;
+        ELSIF content_type = 'Forum' THEN
+            UPDATE dynamic_content.forums
+            SET admin_id = new_admin_id
+            WHERE forum_id = content_id;
+        END IF;
 
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
  `);
 };
 
