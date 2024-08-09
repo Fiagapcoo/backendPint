@@ -348,7 +348,7 @@ async function createUserPreferences(userID, areas=null, subAreas=null, receiveN
   try {
     await db.sequelize.transaction(async (transaction) => {
       // Check if the user preferences already exist
-      const [results] = await sequelize.query(
+      const [results] = await db.sequelize.query(
         `SELECT 1 FROM "user_interactions"."user_pref" WHERE "user_id" = :userID`,
         {
           replacements: { userID },
