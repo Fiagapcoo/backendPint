@@ -108,7 +108,7 @@ async function getUserPreferences(userID) {
           );
         }
   
-        await logUserAction(userID, 'Updated User Preferences', 'User changed preferences');
+        await logUserAction(userID, 'User Preferences', 'User changed preferences');
       });
     } catch (error) {
       console.error('Error updating user preferences:', error);
@@ -373,14 +373,15 @@ async function createUserPreferences(userID, areas=null, subAreas=null, receiveN
         );
 
         // Log the user action
-        await db.sequelize.query(
-          `EXEC "user_interactions"."spLogUserAction" :userID, 'Created User Preferences', 'User Created preferences'`,
-          {
-            replacements: { userID },
-            type: QueryTypes.RAW,
-            transaction
-          }
-        );
+        await logUserAction(userID, 'User Preferences', 'User Created preferences');
+        // await db.sequelize.query(
+        //   `EXEC "user_interactions"."spLogUserAction" :userID, 'Created User Preferences', 'User Created preferences'`,
+        //   {
+        //     replacements: { userID },
+        //     type: QueryTypes.RAW,
+        //     transaction
+        //   }
+        // );
       } else {
         console.log('User preferences already exist.');
       }
