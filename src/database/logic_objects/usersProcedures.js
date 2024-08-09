@@ -346,7 +346,7 @@ async function updateAccStatus(userID, accountStatus) {
 
 async function createUserPreferences(userID, areas=null, subAreas=null, receiveNotifications=null, languageID = null, additionalPreferences = null) {
   try {
-    await sequelize.transaction(async (transaction) => {
+    await db.sequelize.transaction(async (transaction) => {
       // Check if the user preferences already exist
       const [results] = await sequelize.query(
         `SELECT 1 FROM "user_interactions"."user_pref" WHERE "user_id" = :userID`,
@@ -359,7 +359,7 @@ async function createUserPreferences(userID, areas=null, subAreas=null, receiveN
 
       if (!results) {
         // Insert the new user preferences
-        await sequelize.query(
+        await db.sequelize.query(
           `INSERT INTO "user_interactions"."user_pref" (
             "user_id", "areas", "sub_areas", "receive_notifications", "language_id", "additional_preferences"
           ) VALUES (
@@ -373,7 +373,7 @@ async function createUserPreferences(userID, areas=null, subAreas=null, receiveN
         );
 
         // Log the user action
-        await sequelize.query(
+        await db.sequelize.query(
           `EXEC "user_interactions"."spLogUserAction" :userID, 'Created User Preferences', 'User Created preferences'`,
           {
             replacements: { userID },
