@@ -6,6 +6,7 @@ const multer = require('multer');
  * The storage settings define the destination directory and the naming 
  * convention for uploaded files. Files are stored in the './src/uploads/' 
  * directory, and their filenames are prefixed with the current date and time.
+ * Spaces in filenames are replaced with underscores.
  * 
  * @constant {Object} storage
  */
@@ -14,7 +15,8 @@ const storage = multer.diskStorage({
     cb(null, './src/uploads/'); 
   },
   filename: function(req, file, cb) {
-    cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname);
+    const originalName = file.originalname.replace(/\s+/g, '_'); // Replace spaces with underscores
+    cb(null, new Date().toISOString().replace(/:/g, '-') + originalName);
   }
 });
 
