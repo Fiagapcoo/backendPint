@@ -44,7 +44,7 @@ const upload_create = (req, res) => {
     if (req.file) {
         res.json({ success:true,  message: 'Imagem carregada com sucesso!', file: req.file });
     } else {
-        res.status(400).json({success:false, message:'Erro no upload da imagem'});
+        res.status(400).json({success:false, message:'Erro no upload da imagem',});
     }
 };
 

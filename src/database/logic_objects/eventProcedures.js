@@ -228,7 +228,7 @@ async function spEditEvent(eventId, subAreaId = null, officeId = null, adminId =
             await db.sequelize.query(
                 `UPDATE "dynamic_content"."events"
                 SET
-                    "subarea_id" = COALESCE(:subAreaId, "subarea_id"),
+                    "sub_area_id" = COALESCE(:subAreaId, "sub_area_id"),
                     "office_id" = COALESCE(:officeId, "office_id"),
                     "admin_id" = COALESCE(:adminId, "admin_id"),
                     "name" = COALESCE(:name, "name"),
