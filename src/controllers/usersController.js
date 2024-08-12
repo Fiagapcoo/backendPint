@@ -9,6 +9,7 @@ const { getUserPreferences,
         updateAccStatus,
         createUserPreferences,
         getUsersToValidate,
+        updateProfile
      } = require('../database/logic_objects/usersProcedures');
 
 
@@ -138,5 +139,18 @@ controllers.get_users_to_validate = async (req, res) => {
         res.status(500).send('Error creating Forum: ' + error.message);
     }
 }
+
+controllers.update_profile = async (req, res) => {
+    const user = req.user.id;
+    const {  firstName, lastName, profile_pic} = req.body;
+
+    try {
+        await updateProfile(user, firstName, lastName, profile_pic);
+        res.status(200).json({success:true, message:'Profile updated successfully.'});
+    } catch (error) {
+        res.status(500).send('Error creating Forum: ' + error.message);
+    }
+
+};
 
 module.exports = controllers;

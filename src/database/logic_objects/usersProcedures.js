@@ -409,6 +409,37 @@ async function getUsersToValidate() {
   }
 };
 
+async function updateProfile(user, firstName, lastName, profile_pic) {
+  try {
+    await db.sequelize.transaction(async (transaction) => {
+      await db.sequelize.query(
+        `UPDATE "hr"."users"
+        SET
+          "first_name" = COALESCE(:firstName, "first_name"),
+          "last_name" = COALESCE(:lastName, "last_name"),
+          "profile_pic" = COALESCE(:profile_pic, "profile_pic")
+        WHERE "user_id" = :user`,
+        {
+          replacements: { 
+            user, 
+            firstName: firstName || null, 
+            lastName: lastName || null, 
+            profile_pic: profile_pic || null 
+          },
+          type: QueryTypes.UPDATE,
+          transaction
+        }
+      );
+    });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    throw error;
+  }
+};
+
+
+  
+
   
   module.exports = {
     logUserAction,
@@ -424,5 +455,6 @@ async function getUsersToValidate() {
     sp_updateLastAccess,
     updateAccStatus,
     createUserPreferences,
-    getUsersToValidate
+    getUsersToValidate,
+    updateProfile
 }
