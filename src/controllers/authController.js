@@ -83,9 +83,22 @@ controllers.register = async (req, res) => {
 
       await sendMail({
         to: email,
-        subject: "Set up your new password",
-        body: `Link: ${url}`,
+        subject: "Set Up Your New Password",
+        body: `
+          <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px;">
+            <h2 style="text-align: center; color: #00c2ff;">Set Up Your New Password</h2>
+            <p>Hello,</p>
+            <p>We received a request to reset your password. Please click the button below to set up your new password:</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${url}" style="background-color: #00c2ff; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;">Set Up New Password</a>
+            </div>
+            <p>If you did not request this, you can ignore this email.</p>
+            <p>Thank you,<br>The Softinsa Team</p>
+          </div>
+        `,
       });
+      
+      
 
       res.status(201).json({
         success: true,

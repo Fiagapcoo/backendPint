@@ -101,9 +101,19 @@ const spSendWelcomeEmail = async (email) => {
     try {
       sendMail({
         to: email,
-        subject: 'Welcome to the Company!',
-        body: '<br><br>Welcome to the company! We are excited to have you on board in SoftShares.<br><br>Best Regards,<br>Softinsa'
+        subject: 'Welcome to SoftShares!',
+        body: `
+          <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px;">
+            <h2 style="text-align: center; color: #00c2ff;">Welcome to SoftShares!</h2>
+            <p>Welcome to the team! We are thrilled to have you on board at SoftShares. Your journey with us is just beginning, and we look forward to achieving great things together.</p>
+            <p>As part of our team, you’ll play a key role in helping us drive success and innovation. We’re confident that your skills and talents will be a great addition to our collective efforts.</p>
+            <p>If you have any questions or need assistance as you settle in, feel free to reach out to your team members or HR. We are here to support you every step of the way.</p>
+            <p>Once again, welcome to SoftShares. Let’s make great things happen!</p>
+            <p>Best Regards,<br>The Softinsa Team</p>
+          </div>
+        `,
       });
+      
     } catch (error) {
       throw error;
     }
@@ -149,8 +159,20 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
       await sendMail({
         to: email,
         subject: 'SOFTSHARES - Account Creation',
-        body: 'This email serves as a notification for successful account creation. Pay attention as you will soon receive an email with a link to create your password!'
+        body: `
+          <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px;">
+            <h2 style="text-align: center; color: #00c2ff;">Welcome to SOFTSHARES!</h2>
+            <p>Hello,</p>
+            <p>We are excited to inform you that your account has been successfully created. We’re thrilled to have you on board.</p>
+            <p><strong>Next Steps:</strong></p>
+            <p>Keep an eye on your inbox—soon, you’ll receive an email containing a link to set up your password. Follow the instructions in the email to complete your account setup.</p>
+            <p>If you did not create an account with SOFTSHARES, please disregard this email.</p>
+            <p>Thank you for joining us! We look forward to providing you with a seamless and productive experience.</p>
+            <p>Best regards,<br>The Softinsa Team</p>
+          </div>
+        `,
       });
+      
   
       await spSendWelcomeEmail(email);
   
