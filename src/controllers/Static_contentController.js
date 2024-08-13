@@ -54,4 +54,31 @@ controllers.get_all_sub_areas = async (req, res) => {
     }
 };
 
+controllers.update_category = async (req, res) => {
+    const {title, icon } = req.body;
+    const { categoryID } = req.params;
+
+    try {
+        await db.sequelize.query(
+            `UPDATE "static_content"."area" 
+             SET 
+                title = COALESCE(:title, title), 
+                icon_name = COALESCE(:icon, icon_name) 
+             WHERE area_id = :categoryID`,
+            { 
+                replacements: {
+                    categoryID,
+                    title: title !== undefined ? title : null,
+                    icon: icon !== undefined ? icon : null,
+                },
+                type: QueryTypes.UPDATE 
+            }
+        );
+        res.status(200).json({success:true, message:'Category updated successfully.'});
+    } catch (error) {
+        res.status(500).json({success:false, message:'Error updating category: ' + error.message});
+    }
+};
+
+
 module.exports = controllers;

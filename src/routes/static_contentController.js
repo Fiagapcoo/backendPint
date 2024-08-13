@@ -7,5 +7,6 @@ router.post('/create-category', validation, static_contentController.create_cate
 router.post('/create-sub-category', validation, static_contentController.create_sub_category);
 router.get('/get-areas', validation, static_contentController.get_all_areas);
 router.get('/get-sub-areas', validation, static_contentController.get_all_sub_areas);
+router.patch('/update-category/:categoryID', validation, static_contentController.update_category);
 
 module.exports = router;
