@@ -80,5 +80,22 @@ controllers.update_category = async (req, res) => {
     }
 };
 
+controllers.delete_category = async (req, res) => {
+    const { categoryID } = req.params;
+
+    try {
+        await db.sequelize.query(
+            `DELETE FROM "static_content"."area" WHERE area_id = :categoryID`,
+            { 
+                replacements: { categoryID },
+                type: QueryTypes.DELETE 
+            }
+        );
+        res.status(200).json({success:true, message:'Category deleted successfully.'});
+    } catch (error) {
+        res.status(500).json({success:false, message:'Error deleting category: ' + error.message});
+    }
+}
+
 
 module.exports = controllers;
