@@ -123,7 +123,12 @@ async function validateContent(contentType, contentID, adminID) {
            "content_status" = 'Approved'
        WHERE "content_real_id" = :contentID AND "content_type" = :contentTypeCapitalized`,
       {
-        replacements: { contentID, contentTypeCapitalized, adminID, currentTimestamp },
+        replacements: {
+          contentID,
+          contentTypeCapitalized,
+          adminID,
+          currentTimestamp,
+        },
         type: QueryTypes.UPDATE,
         transaction,
       }
@@ -469,7 +474,7 @@ async function spValidateContent(contentID, contentType, validatorID) {
 
       // Check if the content belongs to the admin's designated center
       const isAuthorized = await db.sequelize.query(
-          `SELECT 1
+        `SELECT 1
           FROM ${tableName} p
           JOIN "centers"."office_admins" ro ON p."office_id" = ro."office_id"
           WHERE ${additionalCondition} = :contentID
@@ -484,7 +489,7 @@ async function spValidateContent(contentID, contentType, validatorID) {
       if (isAuthorized.length > 0) {
         await spValidateContentHELPER(contentID, contentType, validatorID);
       } else {
-        throw new Error('Not authorized to validate this content');
+        throw new Error("Not authorized to validate this content");
       }
     }
     await transaction.commit();
@@ -579,8 +584,16 @@ async function spMakeWarningInactive(warningId, adminId, officeId) {
 async function getCenters() {
   try {
     const results = await db.sequelize.query(
-      `SELECT "office_id", "city", "officeImage"
-         FROM "centers"."offices"`,
+   `SELECT DISTINCT ON (co.office_id)
+	  co."office_id",
+    co.city,
+    co."officeImage",
+    u.first_name,
+    u.last_name
+    FROM "centers"."offices" co
+    LEFT JOIN "centers"."office_admins" oa ON co.office_id = oa.office_id
+    LEFT JOIN "hr"."users" u ON oa.manager_id = u.user_id
+    ORDER BY co.office_id, u.first_name, u.last_name;`,
       {
         type: QueryTypes.SELECT,
       }
@@ -615,6 +628,37 @@ async function makeCenterAdmin(officeId, admin) {
   }
 }
 
+async function updateCenter(center_id, city, officeImage) {
+  const transaction = await db.sequelize.transaction();
+  try {
+    // Ensure that the replacement map includes all necessary keys
+    await db.sequelize.query(
+      `UPDATE "centers"."offices"
+       SET "city" = COALESCE(:city, "city"), 
+           "officeImage" = COALESCE(:officeImage, "officeImage")
+       WHERE "office_id" = :center_id`,
+      {
+        replacements: { 
+          center_id, 
+          city: city !== undefined ? city : null, 
+          officeImage: officeImage !== undefined ? officeImage : null 
+        },
+        type: QueryTypes.UPDATE,
+        transaction,
+      }
+    );
+    await transaction.commit();
+  } catch (error) {
+    if (transaction) await transaction.rollback();
+
+    console.error("Error updating center:", error.message);
+
+    throw error;
+  }
+}
+
+
+
 module.exports = {
   getUserEngagementMetrics,
   getContentValidationStatusByadmin,
@@ -630,6 +674,6 @@ module.exports = {
   spCreateWarning,
   spMakeWarningInactive,
   getCenters,
-
+  updateCenter,
   makeCenterAdmin,
 };

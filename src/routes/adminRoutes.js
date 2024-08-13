@@ -15,5 +15,6 @@ router.get('/content-center-to-be-validated/:center_id', validation, controller.
 router.post('/create-center', validation, controller.createCenter);
 router.delete('/delete-center/:center_id', validation, controller.deleteCenter);
 router.get('/get-all-centers', controller.getCenters);
+router.patch('/update-center/:center_id', validation, controller.updateCenter);
 
 module.exports = router;

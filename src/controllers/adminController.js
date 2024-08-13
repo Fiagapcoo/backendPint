@@ -12,6 +12,7 @@ const { getUserEngagementMetrics,
         deleteCenter,
         getCenters ,
         makeCenterAdmin,
+        updateCenter,
       } = require('../database/logic_objects/adminProcedures');
 
 const controllers = {};
@@ -186,5 +187,22 @@ controllers.makeCenterAdmin = async (req,res) => {
     res.status(500).json({success:false, message:'Error setting admin: ' + error.message});
   }
 }
+
+controllers.updateCenter = async (req, res) => {
+  const { center_id } = req.params;
+  const { city, officeImage } = req.body;
+  // Validate inputs
+  if (validator.isEmpty(city)) {
+    return res.status(400).json({ success: false, message: 'City is required' });
+  }
+
+
+  try {
+    await updateCenter(center_id, city, officeImage);
+    res.status(201).json({success:true, message:'Center updated successfully.'});
+  } catch (error) {
+    res.status(500).json({success:false, message:'Error updating center: ' + error.message});
+  }
+};
 
 module.exports = controllers;
