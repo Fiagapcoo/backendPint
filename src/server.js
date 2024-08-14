@@ -3,7 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const logger = require('morgan');
 
-const passport = require("./config/passport-setup"); 
+//const passport = require("./config/passport-setup"); 
 // const session = require("express-session");
 
 const app = express();
