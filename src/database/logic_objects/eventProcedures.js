@@ -27,7 +27,7 @@ async function spCreateEvent(
   try {
     const [eventResult] = await db.sequelize.query(
       `INSERT INTO "dynamic_content"."events" 
-            ("office_id", "sub_area_id", "publisher_id", "admin_id", "creation_date", "name", "description", "event_date", "recurring", "recurring_pattern", "max_participants", "event_location", "validated", "filepath")
+            ("office_id", "sub_area_id", "publisher_id", "admin_id", "creation_date", "name", "description", "event_date", "start_time" , "end_time" , "recurring", "recurring_pattern", "max_participants", "event_location", "validated", "filepath")
             VALUES (:officeId, :subAreaId, :publisher_id, :admin_id, CURRENT_TIMESTAMP, :name, :description, :eventDate, :startTime, :endTime, :recurring, :recurring_pattern, :max_participants, :location, :validated, :filePath)
             RETURNING "event_id"`,
       {
