@@ -3,6 +3,9 @@ const cors = require('cors');
 const path = require('path');
 const logger = require('morgan');
 
+const passport = require("./config/passport-setup"); 
+// const session = require("express-session");
+
 const app = express();
 //require('dotenv').config();
 
@@ -12,7 +15,7 @@ const app = express();
 
 //por a correr 1 vez unica
 const {server} = require('./websockets');
-//var admin = require("firebase-admin");
+var admin = require("firebase-admin");
 
 
 
@@ -37,7 +40,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 
 
 
-
+//middleware
 app.set('port', process.env.PORT || 8000);
 app.use(logger('dev'));
 
@@ -51,6 +54,9 @@ app.use((req, res, next) => {
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+// app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
+// app.use(passport.initialize());
+// app.use(passport.session());
          
 
 //API
@@ -72,14 +78,14 @@ app.use('/api/upload', uploadRoute);
 app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/email', emailRoute);
 
-/*
+
 const serviceAccount = require("../softshares-000515-firebase-adminsdk-ds8og-d6087d42e3.json");
 
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });
-
+/*
   async function sendNotification(token, title, body) {
     const message = {
       notification: {
