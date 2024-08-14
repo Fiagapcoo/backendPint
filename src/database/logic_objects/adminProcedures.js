@@ -584,16 +584,22 @@ async function spMakeWarningInactive(warningId, adminId, officeId) {
 async function getCenters() {
   try {
     const results = await db.sequelize.query(
-   `SELECT DISTINCT ON (co.office_id)
-	  co."office_id",
-    co.city,
-    co."officeImage",
-    u.first_name,
-    u.last_name
-    FROM "centers"."offices" co
-    LEFT JOIN "centers"."office_admins" oa ON co.office_id = oa.office_id
-    LEFT JOIN "hr"."users" u ON oa.manager_id = u.user_id
-    ORDER BY co.office_id, u.first_name, u.last_name;`,
+   `SELECT 
+    co.office_id AS officeid,
+    co.city AS city,
+    co."officeImage" AS officeImage,
+    array_agg(u.first_name || ' ' || u.last_name) AS name
+FROM 
+    "centers"."offices" co
+LEFT JOIN 
+    "centers"."office_admins" oa ON co.office_id = oa.office_id
+LEFT JOIN 
+    "hr"."users" u ON oa.manager_id = u.user_id
+GROUP BY 
+    co.office_id, co.city, co."officeImage"
+ORDER BY 
+    co.office_id;
+`,
       {
         type: QueryTypes.SELECT,
       }
