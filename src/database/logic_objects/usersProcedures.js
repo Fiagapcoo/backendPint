@@ -437,6 +437,52 @@ async function updateProfile(user, firstName, lastName, profile_pic) {
   }
 };
 
+async function getUserPosts(userID) {
+  try {
+    const results = await db.sequelize.query(
+      `SELECT 
+        p."post_id" AS "ContentID",
+        'Post' AS "ContentType",
+        p."title" AS "Title",
+        p."content" AS "Content",
+        p."creation_date" AS "CreationDate"
+      FROM "dynamic_content"."posts" p
+      WHERE p."publisher_id" = :userID
+
+      UNION ALL
+
+      SELECT 
+        f."forum_id" AS "ContentID",
+        'Forum' AS "ContentType",
+        f."title" AS "Title",
+        f."content" AS "Content",
+        f."creation_date" AS "CreationDate"
+      FROM "dynamic_content"."forums" f
+      WHERE f."publisher_id" = :userID
+
+      UNION ALL
+
+      SELECT 
+        e."event_id" AS "ContentID",
+        'Event' AS "ContentType",
+        e."name" AS "Title",
+        e."description" AS "Content",
+        e."creation_date" AS "CreationDate"
+      FROM "dynamic_content"."events" e
+      WHERE e."publisher_id" = :userID
+
+      ORDER BY "CreationDate" DESC`,
+      {
+        replacements: { userID },
+        type: QueryTypes.SELECT
+      }
+    );
+    return results;
+  } catch (error) {
+    console.error('Error fetching user-created content:', error);
+    throw error;
+  }
+}
 
   
 
@@ -456,5 +502,7 @@ async function updateProfile(user, firstName, lastName, profile_pic) {
     updateAccStatus,
     createUserPreferences,
     getUsersToValidate,
-    updateProfile
+    updateProfile,
+
+    getUserPosts,
 }

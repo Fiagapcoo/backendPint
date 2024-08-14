@@ -16,6 +16,9 @@ router.put('/update-acc-status', validation, controller.update_acc_status);
 router.get('/get-users-to-validate', validation, controller.get_users_to_validate);
 router.patch('/update-profile', validation, controller.update_profile);
 
+router.get('/get-content', validation, controller.get_user_content);
+
+
 
 
 module.exports = router;
