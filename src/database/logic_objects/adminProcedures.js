@@ -605,28 +605,7 @@ async function getCenters() {
   }
 }
 
-//WIP
-async function makeCenterAdmin(officeId, admin) {
-  const transaction = await db.sequelize.transaction();
-  try {
-    await db.sequelize.query(
-      `INSERT INTO "centers"."office_admins" ("office_id", "manager_id")
-       VALUES (:officeId, :admin)`,
-      {
-        replacements: { officeId, admin },
-        type: QueryTypes.INSERT,
-        transaction,
-      }
-    );
-    await transaction.commit();
-  } catch (error) {
-    if (transaction) await transaction.rollback();
 
-    console.error("Error making warning inactive:", error.message);
-
-    throw error;
-  }
-}
 
 async function updateCenter(center_id, city, officeImage) {
   const transaction = await db.sequelize.transaction();
@@ -652,6 +631,31 @@ async function updateCenter(center_id, city, officeImage) {
     if (transaction) await transaction.rollback();
 
     console.error("Error updating center:", error.message);
+
+    throw error;
+  }
+}
+
+
+
+//WIP
+async function makeCenterAdmin(officeId, admin) {
+  const transaction = await db.sequelize.transaction();
+  try {
+    await db.sequelize.query(
+      `INSERT INTO "centers"."office_admins" ("office_id", "manager_id")
+       VALUES (:officeId, :admin)`,
+      {
+        replacements: { officeId, admin },
+        type: QueryTypes.INSERT,
+        transaction,
+      }
+    );
+    await transaction.commit();
+  } catch (error) {
+    if (transaction) await transaction.rollback();
+
+    console.error("Error making warning inactive:", error.message);
 
     throw error;
   }

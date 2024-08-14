@@ -185,7 +185,7 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
 };
 
 
-// TODO
+// TODO - totest
 const spChangeUserPassword = async (userId, newPassword) => {
   const transaction = await db.sequelize.transaction();
   try {
@@ -254,7 +254,7 @@ const spDeactivateUser = async (userId) => {
     const transaction = await db.sequelize.transaction();
     try {
       await db.sequelize.query(
-        `UPDATE "security"."user_account_details" SET "account_status" = 0 WHERE "user_id" = :userId`,
+        `UPDATE "security"."user_account_details" SET "account_status" = false WHERE "user_id" = :userId`,
         {
           replacements: { userId },
           type: QueryTypes.UPDATE,
@@ -322,7 +322,9 @@ const spActivateUser = async (userId) => {
       throw error;
     }
 };
-  //to set route
+  
+
+//to set route
 const spSetCenterAdmin = async (userId, officeId) => {
   var _role_id;
     const transaction = await db.sequelize.transaction();
