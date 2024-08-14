@@ -515,6 +515,29 @@ async function getUserRegisteredEvents(userID) {
   }
 }
 
+async function updateUserPassword(user, password) {
+
+  const hashedPassword = await bcrypt.hash(password, 12);
+
+  try{
+    await db.sequelize.transaction(async (transaction) => {
+      await db.sequelize.query(
+        `UPDATE "hr"."users"
+        SET "password" = :hashedPassword
+        WHERE "user_id" = :user`,
+        {
+          replacements: { user, hashedPassword },
+          type: QueryTypes.UPDATE,
+          transaction
+        }
+      );
+    });
+  }catch(error){
+    console.error('Error updating password:', error);
+    throw error;
+  }
+}
+
 
   
 

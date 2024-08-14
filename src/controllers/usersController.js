@@ -12,6 +12,7 @@ const { getUserPreferences,
         updateProfile,
         getUserPosts,
         getUserRegisteredEvents,
+        updateUserPassword
      } = require('../database/logic_objects/usersProcedures');
 
 
@@ -173,6 +174,16 @@ controllers.get_user_registeredEvents = async (req, res) => {
         res.status(200).json({success:true, data:aux, message:'Got events registered by user.'});
     } catch (error) {
         res.status(500).send('Error getting events: ' + error.message);
+    }
+}
+
+controllers.update_user_password = async (req, res) => {
+    const {password, user} = req.body;
+    try {
+        await updateUserPassword(user, password);
+        res.status(200).json({success:true, message:'Password updated successfully.'});
+    } catch (error) {
+        res.status(500).send('Error updating password: ' + error.message);
     }
 }
 
