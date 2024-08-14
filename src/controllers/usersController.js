@@ -166,5 +166,16 @@ controllers.get_user_content = async (req, res) => {
     }
 }
 
+controllers.get_user_registeredEvents = async (req, res) => {
+    try {
+        const user = req.user.id;
+        const aux = await getUserRegisteredEvents(user);
+        console.log(aux);
+        res.status(200).json({success:true, data:aux, message:'Got events registered by user.'});
+    } catch (error) {
+        res.status(500).send('Error getting events: ' + error.message);
+    }
+}
+
 
 module.exports = controllers;
