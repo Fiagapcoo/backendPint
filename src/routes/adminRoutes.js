@@ -20,7 +20,7 @@ router.patch('/update-center/:center_id', validation, controller.updateCenter);
 
 
 //validate operations for users
-router.patch('/deactivate-user', validation, controller.validate_user);
 router.patch('/validate-user', validation, controller.validate_user);
+router.patch('/deactivate-user', validation, controller.deactivate_user);
 
 module.exports = router;
