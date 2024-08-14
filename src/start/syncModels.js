@@ -87,13 +87,13 @@ async function syncModels() {
 
         // Insert default offices into Offices
         await db.sequelize.query(`
-            INSERT INTO "centers"."offices" (office_id, city) VALUES
-            (0, 'ALL'),
-            (1, 'TOMAR'),
-            (2, 'VISEU'),
-            (3, 'FUNDAO'),
-            (4, 'PORTALEGRE'),
-            (5, 'VILA REAL')
+            INSERT INTO "centers"."offices" (office_id, city, officeImage) VALUES
+            (0, 'ALL','All.png'),
+            (1, 'TOMAR','tomar.jpeg'),
+            (2, 'VISEU','viseu.jpeg'),
+            (3, 'FUNDAO','fundao.jpeg'),
+            (4, 'PORTALEGRE','portalegre.jpeg'),
+            (5, 'VILA REAL','vila-real.jpeg')
             ON CONFLICT (office_id) DO NOTHING;
         `);
 
