@@ -11,7 +11,7 @@ const { getUserPreferences,
         getUsersToValidate,
         updateProfile,
         getUserPosts,
-
+        getUserRegisteredEvents,
      } = require('../database/logic_objects/usersProcedures');
 
 

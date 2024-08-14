@@ -484,6 +484,35 @@ async function getUserPosts(userID) {
   }
 }
 
+async function getUserRegisteredEvents(userID) {
+  try {
+    const results = await db.sequelize.query(
+      `SELECT 
+        e."event_id",
+        e."name" AS "EventName",
+        e."description" AS "EventDescription",
+        e."event_date" AS "Date",
+        e."start_time" AS "Start Time",
+        e."end_time" AS "End Time",
+        e."event_location" AS "Location",
+        p."entry_date" AS "RegistrationDate"
+      FROM "control"."participation" p
+      JOIN "dynamic_content"."events" e ON p."event_id" = e."event_id"
+      WHERE p."user_id" = :userID
+      ORDER BY e."event_date" DESC`,
+      {
+        replacements: { userID },
+        type: QueryTypes.SELECT
+      }
+    );
+    return results;
+  } catch (error) {
+    console.error('Error fetching user registered events:', error);
+    throw error;
+  }
+}
+
+
   
 
   
@@ -505,4 +534,5 @@ async function getUserPosts(userID) {
     updateProfile,
 
     getUserPosts,
+    getUserRegisteredEvents,
 }

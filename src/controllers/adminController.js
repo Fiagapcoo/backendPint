@@ -20,6 +20,7 @@ const {
   spDeactivateUser,
   spActivateUser,
 } = require("../database/logic_objects/securityProcedures");
+const {spEventParticipationCleanup} = require("../database/logic_objects/eventProcedures");
 const controllers = {};
 
 controllers.validate_content = async (req, res) => {
@@ -358,6 +359,7 @@ controllers.deactivate_user = async (req,res) => {
 
   try {
     await spDeactivateUser(user_id);
+    await spEventParticipationCleanup();
     res
       .status(201)
       .json({ success: true, message: "User deactivated successfully." });
