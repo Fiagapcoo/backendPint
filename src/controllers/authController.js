@@ -59,6 +59,14 @@ controllers.register = async (req, res) => {
       .json({ success: false, message: validationResult.message });
   }
 
+  const verifyEmail = await sp_findUserByEmail(email);
+  if (verifyEmail) {
+    return res.status(400).json({
+      success: false,
+      message: "Email already exists. Please use another email.",
+    });
+  }
+
   try {
     const user = await spRegisterNewUser(firstName, lastName, email, centerId);
 
