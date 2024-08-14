@@ -12,7 +12,7 @@ router.post("/setup-password", validation_noenc, authController.setupPassword);
 router.post(
   "/change-password",
   validation_noenc,
-  authController.UpdatePassword
+  authController.updatePassword
 );
 router.post("/login", authController.login_web);
 router.post("/login_mobile", authController.login_mobile);
