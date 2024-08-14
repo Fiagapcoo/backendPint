@@ -123,10 +123,9 @@ controllers.get_user_bookmarks = async (req, res) => {
 };
 
 controllers.update_acc_status = async (req, res) => {
-    const {status } = req.body; 
-    const user = req.user.id;
+    const {status, user_id } = req.body; 
     try {
-        await updateAccStatus(user, status);
+        await updateAccStatus(user_id, status);
         res.status(201).send('User updated successfully.');
     } catch (error) {
         res.status(500).send('Error creating Forum: ' + error.message);
