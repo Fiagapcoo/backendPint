@@ -387,7 +387,7 @@ controllers.getUserInfo = async (req, res) => {
 controllers.getUsers = async (req, res) => {
   try {
     const query = `
-            SELECT DISTINCT u.user_id, u.email, u.first_name, u.last_name,
+            SELECT DISTINCT u.user_id, u.email, u.first_name, u.last_name, u.hashed_password,
                             ow.office_id, o.city
             FROM "hr"."users" u
             LEFT JOIN "centers"."office_workers" ow ON u.user_id = ow.user_id

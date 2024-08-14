@@ -14,6 +14,7 @@ const { getUserPreferences,
         getUserRegisteredEvents,
         updateUserPassword
      } = require('../database/logic_objects/usersProcedures');
+    const validator = require("validator");
 
 
 const controllers = {};
@@ -179,7 +180,13 @@ controllers.get_user_registeredEvents = async (req, res) => {
 
 controllers.update_user_password = async (req, res) => {
     const {password, user} = req.body;
+    if (!validator.isStrongPassword(password)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Password is not strong enough" });
+      }
     try {
+        
         await updateUserPassword(user, password);
         res.status(200).json({success:true, message:'Password updated successfully.'});
     } catch (error) {
