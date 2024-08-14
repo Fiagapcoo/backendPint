@@ -5,7 +5,7 @@ const {
 } = require("../controllers/jwt_middlewareController");
 const router = express.Router();
 const authController = require("../controllers/authController");
-const passport = require("../config/passport-setup"); 
+//const passport = require("../config/passport-setup"); 
 
 router.post("/register", authController.register);
 router.post("/setup-password", validation_noenc, authController.setupPassword);
@@ -23,7 +23,7 @@ router.post("/refresh-token", authController.refreshToken);
 //router.put('/update-last-access', validation, authController.updateLastAccess);
 router.post("/change-password", validation ,authController.updatePassword);
 
-
+/*
 // Google Auth
 router.get('/google', passport.authenticate('google', {  //it knows it has to active the google strategy in passport-setup
   scope: ['profile', 'email'] // what we want to retrieve from the user profile (in an array)
@@ -41,5 +41,5 @@ router.get('/facebook/callback', passport.authenticate('facebook', { failureRedi
   const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
   res.redirect(`${process.env.CLIENT_URL}/?token=${token}`);
 });
-
+*/
 module.exports = router;
