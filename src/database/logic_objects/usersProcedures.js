@@ -445,7 +445,8 @@ async function getUserPosts(userID) {
         'Post' AS "ContentType",
         p."title" AS "Title",
         p."content" AS "Content",
-        p."creation_date" AS "CreationDate"
+        p."creation_date" AS "CreationDate",
+        p."validated" AS "Validated"
       FROM "dynamic_content"."posts" p
       WHERE p."publisher_id" = :userID
 
@@ -456,7 +457,8 @@ async function getUserPosts(userID) {
         'Forum' AS "ContentType",
         f."title" AS "Title",
         f."content" AS "Content",
-        f."creation_date" AS "CreationDate"
+        f."creation_date" AS "CreationDate",
+        f."validated" AS "Validated"
       FROM "dynamic_content"."forums" f
       WHERE f."publisher_id" = :userID
 
@@ -467,7 +469,8 @@ async function getUserPosts(userID) {
         'Event' AS "ContentType",
         e."name" AS "Title",
         e."description" AS "Content",
-        e."creation_date" AS "CreationDate"
+        e."creation_date" AS "CreationDate",
+        e."validated" AS "Validated"
       FROM "dynamic_content"."events" e
       WHERE e."publisher_id" = :userID
 
