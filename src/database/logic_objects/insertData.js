@@ -302,6 +302,19 @@ async function bulkInsert() {
         ON CONFLICT ("field_id") DO NOTHING; 
     `);
 
+    await db.sequelize.query(`
+        UPDATE "centers"."offices"
+        SET "officeImage" = CASE
+            WHEN office_id = 1 THEN 'tomar.jpeg'
+            WHEN office_id = 2 THEN 'viseu.jpeg'
+            WHEN office_id = 3 THEN 'fundao.jpeg'
+            WHEN office_id = 4 THEN 'portalegre.jpeg'
+            WHEN office_id = 5 THEN 'vila-real.jpeg'
+            ELSE "officeImage"
+        END
+        WHERE office_id IN (1, 2, 3, 4, 5);
+    `);
+
     
     
 }
