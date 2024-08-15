@@ -8,7 +8,7 @@ const createTriggerFunction_trg_content_validation = async () => {
             content_real_id INT;
             content_type TEXT;
             content_status TEXT;
-            publisher_id INT;
+            new_publisher_id INT;
             error_message TEXT;
             error_severity TEXT;
             error_state TEXT;
@@ -32,13 +32,13 @@ const createTriggerFunction_trg_content_validation = async () => {
 
                         -- Get the Publisher ID from the EVENTS table
                         SELECT publisher_id
-                        INTO publisher_id
+                        INTO new_publisher_id
                         FROM dynamic_content.events
                         WHERE event_id = content_real_id;
 
                         -- Insert into PARTICIPATION and SCORES tables if the event is approved
                         INSERT INTO control.participation (user_id, event_id)
-                        VALUES (publisher_id, content_real_id);
+                        VALUES (new_publisher_id, content_real_id);
 
                         INSERT INTO dynamic_content.scores (event_id, score)
                         VALUES (content_real_id, 0);
@@ -69,7 +69,7 @@ const createTrigger_validateContent = async () => {
                 DROP TRIGGER trg_content_status_approved ON admin.content_validation_status;
             END IF;
             CREATE TRIGGER trg_content_status_approved
-            AFTER UPDATE ON admin.content_validation_status
+            AFTER INSERT OR UPDATE ON admin.content_validation_status
             FOR EACH ROW
             EXECUTE FUNCTION admin.trg_content_status_approved();
             END $$;`);
@@ -83,6 +83,7 @@ const createTriggerFunction_trg_update_content_admin_id = async () => {
         content_id INT;
         content_type TEXT;
         new_admin_id INT;
+        new_publisher_id INT;
     BEGIN
         -- Get values from NEW row
         content_id := NEW.content_real_id;
@@ -95,9 +96,25 @@ const createTriggerFunction_trg_update_content_admin_id = async () => {
             SET admin_id = new_admin_id
             WHERE post_id = content_id;
         ELSIF content_type = 'Event' THEN
+
             UPDATE dynamic_content.events
             SET admin_id = new_admin_id
             WHERE event_id = content_id;
+
+            RAISE NOTICE 'Getting publisher ID';
+            -- Get the Publisher ID from the EVENTS table
+            SELECT publisher_id
+            INTO new_publisher_id
+            FROM dynamic_content.events
+            WHERE event_id = content_id;
+            RAISE NOTICE 'Inserting into participation table, user %', new_publisher_id;
+            -- Insert into PARTICIPATION and SCORES tables if the event is approved
+            INSERT INTO control.participation (user_id, event_id)
+            VALUES (new_publisher_id, content_id);
+
+            INSERT INTO dynamic_content.scores (event_id, score)
+            VALUES (content_id, 0);
+            RAISE NOTICE 'finished trigger ';
         ELSIF content_type = 'Forum' THEN
             UPDATE dynamic_content.forums
             SET admin_id = new_admin_id
@@ -118,7 +135,7 @@ const createTrigger_contentValidated = async () => {
                 DROP TRIGGER trg_update_content_admin_id ON admin.content_validation_status;
             END IF;
             CREATE TRIGGER trg_update_content_admin_id
-            AFTER UPDATE ON admin.content_validation_status
+            AFTER INSERT OR UPDATE ON admin.content_validation_status
             FOR EACH ROW
             EXECUTE FUNCTION admin.trg_update_content_admin_id();
             END $$;
