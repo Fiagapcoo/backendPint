@@ -1,7 +1,9 @@
 const { spCreateForum, 
         spCreateForumForEvent, 
-        fnGetForumState, 
-        spEditForum } = require('../database/logic_objects/forumProcedures');
+        fnGetForumState,
+        spChangeForumState,
+        spEditForum,
+        spDeleteForum } = require('../database/logic_objects/forumProcedures');
 
 const controllers = {};
 
@@ -52,5 +54,28 @@ controllers.edit_forum = async (req, res) => {
         res.status(500).json({success:false, message:'Error creating Forum: ' + error.message});
     }
 };
+
+controllers.change_forum_state = async (req, res) => {
+    const { forumId } = req.params;
+    const { state } = req.body; 
+    console.log(req.params);
+    try {
+        await spChangeForumState(forumId, state);
+        res.status(201).json({success:true, message:'Forum state changed successfully.'});
+    } catch (error) {
+        res.status(500).json({success:false, message:'Error changing Forum state: ' + error.message});
+    }
+}
+
+controllers.delete_forum = async (req, res) => {
+    const { forumId } = req.params; 
+    console.log(req.params);
+    try {
+        await spDeleteForum(forumId);
+        res.status(201).json({success:true, message:'Forum deleted successfully.'});
+    } catch (error) {
+        res.status(500).json({success:false, message:'Error deleting Forum: ' + error.message});
+    }
+}
 
 module.exports = controllers;

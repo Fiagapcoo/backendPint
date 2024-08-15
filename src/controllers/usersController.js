@@ -12,7 +12,9 @@ const { getUserPreferences,
         updateProfile,
         getUserPosts,
         getUserRegisteredEvents,
+        updateUserPassword
      } = require('../database/logic_objects/usersProcedures');
+    const validator = require("validator");
 
 
 const controllers = {};
@@ -123,10 +125,9 @@ controllers.get_user_bookmarks = async (req, res) => {
 };
 
 controllers.update_acc_status = async (req, res) => {
-    const {status } = req.body; 
-    const user = req.user.id;
+    const {status, user_id } = req.body; 
     try {
-        await updateAccStatus(user, status);
+        await updateAccStatus(user_id, status);
         res.status(201).send('User updated successfully.');
     } catch (error) {
         res.status(500).send('Error creating Forum: ' + error.message);
@@ -174,6 +175,22 @@ controllers.get_user_registeredEvents = async (req, res) => {
         res.status(200).json({success:true, data:aux, message:'Got events registered by user.'});
     } catch (error) {
         res.status(500).send('Error getting events: ' + error.message);
+    }
+}
+
+controllers.update_user_password = async (req, res) => {
+    const {password, user} = req.body;
+    if (!validator.isStrongPassword(password)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Password is not strong enough" });
+      }
+    try {
+        
+        await updateUserPassword(user, password);
+        res.status(200).json({success:true, message:'Password updated successfully.'});
+    } catch (error) {
+        res.status(500).send('Error updating password: ' + error.message);
     }
 }
 

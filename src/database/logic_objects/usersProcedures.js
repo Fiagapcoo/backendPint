@@ -1,5 +1,6 @@
 const { QueryTypes } = require('sequelize');
 const db = require('../../models'); 
+const bcrypt = require("bcryptjs");
 
 async function logUserAction(userID, type, description) {
     try {
@@ -515,6 +516,29 @@ async function getUserRegisteredEvents(userID) {
   }
 }
 
+async function updateUserPassword(user, password) {
+
+  const hashedPassword = await bcrypt.hash(password, 12);
+
+  try{
+    await db.sequelize.transaction(async (transaction) => {
+      await db.sequelize.query(
+        `UPDATE "hr"."users"
+        SET "hashed_password" = :hashedPassword
+        WHERE "user_id" = :user`,
+        {
+          replacements: { user, hashedPassword },
+          type: QueryTypes.UPDATE,
+          transaction
+        }
+      );
+    });
+  }catch(error){
+    console.error('Error updating password:', error);
+    throw error;
+  }
+}
+
 
   
 
@@ -535,7 +559,7 @@ async function getUserRegisteredEvents(userID) {
     createUserPreferences,
     getUsersToValidate,
     updateProfile,
-
+    updateUserPassword,
     getUserPosts,
     getUserRegisteredEvents,
 }

@@ -125,9 +125,44 @@ async function spEditForum(forumId, subAreaId = null, officeId = null, adminId =
     }
 }
 
+async function spChangeForumState(forumId, state) {
+    const transaction = await db.sequelize.transaction();
+    try {
+        await db.sequelize.query(
+            `UPDATE "dynamic_content"."forums"
+      SET "forum_status" = :state
+      WHERE "forum_id" = :forumId`,
+            { replacements: { forumId, state }, type: QueryTypes.UPDATE, transaction }
+        );
+
+        await transaction.commit();
+    } catch (error) {
+        await transaction.rollback();
+        throw error;
+    }
+    
+}
+
+async function spDeleteForum(forumId) {
+    const transaction = await db.sequelize.transaction();
+    try {
+        await db.sequelize.query(
+            `DELETE FROM "dynamic_content"."forums" WHERE "forum_id" = :forumId`,
+            { replacements: { forumId }, type: QueryTypes.DELETE, transaction }
+        );
+
+        await transaction.commit();
+    } catch (error) {
+        await transaction.rollback();
+        throw error;
+    }
+};
+
 module.exports = {
     spCreateForum,
     spCreateForumForEvent,
     fnGetForumState,
-    spEditForum
+    spEditForum,
+    spChangeForumState,
+    spDeleteForum
 }

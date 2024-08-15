@@ -18,6 +18,7 @@ router.patch('/update-profile', validation, controller.update_profile);
 
 router.get('/get-content', validation, controller.get_user_content);
 router.get('/get-registered-events', validation, controller.get_user_registeredEvents);
+router.patch('/update-user-password', validation, controller.update_user_password);
 
 
 
