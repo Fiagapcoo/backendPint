@@ -9,7 +9,7 @@ const authController = require("../controllers/authController");
 
 router.post("/register", authController.register);
 router.post("/setup-password", validation_noenc, authController.setupPassword);
-router.post(
+router.patch(
   "/change-password",
   validation_noenc,
   authController.updatePassword
