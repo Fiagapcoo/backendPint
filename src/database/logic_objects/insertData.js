@@ -231,50 +231,50 @@ async function bulkInsert() {
         ON CONFLICT ("user_id") DO NOTHING; 
     `);
     await db.sequelize.query(`
-        INSERT INTO "dynamic_content"."posts" ("sub_area_id", "office_id", "publisher_id", "title", "content", "p_location","creation_date")
+        INSERT INTO "dynamic_content"."posts" ("sub_area_id", "office_id", "publisher_id", "title", "content", "p_location","creation_date", "validated")
         VALUES
-        (1001, 2, 2, 'CUF', 'This is a description', '40.64538746001789 -7.911339742327035' ,CURRENT_TIMESTAMP),
-        (2002, 2, 3, 'ESTGV', 'I have finally finished my degree!!','40.64428390013725 -7.920937078897956',CURRENT_TIMESTAMP),
-        (3001, 3, 4, 'Crossfit in Fundão', 'Link to gym: ','40.19671415803123 -7.486179137001208',CURRENT_TIMESTAMP),
-        (5001, 4, 6, 'One Bedroom', 'One bedroom apartment in the center of the city for rent','39.606339401281865 -8.420089558257569',CURRENT_TIMESTAMP),
-        (6001, 2, 7, 'Cinemas', 'Forum Viseu is going to display Star Wars the original trilogy','40.6619963279803 -7.914111529651657',CURRENT_TIMESTAMP),
-        (7001, 2, 8, 'Flixbus Strike', 'On the 9th of August, flixbus will be on strike','40.661834384758485 -7.915667269409799',CURRENT_TIMESTAMP),
-        (6003, 2, 9, 'Ottieland', 'Ottieland returns for one more year','40.660851335604924 -7.899651358488228',CURRENT_TIMESTAMP),
-        (4003, 2, 10, 'Capuchinho', 'Capuchinho bakery turns 75 years old','40.65835162925675 -7.914251302670703',CURRENT_TIMESTAMP),
-        (3002, 1, 1, 'Estádio Municipal António Fortes (Totói)', 'The Municipal Stadium Tomar hosts the final of the junior league','39.60642642032696 -8.411791987019729',CURRENT_TIMESTAMP);
+        (1001, 2, 2, 'CUF', 'This is a description', '40.64538746001789 -7.911339742327035' ,CURRENT_TIMESTAMP, true),
+        (2002, 2, 3, 'ESTGV', 'I have finally finished my degree!!','40.64428390013725 -7.920937078897956',CURRENT_TIMESTAMP, true),
+        (3001, 3, 4, 'Crossfit in Fundão', 'Link to gym: ','40.19671415803123 -7.486179137001208',CURRENT_TIMESTAMP, true),
+        (5001, 4, 6, 'One Bedroom', 'One bedroom apartment in the center of the city for rent','39.606339401281865 -8.420089558257569',CURRENT_TIMESTAMP, true),
+        (6001, 2, 7, 'Cinemas', 'Forum Viseu is going to display Star Wars the original trilogy','40.6619963279803 -7.914111529651657',CURRENT_TIMESTAMP, true),
+        (7001, 2, 8, 'Flixbus Strike', 'On the 9th of August, flixbus will be on strike','40.661834384758485 -7.915667269409799',CURRENT_TIMESTAMP, true),
+        (6003, 2, 9, 'Ottieland', 'Ottieland returns for one more year','40.660851335604924 -7.899651358488228',CURRENT_TIMESTAMP, true),
+        (4003, 2, 10, 'Capuchinho', 'Capuchinho bakery turns 75 years old','40.65835162925675 -7.914251302670703',CURRENT_TIMESTAMP, true),
+        (3002, 1, 1, 'Estádio Municipal António Fortes (Totói)', 'The Municipal Stadium Tomar hosts the final of the junior league','39.60642642032696 -8.411791987019729',CURRENT_TIMESTAMP, true);
     `);
     await db.sequelize.query(`
-        INSERT INTO "dynamic_content"."posts" ("sub_area_id", "office_id", "publisher_id", "title", "content", "type", "creation_date")
+        INSERT INTO "dynamic_content"."posts" ("sub_area_id", "office_id", "publisher_id", "title", "content", "type", "creation_date", "validated")
         VALUES
-        (4002, 4, 5, 'Neon Byte Bistro', 'Restaurant with a cyberpunk theme', 'P',CURRENT_TIMESTAMP);
+        (4002, 4, 5, 'Neon Byte Bistro', 'Restaurant with a cyberpunk theme', 'P',CURRENT_TIMESTAMP, true);
     `);
     await db.sequelize.query(`
-        INSERT INTO "dynamic_content"."events" ("publisher_id", "office_id", "sub_area_id", "name", "description", "event_location","event_date", "recurring","creation_date")
+        INSERT INTO "dynamic_content"."events" ("publisher_id", "office_id", "sub_area_id", "name", "description", "event_location","event_date", "recurring","creation_date", "validated")
         VALUES
-        (1, 2, 1001, 'Volunteering', 'Viseu hospital will be hosting an auction to gain funding for children in need', '40.65056885039045 -7.905631258488603','2023-11-15', false,CURRENT_TIMESTAMP),
-        (2, 2, 2001, 'Marathon', 'Next Friday Alves Martins school will host a marathon in support of cancer', '40.65434224001848 -7.916687987324942','2023-12-01', false,CURRENT_TIMESTAMP),
-        (3, 3, 3002, 'Football tournament', 'Every Sunday we will be playing football until the end of the tournament', '40.146181639547116 -7.483017349363566','2023-12-10', false,CURRENT_TIMESTAMP),
-        (4, 2, 4003, 'Rafael Mariano Live', 'Rafael Mariano will be hosting a live show in Old School Bar','40.11331582264235 -7.600471037595766' ,'2023-12-31', false,CURRENT_TIMESTAMP),
-        (5, 5, 6002, 'The Lord Of the Rings live', 'Nosso Shopping will be playing the OST of The Lord of the Rings with the movie', '41.29696712221882 -7.734768146829981','2024-01-05', false,CURRENT_TIMESTAMP),
-        (6, 1, 4001, 'Company dinner', 'We are celebrating a closed deal and will be having dinner at Canoa Wine Bar', '39.6048610997216 -8.414854011912372','2024-01-15', false,CURRENT_TIMESTAMP),
-        (7, 4, 2003, 'Live Reading', 'The library will be having a live reading directed to children', '39.29030284651063 -7.432249675738156' ,'2024-01-25', false,CURRENT_TIMESTAMP),
-        (8, 3, 1002, 'Donate Blood', 'Local pharmacy will be collecting blood for charity purposes', '40.13969717714694 -7.671405025696972','2024-02-05', false,CURRENT_TIMESTAMP),
-        (9, 4, 2002, 'Tecnico Open Day', 'Técnico will open its doors for everyone', '39.291450016171346 -7.43306862970031','2024-02-15', false,CURRENT_TIMESTAMP),
-        (10, 5, 3001, 'Workout competition', 'Fitness hut is opening a tournament and the prize is a free membership for a year', '41.29319651421935 -7.737093562591062','2024-03-01', false,CURRENT_TIMESTAMP);
+        (1, 2, 1001, 'Volunteering', 'Viseu hospital will be hosting an auction to gain funding for children in need', '40.65056885039045 -7.905631258488603','2023-11-15', false,CURRENT_TIMESTAMP, true),
+        (2, 2, 2001, 'Marathon', 'Next Friday Alves Martins school will host a marathon in support of cancer', '40.65434224001848 -7.916687987324942','2023-12-01', false,CURRENT_TIMESTAMP, true),
+        (3, 3, 3002, 'Football tournament', 'Every Sunday we will be playing football until the end of the tournament', '40.146181639547116 -7.483017349363566','2023-12-10', false,CURRENT_TIMESTAMP, true),
+        (4, 2, 4003, 'Rafael Mariano Live', 'Rafael Mariano will be hosting a live show in Old School Bar','40.11331582264235 -7.600471037595766' ,'2023-12-31', false,CURRENT_TIMESTAMP, true),
+        (5, 5, 6002, 'The Lord Of the Rings live', 'Nosso Shopping will be playing the OST of The Lord of the Rings with the movie', '41.29696712221882 -7.734768146829981','2024-01-05', false,CURRENT_TIMESTAMP, true),
+        (6, 1, 4001, 'Company dinner', 'We are celebrating a closed deal and will be having dinner at Canoa Wine Bar', '39.6048610997216 -8.414854011912372','2024-01-15', false,CURRENT_TIMESTAMP, true),
+        (7, 4, 2003, 'Live Reading', 'The library will be having a live reading directed to children', '39.29030284651063 -7.432249675738156' ,'2024-01-25', false,CURRENT_TIMESTAMP, true),
+        (8, 3, 1002, 'Donate Blood', 'Local pharmacy will be collecting blood for charity purposes', '40.13969717714694 -7.671405025696972','2024-02-05', false,CURRENT_TIMESTAMP, true),
+        (9, 4, 2002, 'Tecnico Open Day', 'Técnico will open its doors for everyone', '39.291450016171346 -7.43306862970031','2024-02-15', false,CURRENT_TIMESTAMP, true),
+        (10, 5, 3001, 'Workout competition', 'Fitness hut is opening a tournament and the prize is a free membership for a year', '41.29319651421935 -7.737093562591062','2024-03-01', false,CURRENT_TIMESTAMP, true);
     `);
     await db.sequelize.query(`
-        INSERT INTO "dynamic_content"."forums" ("publisher_id", "office_id", "sub_area_id", "title", "content","creation_date")
+        INSERT INTO "dynamic_content"."forums" ("publisher_id", "office_id", "sub_area_id", "title", "content","creation_date", "validated")
         VALUES
-        (1, 1, 4002, 'Coffee Shops', 'Can someone recommend coffee shops with a "hippie" vibe?',CURRENT_TIMESTAMP),
-        (2, 2, 2002, 'Best colleges in the country?', 'Trying to get a new degree in a new school, what are the best options',CURRENT_TIMESTAMP),
-        (3, 3, 4001, 'Anniversary Dinner', 'Want to take my SO somewhere nice, what do you guys recommend?',CURRENT_TIMESTAMP),
-        (4, 4, 6001, 'Top 3 movies', 'Tell me your top 3 movies of all time. Mine are 1.Return of the king 2.Blade Runner 1982 3. Hacksaw Ridge',CURRENT_TIMESTAMP),
-        (5, 5, 3003, 'Parks to walk the dog?', 'Need a good park to walk my dog. Any recommendations',CURRENT_TIMESTAMP),
-        (6, 1, 7004, 'Need a lift', 'Need a lift to my house in UnicornLand, can someone give me a lift?',CURRENT_TIMESTAMP),
-        (7, 2, 7003, 'Airplane ticket', 'I bought these airplane tickets, does anyone want them?',CURRENT_TIMESTAMP),
-        (8, 3, 4002, 'Baking a red velvet', 'I am having a hard time in the 3rd step of the mixture of the ingredients, can someone help me?',CURRENT_TIMESTAMP),
-        (9, 4, 5001, 'Looking for a studio', 'Does anyone know a good landlord who rents studios at an affordable price and good conditions?',CURRENT_TIMESTAMP),
-        (10, 5, 1002, 'Need counseling', 'I am looking for a good psychologist for my oldest son, does anyone have a recommendation? Thank you all!',CURRENT_TIMESTAMP);
+        (1, 1, 4002, 'Coffee Shops', 'Can someone recommend coffee shops with a "hippie" vibe?',CURRENT_TIMESTAMP, true),
+        (2, 2, 2002, 'Best colleges in the country?', 'Trying to get a new degree in a new school, what are the best options',CURRENT_TIMESTAMP, true),
+        (3, 3, 4001, 'Anniversary Dinner', 'Want to take my SO somewhere nice, what do you guys recommend?',CURRENT_TIMESTAMP, true),
+        (4, 4, 6001, 'Top 3 movies', 'Tell me your top 3 movies of all time. Mine are 1.Return of the king 2.Blade Runner 1982 3. Hacksaw Ridge',CURRENT_TIMESTAMP, true),
+        (5, 5, 3003, 'Parks to walk the dog?', 'Need a good park to walk my dog. Any recommendations',CURRENT_TIMESTAMP, true),
+        (6, 1, 7004, 'Need a lift', 'Need a lift to my house in UnicornLand, can someone give me a lift?',CURRENT_TIMESTAMP, true),
+        (7, 2, 7003, 'Airplane ticket', 'I bought these airplane tickets, does anyone want them?',CURRENT_TIMESTAMP, true),
+        (8, 3, 4002, 'Baking a red velvet', 'I am having a hard time in the 3rd step of the mixture of the ingredients, can someone help me?',CURRENT_TIMESTAMP, true),
+        (9, 4, 5001, 'Looking for a studio', 'Does anyone know a good landlord who rents studios at an affordable price and good conditions?',CURRENT_TIMESTAMP, true),
+        (10, 5, 1002, 'Need counseling', 'I am looking for a good psychologist for my oldest son, does anyone have a recommendation? Thank you all!',CURRENT_TIMESTAMP, true);
     `);
     await db.sequelize.query(`
         INSERT INTO "user_interactions"."notifications" ("user_id", "event_id", "post_id", "notification_text","create_date")
