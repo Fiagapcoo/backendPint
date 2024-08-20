@@ -1,5 +1,6 @@
 const db = require("../models");
 const jwt = require("jsonwebtoken");
+const admin = require('firebase-admin');
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const { sendMail } = require("./emailController");
@@ -20,6 +21,10 @@ const {
   updateAccessOnLogin,
   sp_verifyUser,
   sp_updateLastAccess,
+  findUserByGoogleId,
+  findUserByEmail,
+  updateUser,
+  createUser,
 } = require("../database/logic_objects/usersProcedures");
 
 const {
@@ -369,28 +374,60 @@ controllers.login_mobile = async (req, res) => {
   }
 };
 
-// controllers.testjwt = async (req, res) => {
-//   const info = {
-//     id: 1,
-//     email: "abc@gmail.com",
-//   };
 
-//   const token = jwt.sign(info, process.env.JWT_SECRET, { expiresIn: "1h" });
-//   console.log("token:", token);
-// };
 
-// controllers.validateToken = async (req, res) => {
-//   const { token } = req.body;
+controllers.login_google = async (req,res) => {
+  const { idToken  } = req.body;
+  
 
-//   try {
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//     console.log("decoded:", decoded);
-//     res.status(200).json({ success: true, message: "Token is valid" });
-//   } catch (error) {
-//     console.error("Error validating token:", error);
-//     res.status(401).json({ success: false, message: "Invalid token" });
-//   }
-// };
+  try {
+    // Verify the ID token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    console.log('This is the decoded token');
+    console.log(decodedToken);
+    const email = decodedToken.email;
+    const googleId = decodedToken.uid;
+
+    // Check if the user exists in your database
+    let user = await findUserByGoogleId(googleId);
+    if (!user) {
+      // If not, check by email to see if an account already exists
+      user = await findUserByEmail(email);
+      if (user) {
+        // Merge accounts if found by email
+        user.googleId = googleId;
+        await updateUser(user);
+      } else {
+        // Otherwise, create a new user
+        user = await createUser(
+          decodedToken
+        );
+      }
+    }
+    console.log ('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+    console.log(user);
+    const token = generateToken(user.user_id);
+    const refreshToken = generateRefreshToken(user.user_id);
+    await sp_updateLastAccess(user.user_id); 
+    res
+      .status(200)
+      .json({
+        token,
+        refreshToken,
+        success: true,
+        message: "Login successful",
+      });
+  } catch (error) {
+    console.error("Error logging in:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+
+
+
+
+
 
 controllers.getUserByToken = async (req, res) => {
   const user_id = req.user.id;
@@ -419,6 +456,9 @@ controllers.refreshToken = async (req, res) => {
     console.error("Error refreshing token:", error);
   }
 };
+
+
+
 
 
 

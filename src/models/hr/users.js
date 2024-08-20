@@ -54,7 +54,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
       },
-      google_id: { type: DataTypes.INTEGER, allowNull: true },
+      google_id: { type: DataTypes.STRING(255), allowNull: true },
       // fcmToken: { type: DataTypes.STRING, allowNull:true}
     },
     {

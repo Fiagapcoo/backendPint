@@ -57,6 +57,16 @@ const insertAdmins = async () => {
   await spCreatePassword(21, "123456@Softshares-vilareal");
   await spActivateUser(21);
   await spSetCenterAdmin(21, 5);
+
+  await spRegisterNewUser(
+    "test",
+    "Admin",
+    "test@yopmail.com",
+    2
+  );
+  await spCreatePassword(22, "123456@Softshares");
+  await spActivateUser(22);
+  await spSetCenterAdmin(22, 2);
 };
 
 insertAdmins();

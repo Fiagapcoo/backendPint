@@ -609,9 +609,14 @@ async function updateUser(user) {
 
 async function createUser(userData) {
   try {
+    console.log('inside createUser');
+    var name = userData.name;
+    console.log(name);
+    const nameArray = name.split(' ');
+    console.log(nameArray);
     const newUser = await db.Users.create({
-      first_name: userData.first_name || "", // default empty if not provided
-      last_name: userData.last_name || "", // default empty if not provided
+      first_name: nameArray[0] || "", // default empty if not provided
+      last_name: nameArray[1] || "", // default empty if not provided
       email: userData.email,
       google_id: userData.google_id,
       role_id: userData.role_id || 1, // assuming default role_id is 1, adjust as needed
