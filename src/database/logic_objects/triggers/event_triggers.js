@@ -42,7 +42,11 @@ const createTriggerFunction_trg_moderate_event_content = async () => {
                     RAISE NOTICE 'Inserting score for the new event';
                     INSERT INTO dynamic_content.scores(event_id, score)
                     VALUES (eid, 0);
+
+                    --C
                 END IF;
+
+                
 
             EXCEPTION
                 WHEN OTHERS THEN
@@ -200,11 +204,95 @@ const createTrigger_event_part_count= async () => {
 };
 
 
+
+
+
+
+
+
+
+const createTriggerFunction_create_album_for_validated_event = async () => {
+    await db.sequelize.query(`
+        CREATE OR REPLACE FUNCTION dynamic_content.create_album_for_validated_event()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            error_message TEXT;
+            error_severity TEXT;
+            error_state TEXT;
+        BEGIN
+            -- Check if the event is validated
+            IF NEW.validated = TRUE THEN
+                -- Insert a new album associated with the validated event
+                INSERT INTO dynamic_content.albuns (event_id, title, sub_area_id)
+                VALUES (NEW.event_id, NEW.name, NEW.sub_area_id); -- Use the event title as the album name
+            END IF;
+
+            RETURN NEW;
+        EXCEPTION
+            WHEN OTHERS THEN
+                -- Capture the error details
+                GET STACKED DIAGNOSTICS error_message = MESSAGE_TEXT,
+                                        error_severity = RETURNED_SQLSTATE,
+                                        error_state = PG_EXCEPTION_DETAIL;
+
+                -- Log the error details (if you have a logging function)
+                --PERFORM security.log_error(error_message, error_severity, error_state);
+
+                -- Raise notice with error details (for debugging)
+                RAISE NOTICE 'Error: %', error_message;
+
+                RETURN NULL;
+        END;
+        $$ LANGUAGE plpgsql;
+    `);
+};
+
+const createTrigger_create_album_after_event_insert = async () => {
+    await db.sequelize.query(`
+        DO $$ 
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_create_album_after_event_insert') THEN
+                DROP TRIGGER trg_create_album_after_event_insert ON dynamic_content.events;
+            END IF;
+
+            CREATE TRIGGER trg_create_album_after_event_insert
+            AFTER INSERT ON dynamic_content.events
+            FOR EACH ROW
+            WHEN (NEW.validated IS TRUE)
+            EXECUTE FUNCTION dynamic_content.create_album_for_validated_event();
+        END $$;
+    `);
+};
+
+const createTrigger_create_album_after_event_update = async () => {
+    await db.sequelize.query(`
+        DO $$ 
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_create_album_after_event_update') THEN
+                DROP TRIGGER trg_create_album_after_event_update ON dynamic_content.events;
+            END IF;
+
+            CREATE TRIGGER trg_create_album_after_event_update
+            AFTER UPDATE ON dynamic_content.events
+            FOR EACH ROW
+            WHEN (NEW.validated IS TRUE AND OLD.validated IS FALSE)
+            EXECUTE FUNCTION dynamic_content.create_album_for_validated_event();
+        END $$;
+    `);
+};
+
+
+
 module.exports = {
     createTriggerFunction_trg_moderate_event_content,
     createTrigger_createEvent,
     sp_for_next_trigger,
     create_sp_for_trigger,
     createTriggerFunction_event_part_count,
-    createTrigger_event_part_count
+    createTrigger_event_part_count,
+
+    createTriggerFunction_create_album_for_validated_event,
+    createTrigger_create_album_after_event_insert,
+    createTrigger_create_album_after_event_update
+
 };

@@ -100,8 +100,34 @@ async function spEditPost(postId, subAreaId = null, officeId = null, adminId = n
     }
 }
 
+async function spDeletePost(postId) {
+    const transaction = await db.sequelize.transaction();
+    try {
+      await db.sequelize.query(
+        `DELETE FROM "dynamic_content"."posts" WHERE "post_id" = :postId`,
+        { replacements: { postId }, type: QueryTypes.DELETE, transaction }
+      );
+  
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+  
+  async function spGetPost(postId) {
+    const post = await db.sequelize.query(
+      `SELECT * FROM "dynamic_content"."posts" WHERE "post_id" = :postId`,
+      { replacements: { postId }, type: QueryTypes.SELECT }
+    );
+  
+    return post.length ? forum[0] : null;
+  }
+
 module.exports = {
     spCreatePost,
     fnGetPostState,
-    spEditPost
+    spEditPost,
+    spDeletePost,
+    spGetPost
 }

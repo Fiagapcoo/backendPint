@@ -44,7 +44,7 @@ controllers.getAllContentByCity = async (req, res) => {
     const posts = await db.sequelize.query(
       `SELECT * FROM "dynamic_content"."posts" p 
             JOIN "centers"."offices" o ON p.office_id = o.office_id
-            WHERE o.office_id = :city_id
+            WHERE o.office_id = :city_id AND p.validated=true
             ORDER BY p.creation_date DESC `,
       {
         replacements: { city_id },
@@ -55,7 +55,7 @@ controllers.getAllContentByCity = async (req, res) => {
     const forums = await db.sequelize.query(
       `SELECT * FROM "dynamic_content"."forums" f 
             JOIN "centers"."offices" o ON f.office_id = o.office_id
-            WHERE o.office_id = :city_id
+            WHERE o.office_id = :city_id AND f.validated=true
             ORDER BY f.creation_date DESC `,
       {
         replacements: { city_id },
@@ -66,7 +66,7 @@ controllers.getAllContentByCity = async (req, res) => {
     const events = await db.sequelize.query(
       `SELECT * FROM "dynamic_content"."events" e 
             JOIN "centers"."offices" o ON e.office_id = o.office_id
-            WHERE o.office_id = :city_id
+            WHERE o.office_id = :city_id AND e.validated=true
             ORDER BY e.creation_date DESC `,
       {
         replacements: { city_id },
@@ -95,7 +95,7 @@ controllers.getPostsByCity = async (req, res) => {
             FROM "dynamic_content"."posts" p
             JOIN "centers"."offices" o ON p.office_id = o.office_id
             JOIN "dynamic_content"."scores" s ON p.post_id = s.post_id
-            WHERE o.office_id = :city_id
+            WHERE o.office_id = :city_id AND p.validated=true
             ORDER BY p.creation_date DESC
         `,
       {
@@ -123,7 +123,7 @@ controllers.getForumsByCity = async (req, res) => {
             SELECT f.*, o.city
             FROM "dynamic_content"."forums" f
             JOIN "centers"."offices" o ON f.office_id = o.office_id
-            WHERE o.office_id = :city_id
+            WHERE o.office_id = :city_id AND f.validated=true
             ORDER BY f.creation_date DESC
         `,
       {
@@ -151,7 +151,7 @@ controllers.getEventsByCity = async (req, res) => {
             SELECT e.*, o.city
             FROM "dynamic_content"."events" e
             JOIN "centers"."offices" o ON e.office_id = o.office_id
-            WHERE o.office_id = :city_id
+            WHERE o.office_id = :city_id AND e.validated=true
             ORDER BY e.creation_date DESC
         `,
       {
