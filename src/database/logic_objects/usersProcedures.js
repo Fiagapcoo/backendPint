@@ -1,29 +1,29 @@
-const { QueryTypes } = require('sequelize');
-const db = require('../../models'); 
+const { QueryTypes } = require("sequelize");
+const db = require("../../models");
 const bcrypt = require("bcryptjs");
 
 async function logUserAction(userID, type, description) {
-    try {
-      await db.sequelize.transaction(async (transaction) => {
-        await db.sequelize.query(
-          `INSERT INTO "user_interactions"."user_actions_log" (user_id, action_type, action_description, action_date) VALUES (:userID, :type, :description, CURRENT_TIMESTAMP)`,
-          {
-            replacements: { userID, type, description },
-            type: QueryTypes.INSERT,
-            transaction
-          }
-        );
-      });
-    } catch (error) {
-      console.error('Error logging user action:', error);
-      throw error;
-    }
+  try {
+    await db.sequelize.transaction(async (transaction) => {
+      await db.sequelize.query(
+        `INSERT INTO "user_interactions"."user_actions_log" (user_id, action_type, action_description, action_date) VALUES (:userID, :type, :description, CURRENT_TIMESTAMP)`,
+        {
+          replacements: { userID, type, description },
+          type: QueryTypes.INSERT,
+          transaction,
+        }
+      );
+    });
+  } catch (error) {
+    console.error("Error logging user action:", error);
+    throw error;
+  }
 }
 
 async function getUserPreferences(userID) {
-    try {
-      const results = await db.sequelize.query(
-        `SELECT 
+  try {
+    const results = await db.sequelize.query(
+      `SELECT 
             up.user_id, 
             up.areas, 
             up.sub_areas, 
@@ -42,121 +42,131 @@ async function getUserPreferences(userID) {
               WHERE value = CAST(sa."sub_area_id" AS NVARCHAR)
           )
           WHERE up.user_id = :userID`,
-        {
-          replacements: { userID },
-          type: QueryTypes.SELECT
-        }
-      );
-      return results;
-    } catch (error) {
-      console.error('Error fetching user preferences:', error);
-      throw error;
-    }
+      {
+        replacements: { userID },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return results;
+  } catch (error) {
+    console.error("Error fetching user preferences:", error);
+    throw error;
+  }
 }
 
-  async function updateUserPreferences(userID, preferredlanguage_id, preferredAreas, preferredSubAreas, receiveNotifications) {
-    try {
-      await db.sequelize.transaction(async (transaction) => {
-        if (preferredlanguage_id !== null) {
-          await db.sequelize.query(
-            `UPDATE "user_interactions"."user_pref"
+async function updateUserPreferences(
+  userID,
+  preferredlanguage_id,
+  preferredAreas,
+  preferredSubAreas,
+  receiveNotifications
+) {
+  try {
+    await db.sequelize.transaction(async (transaction) => {
+      if (preferredlanguage_id !== null) {
+        await db.sequelize.query(
+          `UPDATE "user_interactions"."user_pref"
             SET "language_id" = :preferredlanguage_id
             WHERE "user_id" = :userID`,
-            {
-              replacements: { userID, preferredlanguage_id },
-              type: QueryTypes.UPDATE,
-              transaction
-            }
-          );
-        }
-  
-        if (preferredAreas !== null) {
-          await db.sequelize.query(
-            `UPDATE "user_interactions"."user_pref"
+          {
+            replacements: { userID, preferredlanguage_id },
+            type: QueryTypes.UPDATE,
+            transaction,
+          }
+        );
+      }
+
+      if (preferredAreas !== null) {
+        await db.sequelize.query(
+          `UPDATE "user_interactions"."user_pref"
             SET "areas" = :preferredAreas
             WHERE "user_id" = :userID`,
-            {
-              replacements: { userID, preferredAreas },
-              type: QueryTypes.UPDATE,
-              transaction
-            }
-          );
-        }
-  
-        if (preferredSubAreas !== null) {
-          await db.sequelize.query(
-            `UPDATE "user_interactions"."user_pref"
+          {
+            replacements: { userID, preferredAreas },
+            type: QueryTypes.UPDATE,
+            transaction,
+          }
+        );
+      }
+
+      if (preferredSubAreas !== null) {
+        await db.sequelize.query(
+          `UPDATE "user_interactions"."user_pref"
             SET "sub_areas" = :preferredSubAreas
             WHERE "user_id" = :userID`,
-            {
-              replacements: { userID, preferredSubAreas },
-              type: QueryTypes.UPDATE,
-              transaction
-            }
-          );
-        }
-  
-        if (receiveNotifications !== null) {
-          await db.sequelize.query(
-            `UPDATE "user_interactions"."user_pref"
+          {
+            replacements: { userID, preferredSubAreas },
+            type: QueryTypes.UPDATE,
+            transaction,
+          }
+        );
+      }
+
+      if (receiveNotifications !== null) {
+        await db.sequelize.query(
+          `UPDATE "user_interactions"."user_pref"
             SET "receive_notifications" = :receiveNotifications
             WHERE "user_id" = :userID`,
-            {
-              replacements: { userID, receiveNotifications },
-              type: QueryTypes.UPDATE,
-              transaction
-            }
-          );
-        }
-  
-        await logUserAction(userID, 'User Preferences', 'User changed preferences');
-      });
-    } catch (error) {
-      console.error('Error updating user preferences:', error);
-      throw error;
-    }
+          {
+            replacements: { userID, receiveNotifications },
+            type: QueryTypes.UPDATE,
+            transaction,
+          }
+        );
+      }
+
+      await logUserAction(
+        userID,
+        "User Preferences",
+        "User changed preferences"
+      );
+    });
+  } catch (error) {
+    console.error("Error updating user preferences:", error);
+    throw error;
+  }
 }
 
 async function updateAccessOnLogin(userID) {
-    try {
-      await db.sequelize.transaction(async (transaction) => {
-        await db.sequelize.query(
-          `UPDATE "hr"."users"
+  try {
+    await db.sequelize.transaction(async (transaction) => {
+      await db.sequelize.query(
+        `UPDATE "hr"."users"
           SET "last_access" = CURRENT_TIMESTAMP
           WHERE "user_id" = :userID`,
-          {
-            replacements: { userID },
-            type: QueryTypes.UPDATE,
-            transaction
-          }
-        );
-  
-        await logUserAction(userID, 'Login', 'User logged into the application');
-      });
-    } catch (error) {
-      console.error('Error updating last access on login:', error);
-      throw error;
-    }
+        {
+          replacements: { userID },
+          type: QueryTypes.UPDATE,
+          transaction,
+        }
+      );
+
+      await logUserAction(userID, "Login", "User logged into the application");
+    });
+  } catch (error) {
+    console.error("Error updating last access on login:", error);
+    throw error;
+  }
 }
 
 async function getUserRole(userID) {
-    try {
-      const result = await db.sequelize.query(
-        `SELECT p."role_name"
+  try {
+    const result = await db.sequelize.query(
+      `SELECT p."role_name"
         FROM "hr"."users" u
         JOIN "security"."acc_permissions" p ON u."role_id" = p."role_id"
         WHERE u."user_id" = :userID
         `,
-        {
-          replacements: { userID },
-          type: QueryTypes.SELECT
-        }
-      );
-      return result[0] ? result[0].role_name : null;
-    } catch (error) {
-      console.error('Error getting user role:', error);
-      throw error;
-    }
+      {
+        replacements: { userID },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return result[0] ? result[0].role_name : null;
+  } catch (error) {
+    console.error("Error getting user role:", error);
+    throw error;
+  }
 }
 
 async function getUserByRole(role) {
@@ -170,93 +180,92 @@ async function getUserByRole(role) {
         {
           replacements: { role },
           type: QueryTypes.SELECT,
-          transaction
+          transaction,
         }
       );
     });
     return result;
   } catch (error) {
-    console.error('Error getting user by role:', error);
+    console.error("Error getting user by role:", error);
     throw error;
   }
 }
 
-
 async function addBookmark(userID, contentID, contentType) {
-    try {
-      await db.sequelize.transaction(async (transaction) => {
-        const [results] = await db.sequelize.query(
-          `SELECT 1 FROM "user_interactions"."bookmarks"
+  try {
+    await db.sequelize.transaction(async (transaction) => {
+      const [results] = await db.sequelize.query(
+        `SELECT 1 FROM "user_interactions"."bookmarks"
           WHERE "user_id" = :userID AND "content_id" = :contentID AND "content_type" = :contentType`,
+        {
+          replacements: { userID, contentID, contentType },
+          type: QueryTypes.SELECT,
+          transaction,
+        }
+      );
+
+      if (!results) {
+        await db.sequelize.query(
+          `INSERT INTO "user_interactions"."bookmarks" ("user_id", "content_id", "content_type", "bookmark_date")
+            VALUES (:userID, :contentID, :contentType, CURRENT_TIMESTAMP)`,
           {
             replacements: { userID, contentID, contentType },
-            type: QueryTypes.SELECT,
-            transaction
+            type: QueryTypes.INSERT,
+            transaction,
           }
         );
-  
-        if (!results) {
-          await db.sequelize.query(
-            `INSERT INTO "user_interactions"."bookmarks" ("user_id", "content_id", "content_type", "bookmark_date")
-            VALUES (:userID, :contentID, :contentType, CURRENT_TIMESTAMP)`,
-            {
-              replacements: { userID, contentID, contentType },
-              type: QueryTypes.INSERT,
-              transaction
-            }
-          );
-  
-          await logUserAction(userID, 'Bookmark', 'User added bookmark');
-        } else {
-          console.log('Content already bookmarked.');
-        }
-      });
-    } catch (error) {
-      console.error('Error adding bookmark:', error);
-      throw error;
-    }
+
+        await logUserAction(userID, "Bookmark", "User added bookmark");
+      } else {
+        console.log("Content already bookmarked.");
+      }
+    });
+  } catch (error) {
+    console.error("Error adding bookmark:", error);
+    throw error;
+  }
 }
 
 async function removeBookmark(userID, contentID, contentType) {
-    try {
-      await db.sequelize.transaction(async (transaction) => {
-        const [results] = await db.sequelize.query(
-          `SELECT 1 FROM "user_interactions"."bookmarks"
+  try {
+    await db.sequelize.transaction(async (transaction) => {
+      const [results] = await db.sequelize.query(
+        `SELECT 1 FROM "user_interactions"."bookmarks"
           WHERE "user_id" = :userID AND "content_id" = :contentID AND "content_type" = :contentType`,
+        {
+          replacements: { userID, contentID, contentType },
+          type: QueryTypes.SELECT,
+          transaction,
+        }
+      );
+
+      if (results) {
+        await db.sequelize.query(
+          `DELETE FROM "user_interactions"."bookmarks"
+            WHERE "user_id" = :userID AND "content_id" = :contentID AND "content_type" = :contentType`,
           {
             replacements: { userID, contentID, contentType },
-            type: QueryTypes.SELECT,
-            transaction
+            type: QueryTypes.DELETE,
+            transaction,
           }
         );
-  
-        if (results) {
-          await db.sequelize.query(
-            `DELETE FROM "user_interactions"."bookmarks"
-            WHERE "user_id" = :userID AND "content_id" = :contentID AND "content_type" = :contentType`,
-            {
-              replacements: { userID, contentID, contentType },
-              type: QueryTypes.DELETE,
-              transaction
-            }
-          );
-  
-          await logUserAction(userID, 'Bookmark', 'User removed bookmark');
-          console.log('Bookmark removed successfully.');
-        } else {
-          console.log('Bookmark does not exist.');
-        }
-      });
-    } catch (error) {
-      console.error('Error removing bookmark:', error);
-      throw error;
-    }
+
+        await logUserAction(userID, "Bookmark", "User removed bookmark");
+        console.log("Bookmark removed successfully.");
+      } else {
+        console.log("Bookmark does not exist.");
+      }
+    });
+  } catch (error) {
+    console.error("Error removing bookmark:", error);
+    throw error;
+  }
 }
 
 async function getUserBookmarks(userID) {
-    try {
-      const results = await db.sequelize.query(
-        `SELECT 
+  try {
+    const results = await db.sequelize.query(
+      `SELECT 
           ub."user_id",
           ub."content_id",
           ub."content_type",
@@ -272,80 +281,85 @@ async function getUserBookmarks(userID) {
         LEFT JOIN "dynamic_content"."events" e ON ub."content_id" = e."event_id" AND ub."content_type" = 'Event'
         LEFT JOIN "dynamic_content"."forums" f ON ub."content_id" = f."forum_id" AND ub."content_type" = 'Forum'
         WHERE ub."user_id" = :userID`,
-        {
-          replacements: { userID },
-          type: QueryTypes.SELECT
-        }
-      );
-      return results;
-    } catch (error) {
-      console.error('Error fetching user bookmarks:', error);
-      throw error;
-    }
+      {
+        replacements: { userID },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return results;
+  } catch (error) {
+    console.error("Error fetching user bookmarks:", error);
+    throw error;
+  }
 }
 
 async function sp_verifyUser(userID) {
-    try {
-      const result = await db.sequelize.query(
-        `SELECT u."user_id", a."account_status", a."account_restriction"
+  try {
+    const result = await db.sequelize.query(
+      `SELECT u."user_id", a."account_status", a."account_restriction"
         FROM "hr"."users" u
         JOIN "security"."user_account_details" a ON u."user_id" = a."user_id"
         WHERE u."user_id" = :userID`,
-        {
-          replacements: { userID },
-          type: QueryTypes.SELECT
-        }
-      );
-      return result[0];
-    } catch (error) {
-      console.error('Error verifying user:', error);
-      throw error;
-    }
-};
+      {
+        replacements: { userID },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return result[0];
+  } catch (error) {
+    console.error("Error verifying user:", error);
+    throw error;
+  }
+}
 
 async function sp_updateLastAccess(userID) {
-    try {
-      await db.sequelize.transaction(async (transaction) => {
-        await db.sequelize.query(
-          `UPDATE "hr"."users"
+  try {
+    await db.sequelize.transaction(async (transaction) => {
+      await db.sequelize.query(
+        `UPDATE "hr"."users"
           SET "last_access" = CURRENT_TIMESTAMP
           WHERE "user_id" = :userID`,
-          {
-            replacements: { userID },
-            type: QueryTypes.UPDATE,
-            transaction
-          }
-        );
-      }
+        {
+          replacements: { userID },
+          type: QueryTypes.UPDATE,
+          transaction,
+        }
       );
-    }
-    catch (error) {
-      console.error('Error updating last access:', error);
-      throw error;
-    }
+    });
+  } catch (error) {
+    console.error("Error updating last access:", error);
+    throw error;
+  }
 }
 
 async function updateAccStatus(userID, accountStatus) {
-    try {
-      await db.sequelize.transaction(async (transaction) => {
-        await db.sequelize.query(
-          `UPDATE "security"."user_account_details"
+  try {
+    await db.sequelize.transaction(async (transaction) => {
+      await db.sequelize.query(
+        `UPDATE "security"."user_account_details"
           SET "account_status" = :accountStatus
           WHERE "user_id" = :userID`,
-          {
-            replacements: { userID, accountStatus },
-            type: QueryTypes.UPDATE,
-            transaction
-          }
-        );
-      });
-    } catch (error) {
-      console.error('Error updating account status:', error);
-      throw error;
-    }
-};
+        {
+          replacements: { userID, accountStatus },
+          type: QueryTypes.UPDATE,
+          transaction,
+        }
+      );
+    });
+  } catch (error) {
+    console.error("Error updating account status:", error);
+    throw error;
+  }
+}
 
-async function createUserPreferences(userID, areas=null, subAreas=null, receiveNotifications=null, languageID = null, additionalPreferences = null) {
+async function createUserPreferences(
+  userID,
+  areas = null,
+  subAreas = null,
+  receiveNotifications = null,
+  languageID = null,
+  additionalPreferences = null
+) {
   try {
     await db.sequelize.transaction(async (transaction) => {
       // Check if the user preferences already exist
@@ -354,7 +368,7 @@ async function createUserPreferences(userID, areas=null, subAreas=null, receiveN
         {
           replacements: { userID },
           type: QueryTypes.SELECT,
-          transaction
+          transaction,
         }
       );
 
@@ -367,14 +381,25 @@ async function createUserPreferences(userID, areas=null, subAreas=null, receiveN
             :userID, :areas, :subAreas, :receiveNotifications, :languageID, :additionalPreferences
           )`,
           {
-            replacements: { userID, areas, subAreas, receiveNotifications, languageID, additionalPreferences },
+            replacements: {
+              userID,
+              areas,
+              subAreas,
+              receiveNotifications,
+              languageID,
+              additionalPreferences,
+            },
             type: QueryTypes.INSERT,
-            transaction
+            transaction,
           }
         );
 
         // Log the user action
-        await logUserAction(userID, 'User Preferences', 'User Created preferences');
+        await logUserAction(
+          userID,
+          "User Preferences",
+          "User Created preferences"
+        );
         // await db.sequelize.query(
         //   `EXEC "user_interactions"."spLogUserAction" :userID, 'Created User Preferences', 'User Created preferences'`,
         //   {
@@ -384,11 +409,11 @@ async function createUserPreferences(userID, areas=null, subAreas=null, receiveN
         //   }
         // );
       } else {
-        console.log('User preferences already exist.');
+        console.log("User preferences already exist.");
       }
     });
   } catch (error) {
-    console.error('Error creating user preferences:', error);
+    console.error("Error creating user preferences:", error);
     throw error;
   }
 }
@@ -400,15 +425,15 @@ async function getUsersToValidate() {
       JOIN "security".user_account_details uad on u.user_id = uad.user_id 
       WHERE uad.account_status = false;`,
       {
-        type: QueryTypes.SELECT
+        type: QueryTypes.SELECT,
       }
     );
     return results;
   } catch (error) {
-    console.error('Error fetching users to validate:', error);
+    console.error("Error fetching users to validate:", error);
     throw error;
   }
-};
+}
 
 async function updateProfile(user, firstName, lastName, profile_pic) {
   try {
@@ -421,69 +446,65 @@ async function updateProfile(user, firstName, lastName, profile_pic) {
           "profile_pic" = COALESCE(:profile_pic, "profile_pic")
         WHERE "user_id" = :user`,
         {
-          replacements: { 
-            user, 
-            firstName: firstName || null, 
-            lastName: lastName || null, 
-            profile_pic: profile_pic || null 
+          replacements: {
+            user,
+            firstName: firstName || null,
+            lastName: lastName || null,
+            profile_pic: profile_pic || null,
           },
           type: QueryTypes.UPDATE,
-          transaction
+          transaction,
         }
       );
     });
   } catch (error) {
-    console.error('Error updating profile:', error);
+    console.error("Error updating profile:", error);
     throw error;
   }
-};
+}
 
 async function getUserPosts(userID) {
   try {
-    const results = await db.sequelize.query(
+    const posts = await db.sequelize.query(
       `SELECT 
-        p."post_id" AS "ContentID",
-        'Post' AS "ContentType",
-        p."title" AS "Title",
-        p."content" AS "Content",
-        p."creation_date" AS "CreationDate",
-        p."validated" AS "Validated"
+        * from p 
       FROM "dynamic_content"."posts" p
       WHERE p."publisher_id" = :userID
-
-      UNION ALL
-
+`,
+      {
+        replacements: { userID },
+        type: QueryTypes.SELECT,
+      }
+    );
+    const forums = await db.sequelize.query(
+      `
       SELECT 
-        f."forum_id" AS "ContentID",
-        'Forum' AS "ContentType",
-        f."title" AS "Title",
-        f."content" AS "Content",
-        f."creation_date" AS "CreationDate",
-        f."validated" AS "Validated"
+        * from f
       FROM "dynamic_content"."forums" f
       WHERE f."publisher_id" = :userID
 
-      UNION ALL
-
+      `,
+      {
+        replacements: { userID },
+        type: QueryTypes.SELECT,
+      }
+    );
+    const events = await db.sequelize.query(
+      `
       SELECT 
-        e."event_id" AS "ContentID",
-        'Event' AS "ContentType",
-        e."name" AS "Title",
-        e."description" AS "Content",
-        e."creation_date" AS "CreationDate",
-        e."validated" AS "Validated"
+        * from e
       FROM "dynamic_content"."events" e
       WHERE e."publisher_id" = :userID
 
       ORDER BY "CreationDate" DESC`,
       {
         replacements: { userID },
-        type: QueryTypes.SELECT
+        type: QueryTypes.SELECT,
       }
     );
-    return results;
+    return { posts, forums, events };
   } catch (error) {
-    console.error('Error fetching user-created content:', error);
+    console.error("Error fetching user-created content:", error);
     throw error;
   }
 }
@@ -506,21 +527,20 @@ async function getUserRegisteredEvents(userID) {
       ORDER BY e."event_date" DESC`,
       {
         replacements: { userID },
-        type: QueryTypes.SELECT
+        type: QueryTypes.SELECT,
       }
     );
     return results;
   } catch (error) {
-    console.error('Error fetching user registered events:', error);
+    console.error("Error fetching user registered events:", error);
     throw error;
   }
 }
 
 async function updateUserPassword(user, password) {
-
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  try{
+  try {
     await db.sequelize.transaction(async (transaction) => {
       await db.sequelize.query(
         `UPDATE "hr"."users"
@@ -529,37 +549,106 @@ async function updateUserPassword(user, password) {
         {
           replacements: { user, hashedPassword },
           type: QueryTypes.UPDATE,
-          transaction
+          transaction,
         }
       );
     });
-  }catch(error){
-    console.error('Error updating password:', error);
+  } catch (error) {
+    console.error("Error updating password:", error);
     throw error;
   }
 }
 
-
-  
-
-  
-  module.exports = {
-    logUserAction,
-    getUserPreferences,
-    updateUserPreferences,
-    updateAccessOnLogin,
-    getUserRole,
-    getUserByRole,
-    addBookmark,   
-    removeBookmark, 
-    getUserBookmarks,
-    sp_verifyUser,
-    sp_updateLastAccess,
-    updateAccStatus,
-    createUserPreferences,
-    getUsersToValidate,
-    updateProfile,
-    updateUserPassword,
-    getUserPosts,
-    getUserRegisteredEvents,
+async function findUserByGoogleId(googleId) {
+  try {
+    const user = await db.Users.findOne({
+      where: { google_id: googleId },
+    });
+    return user;
+  } catch (error) {
+    console.error("Error finding user by Google ID:", error);
+    throw error;
+  }
 }
+
+async function findUserByEmail(email) {
+  try {
+    const user = await db.Users.findOne({
+      where: { email: email },
+    });
+    return user;
+  } catch (error) {
+    console.error("Error finding user by email:", error);
+    throw error;
+  }
+}
+
+async function updateUser(user) {
+  try {
+    await db.Users.update(
+      {
+        google_id: user.google_id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        profile_pic: user.profile_pic,
+        role_id: user.role_id,
+        join_date: user.join_date,
+        last_access: user.last_access,
+        hashed_password: user.hashed_password,
+      },
+      {
+        where: { user_id: user.user_id },
+      }
+    );
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  }
+}
+
+async function createUser(userData) {
+  try {
+    const newUser = await db.Users.create({
+      first_name: userData.first_name || "", // default empty if not provided
+      last_name: userData.last_name || "", // default empty if not provided
+      email: userData.email,
+      google_id: userData.google_id,
+      role_id: userData.role_id || 1, // assuming default role_id is 1, adjust as needed
+      join_date: userData.join_date || new Date(),
+      isValidated: false, // assuming validation is required
+      profile_pic: userData.profile_pic || null,
+      last_access: new Date(),
+      hashed_password: null, // null because password isn't needed for Google sign-in
+    });
+    return newUser;
+  } catch (error) {
+    console.error("Error creating user:", error);
+    throw error;
+  }
+}
+
+module.exports = {
+  logUserAction,
+  getUserPreferences,
+  updateUserPreferences,
+  updateAccessOnLogin,
+  getUserRole,
+  getUserByRole,
+  addBookmark,
+  removeBookmark,
+  getUserBookmarks,
+  sp_verifyUser,
+  sp_updateLastAccess,
+  updateAccStatus,
+  createUserPreferences,
+  getUsersToValidate,
+  updateProfile,
+  updateUserPassword,
+  getUserPosts,
+  getUserRegisteredEvents,
+  findUserByGoogleId,
+  findUserByEmail,
+  updateUser,
+  createUser,
+};
