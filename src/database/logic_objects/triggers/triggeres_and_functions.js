@@ -23,6 +23,9 @@ const {
   create_sp_for_trigger,
   createTriggerFunction_event_part_count,
   createTrigger_event_part_count,
+  createTriggerFunction_create_album_for_validated_event,
+    createTrigger_create_album_after_event_insert,
+    createTrigger_create_album_after_event_update
 } = require("./event_triggers");
 const {
   createTriggerFunction_trg_content_validation,
@@ -68,6 +71,10 @@ const set_triggers = async () => {
   await create_sp_for_trigger();
   await createTriggerFunction_event_part_count();
   await createTrigger_event_part_count();
+
+  await createTriggerFunction_create_album_for_validated_event();
+  await createTrigger_create_album_after_event_insert();
+  await createTrigger_create_album_after_event_update();
 
   //for dashboard
   await create_spEngagementMetrics();

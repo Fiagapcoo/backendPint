@@ -2,7 +2,7 @@ const db = require("../../../models");
 
 const createFunction_logError = async () => {
   await db.sequelize.query(` 
-    CREATE OR REPLACE FUNCTION security.log_error(error_message TEXT, error_severity INT, error_state INT)
+    CREATE OR REPLACE FUNCTION security.log_error(error_message TEXT, error_severity TEXT, error_state TEXT)
     RETURNS VOID AS $$
     BEGIN
         -- Log the error details into the error log table
