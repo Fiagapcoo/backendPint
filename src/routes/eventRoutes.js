@@ -10,5 +10,5 @@ router.post('/register-user/:userId/event/:eventId', validation, controller.regi
 router.delete('/unregister-user/:userId/event/:eventId', validation, controller.unregister_user_from_event); //in doubt cause makes 2 deletes 1 update
 router.get('/state/:eventId', validation, controller.get_event_state);
 router.patch('/edit/:eventId', validation, controller.edit_event); 
-router.get('/get/:eventId', validation, controller.get_event);
+//router.get('/get/:eventId', validation, controller.get_event);
 module.exports = router;

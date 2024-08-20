@@ -207,14 +207,14 @@ async function spDeleteForum(forumId) {
   }
 }
 
-async function spGetForum(forumId) {
-  const forum = await db.sequelize.query(
-    `SELECT * FROM "dynamic_content"."forums" WHERE "forum_id" = :forumId`,
-    { replacements: { forumId }, type: QueryTypes.SELECT }
-  );
+// async function spGetForum(forumId) {
+//   const forum = await db.sequelize.query(
+//     `SELECT * FROM "dynamic_content"."forums" WHERE "forum_id" = :forumId`,
+//     { replacements: { forumId }, type: QueryTypes.SELECT }
+//   );
 
-  return forum.length ? forum[0] : null;
-}
+//   return forum.length ? forum[0] : null;
+// }
 
 module.exports = {
   spCreateForum,

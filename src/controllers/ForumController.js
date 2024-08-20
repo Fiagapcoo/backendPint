@@ -140,20 +140,20 @@ controllers.delete_forum = async (req, res) => {
       });
   }
 };
-controllers.get_forum = async (req, res) => {
-  const { forumId } = req.params;
-  console.log(req.params);
-  try {
-    const forum = await spGetForum(forumId);
-    res
-      .status(201)
-      .json({ success: true, message: "Got event successfully.", data: forum });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error getting event: " + error.message,
-    });
-  }
-};
+// controllers.get_forum = async (req, res) => {
+//   const { forumId } = req.params;
+//   console.log(req.params);
+//   try {
+//     const forum = await spGetForum(forumId);
+//     res
+//       .status(201)
+//       .json({ success: true, message: "Got event successfully.", data: forum });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Error getting event: " + error.message,
+//     });
+//   }
+// };
 
 module.exports = controllers;

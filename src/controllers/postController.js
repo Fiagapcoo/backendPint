@@ -126,20 +126,20 @@ controllers.delete_post = async (req, res) => {
     });
   }
 };
-controllers.get_post = async (req, res) => {
-  const { postId } = req.params;
-  console.log(req.params);
-  try {
-    const post = await spGetPost(postId);
-    res
-      .status(201)
-      .json({ success: true, message: "Got event successfully.", data: post });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error getting event: " + error.message,
-    });
-  }
-};
+// controllers.get_post = async (req, res) => {
+//   const { postId } = req.params;
+//   console.log(req.params);
+//   try {
+//     const post = await spGetPost(postId);
+//     res
+//       .status(201)
+//       .json({ success: true, message: "Got event successfully.", data: post });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Error getting event: " + error.message,
+//     });
+//   }
+// };
 
 module.exports = controllers;

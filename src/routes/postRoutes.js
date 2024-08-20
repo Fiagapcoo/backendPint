@@ -7,5 +7,5 @@ router.post('/create', validation, controller.create_post);
 router.get('/state/:postId', validation, controller.get_post_state);
 router.patch('/edit/:postId', validation, controller.edit_post); 
 router.delete('/delete/:postId', validation, controller.delete_post);
-router.get('/get/:postId', validation, controller.get_post);
+//router.get('/get/:postId', validation, controller.get_post);
 module.exports = router;

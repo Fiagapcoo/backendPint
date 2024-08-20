@@ -115,14 +115,14 @@ async function spDeletePost(postId) {
     }
   }
   
-  async function spGetPost(postId) {
-    const post = await db.sequelize.query(
-      `SELECT * FROM "dynamic_content"."posts" WHERE "post_id" = :postId`,
-      { replacements: { postId }, type: QueryTypes.SELECT }
-    );
+//   async function spGetPost(postId) {
+//     const post = await db.sequelize.query(
+//       `SELECT * FROM "dynamic_content"."posts" WHERE "post_id" = :postId`,
+//       { replacements: { postId }, type: QueryTypes.SELECT }
+//     );
   
-    return post.length ? forum[0] : null;
-  }
+//     return post.length ? forum[0] : null;
+//   }
 
 module.exports = {
     spCreatePost,

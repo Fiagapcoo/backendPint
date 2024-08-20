@@ -359,14 +359,14 @@ async function spEditEvent(
   }
 }
 
-async function spGetEvent(eventId) {
-  const event = await db.sequelize.query(
-    `SELECT * FROM "dynamic_content"."events" WHERE "event_id" = :eventId`,
-    { replacements: { eventId }, type: QueryTypes.SELECT }
-  );
+// async function spGetEvent(eventId) {
+//   const event = await db.sequelize.query(
+//     `SELECT * FROM "dynamic_content"."events" WHERE "event_id" = :eventId`,
+//     { replacements: { eventId }, type: QueryTypes.SELECT }
+//   );
 
-  return event.length ? event[0] : null;
-}
+//   return event.length ? event[0] : null;
+// }
 
 async function spGetParticipants(eventId) {
   const participants = await db.sequelize.query(

@@ -189,6 +189,7 @@ controllers.edit_event = async (req, res) => {
   }
 };
 
+/*
 controllers.get_event = async (req, res) => {
   const { eventId } = req.params;
   console.log(req.params);
@@ -204,6 +205,7 @@ controllers.get_event = async (req, res) => {
     });
   }
 };
+*/
 
 controllers.get_participants = async (req, res) => {
   const { eventId } = req.params;
