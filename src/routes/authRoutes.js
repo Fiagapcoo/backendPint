@@ -26,6 +26,9 @@ router.post("/change-password", validation, authController.updatePassword);
 
 router.post("request-password-reset", authController.resetPassword);
 
+
+router.patch("/store-fcm-token", authController.updateFcmToken);
+
 /*
 // Google Auth
 router.get('/google', passport.authenticate('google', {  //it knows it has to active the google strategy in passport-setup

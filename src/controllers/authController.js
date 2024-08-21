@@ -1,4 +1,5 @@
-const db = require("../models");
+const db = require("../models/");
+const { QueryTypes } = require("sequelize");
 const jwt = require("jsonwebtoken");
 const admin = require("firebase-admin");
 const validator = require("validator");
@@ -252,12 +253,10 @@ controllers.resetPassword = async (req, res) => {
     user = findUserByEmail(email);
     if (user === null) {
       console.log("User not found");
-      res
-        .status(200)
-        .json({
-          success: false,
-          message: "Could not found corresponding account with that email.",
-        });
+      res.status(200).json({
+        success: false,
+        message: "Could not found corresponding account with that email.",
+      });
     } else {
       console.log("User found:", user);
       // Assegure que 'user' seja um objeto simples
@@ -287,12 +286,10 @@ controllers.resetPassword = async (req, res) => {
     }
   } catch (error) {
     console.error("Error resetting password:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Server error. Please try again later.",
-      });
+    return res.status(500).json({
+      success: false,
+      message: "Server error. Please try again later.",
+    });
   }
 };
 
@@ -347,14 +344,12 @@ const handleResponseBasedOnRole = async (user, res) => {
     const token = generateToken(user.user_id);
     const refreshToken = generateRefreshToken(user.user_id);
     await sp_updateLastAccess(user.user_id);
-    res
-      .status(200)
-      .json({
-        token,
-        refreshToken,
-        success: true,
-        message: "Login successful",
-      });
+    res.status(200).json({
+      token,
+      refreshToken,
+      success: true,
+      message: "Login successful",
+    });
   } else {
     res.status(403).json({
       success: false,
@@ -491,6 +486,36 @@ controllers.refreshToken = async (req, res) => {
       return res.status(401).json({ message: "refresh token expired" });
     }
     console.error("Error refreshing token:", error);
+  }
+};
+
+//firebase
+controllers.updateFcmToken = async (req, res) => {
+  const { userId, fcmToken } = req.body;
+  console.log(req.body);
+  try {
+    const result = await db.sequelize.query(
+      `UPDATE "hr"."users"
+       SET "fcmToken" = :fcmToken
+       WHERE "user_id" = :userId`,
+      {
+        replacements: { fcmToken, userId },
+        type: QueryTypes.UPDATE,
+      }
+    );
+
+    if (result[1] === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found or token unchanged" });
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "FCM token updated successfully" });
+  } catch (error) {
+    console.error("Error updating FCM token:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
