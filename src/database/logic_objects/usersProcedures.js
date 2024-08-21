@@ -44,7 +44,7 @@ async function getUserPreferences(userID) {
           WHERE up.user_id = :userID`,
       {
         replacements: { userID },
-        type: QueryTypes.SELECT,
+        type: QueryTypes.SELECT, // Since `QueryTypes.SELECT` returns an array, return the first element or null if not found
       }
     );
     return results;
@@ -561,10 +561,19 @@ async function updateUserPassword(user, password) {
 
 async function findUserByGoogleId(googleId) {
   try {
-    const user = await db.Users.findOne({
-      where: { google_id: googleId },
-    });
-    return user;
+    const user = await db.sequelize.query(
+      `
+      SELECT * FROM "hr"."users"
+      WHERE "google_id" = :googleId
+      LIMIT 1
+      `,
+      {
+        replacements: { googleId },
+        type: QueryTypes.SELECT, 
+      }
+    );
+
+    return user.length > 0 ? user[0] : null;
   } catch (error) {
     console.error("Error finding user by Google ID:", error);
     throw error;
@@ -573,32 +582,56 @@ async function findUserByGoogleId(googleId) {
 
 async function findUserByEmail(email) {
   try {
-    const user = await db.Users.findOne({
-      where: { email: email },
-    });
-    return user;
+    const user = await db.sequelize.query(
+      `
+      SELECT * FROM "hr"."users"
+      WHERE "email" = :email
+      LIMIT 1
+      `,
+      {
+        replacements: { email },
+        type: QueryTypes.SELECT, 
+      }
+    );
+
+    return user.length > 0 ? user[0] : null;
   } catch (error) {
-    console.error("Error occurred while searching user by email: ", error);
+    console.error("Error finding user by Google ID:", error);
     throw error;
   }
 }
 
 async function updateUser(user) {
   try {
-    await db.Users.update(
+    await db.sequelize.query(
+      `
+      UPDATE "hr"."users"
+      SET
+        "google_id" = :google_id,
+        "first_name" = :first_name,
+        "last_name" = :last_name,
+        "email" = :email,
+        "profile_pic" = :profile_pic,
+        "role_id" = :role_id,
+        "join_date" = :join_date,
+        "last_access" = :last_access,
+        "hashed_password" = :hashed_password
+      WHERE "user_id" = :user_id
+      `,
       {
-        google_id: user.google_id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        profile_pic: user.profile_pic,
-        role_id: user.role_id,
-        join_date: user.join_date,
-        last_access: user.last_access,
-        hashed_password: user.hashed_password,
-      },
-      {
-        where: { user_id: user.user_id },
+        replacements: {
+          google_id: user.google_id,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          email: user.email,
+          profile_pic: user.profile_pic,
+          role_id: user.role_id,
+          join_date: user.join_date,
+          last_access: user.last_access,
+          hashed_password: user.hashed_password,
+          user_id: user.user_id,
+        },
+        type: QueryTypes.UPDATE,
       }
     );
   } catch (error) {
@@ -610,22 +643,50 @@ async function updateUser(user) {
 async function createUser(userData) {
   try {
     console.log('inside createUser');
-    var name = userData.name;
+    const name = userData.name;
     console.log(name);
     const nameArray = name.split(' ');
     console.log(nameArray);
-    const newUser = await db.Users.create({
-      first_name: nameArray[0] || "", // default empty if not provided
-      last_name: nameArray[1] || "", // default empty if not provided
-      email: userData.email,
-      google_id: userData.google_id,
-      role_id: userData.role_id || 1, // assuming default role_id is 1, adjust as needed
-      join_date: userData.join_date || new Date(),
-      isValidated: false, // assuming validation is required
-      profile_pic: userData.profile_pic || null,
-      last_access: new Date(),
-      hashed_password: null, // null because password isn't needed for Google sign-in
-    });
+
+    // Set default values if not provided
+    const first_name = nameArray[0] || "";
+    const last_name = nameArray[1] || "";
+    const email = userData.email;
+    const google_id = userData.google_id;
+    const role_id = userData.role_id || 1; 
+    const join_date = userData.join_date || new Date().toISOString(); // using ISO string for date
+    const profile_pic = userData.profile_pic || null;
+    const last_access = new Date().toISOString();
+    const hashed_password = null; // null because password isn't needed for Google sign-in
+
+    const result = await db.sequelize.query(
+      `
+      INSERT INTO "hr"."users" 
+      ("first_name", "last_name", "email", "google_id", "role_id", "join_date", "isValidated", "profile_pic", "last_access", "hashed_password")
+      VALUES 
+      (:first_name, :last_name, :email, :google_id, :role_id, :join_date, false, :profile_pic, :last_access, :hashed_password)
+      RETURNING *;
+      `,
+      {
+        replacements: {
+          first_name,
+          last_name,
+          email,
+          google_id,
+          role_id,
+          join_date,
+          profile_pic,
+          last_access,
+          hashed_password,
+        },
+        type: QueryTypes.INSERT,
+      }
+    );
+
+    // Since the query returns an array, return the first element (the newly created user)
+    const newUser = result[0][0];
+    console.log('INSIDE createUser FOR GOOGLE SSO AND FACEBOOK ');
+    console.log(newUser);
     return newUser;
   } catch (error) {
     console.error("Error creating user:", error);

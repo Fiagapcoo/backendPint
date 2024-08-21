@@ -5,10 +5,6 @@ const controllers = {};
 
 controllers.getAllContent = async (req, res) => {
   try {
-    // const posts = await db.Posts.findAll({ order: [['creation_date', 'DESC']] });
-    // const forums = await db.Forums.findAll({ order: [['creation_date', 'DESC']] });
-    // const events = await db.Events.findAll({ order: [['creation_date', 'DESC']] });
-
     // Raw query to get all posts ordered by creation_date in descending order
     const posts = await db.sequelize.query(
       `SELECT * FROM "dynamic_content"."posts" p ORDER BY p.creation_date DESC `,
@@ -174,22 +170,30 @@ controllers.getPostById = async (req, res) => {
     return res.status(400).json({ success: false, message: "Invalid post ID" });
   }
   try {
-    const post = await db.Posts.findByPk(post_id, {
-      include: [
-        { model: db.Users, as: "Publisher" },
-        { model: db.Users, as: "Admin" },
-        { model: db.SubArea },
-        { model: db.OfficeAdmins, as: "Office_admin" },
-        {
-          model: db.Scores,
-          as: "Score",
-          attributes: ["score", "num_of_evals"],
-        },
-      ],
-    });
+    const post = await db.sequelize.query(
+      `
+      SELECT 
+        p.*,
+        pub."first_name" AS "PublisherFirstName",
+        pub."last_name" AS "PublisherLastName",
+        admin."first_name" AS "AdminFirstName",
+        admin."last_name" AS "AdminLastName",
+        sc."score",
+        sc."num_of_evals"
+      FROM "dynamic_content"."posts" p
+      LEFT JOIN "hr"."users" pub ON p."publisher_id" = pub."user_id"
+      LEFT JOIN "hr"."users" admin ON p."admin_id" = admin."user_id"
+      LEFT JOIN "dynamic_content"."scores" sc ON p."post_id" = sc."post_id"
+      WHERE p."post_id" = :post_id
+      `,
+      {
+        replacements: { post_id },
+        type: QueryTypes.SELECT,
+      }
+    );
 
-    if (post) {
-      res.status(200).json(post);
+    if (post.length > 0) {
+      res.status(200).json(post[0]);
     } else {
       res.status(404).json({ success: false, message: "Post not found" });
     }
@@ -201,55 +205,8 @@ controllers.getPostById = async (req, res) => {
   }
 };
 
-// to test
-controllers.getEventByIdNoRawQuery = async (req, res) => {
-  const { event_id } = req.params;
-  const user_id = req.user.id; // Extracted from JWT
-  if (!validator.isInt(event_id)) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid event ID" });
-  }
-  try {
-    const event = await db.Events.findByPk(event_id, {
-      include: [
-        { model: db.Users, as: "Publisher" },
-        { model: db.OfficeAdmins, as: "Office" },
-        { model: db.Users, as: "Admin" },
-        {
-          model: db.Scores,
-          as: "Score",
-          attributes: ["score", "num_of_evals"],
-        },
-        {
-          model: db.Forums,
-          where: { event_id: event_id },
-          required: false,
-          include: [
-            {
-              model: db.EventForumAccess,
-              where: { user_id: user_id },
-              required: false,
-              as: "UserAccess",
-            },
-          ],
-        },
-      ],
-    });
 
-    if (event) {
-      res.status(200).json(event);
-    } else {
-      res.status(404).json({ success: false, message: "Event not found" });
-    }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error retrieving event",
-      error: error.message,
-    });
-  }
-};
+
 
 controllers.getEventById = async (req, res) => {
   const { event_id } = req.params;
@@ -260,26 +217,40 @@ controllers.getEventById = async (req, res) => {
       .json({ success: false, message: "Invalid event ID" });
   }
   try {
-    const event = await db.Events.findByPk(event_id, {
-      include: [
-        { model: db.Users, as: "Publisher" },
-        { model: db.OfficeAdmins, as: "Office_admin" },
-        { model: db.SubArea },
-        { model: db.Users, as: "Admin" },
-        {
-          model: db.Scores,
-          as: "Score",
-          attributes: ["score", "num_of_evals"],
-        },
-      ],
-    });
+    const event = await db.sequelize.query(
+      `
+      SELECT 
+        e.*,  -- Select all fields from the events table
+        pub."first_name" AS "PublisherFirstName",
+        pub."last_name" AS "PublisherLastName",
+        admin."first_name" AS "AdminFirstName",
+        admin."last_name" AS "AdminLastName",
+        sc."score",
+        sc."num_of_evals",
+        f."forum_id",
+        f."title" AS "ForumTitle",
+        f."content" AS "ForumContent"
+      FROM "dynamic_content"."events" e
+      LEFT JOIN "hr"."users" pub ON e."publisher_id" = pub."user_id"
+      LEFT JOIN "hr"."users" admin ON e."admin_id" = admin."user_id"
+      LEFT JOIN "dynamic_content"."scores" sc ON e."event_id" = sc."event_id"
+      LEFT JOIN "dynamic_content"."forums" f ON e."event_id" = f."event_id"
+      LEFT JOIN "control"."event_forum_access" efa 
+        ON f."forum_id" = efa."forum_id" AND efa."user_id" = :user_id
+      WHERE e."event_id" = :event_id
+      `,
+      {
+        replacements: { event_id, user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
 
-    if (!event) {
+    if (!(event.length > 0))  {
       return res
         .status(404)
         .json({ success: false, message: "Event not found" });
     }
-
+    const event_ = event[0];
     // Check if the user is registered for the event
     const participationExists = await db.sequelize.query(
       `SELECT 1
@@ -305,7 +276,7 @@ controllers.getEventById = async (req, res) => {
 
     // Construct the response
     const response = {
-      event,
+      event_,
       forum,
     };
 
@@ -327,17 +298,27 @@ controllers.getForumById = async (req, res) => {
       .json({ success: false, message: "Invalid forum ID" });
   }
   try {
-    const forum = await db.Forums.findByPk(forum_id, {
-      include: [
-        { model: db.Users, as: "Publisher" },
-        { model: db.Users, as: "Admin" },
-        { model: db.SubArea },
-        { model: db.Events },
-      ],
-    });
+    const forum = await db.sequelize.query(
+      `
+      SELECT 
+        p.*,
+        pub."first_name" AS "PublisherFirstName",
+        pub."last_name" AS "PublisherLastName",
+        admin."first_name" AS "AdminFirstName",
+        admin."last_name" AS "AdminLastName",
+      FROM "dynamic_content"."forums" p
+      LEFT JOIN "hr"."users" pub ON p."publisher_id" = pub."user_id"
+      LEFT JOIN "hr"."users" admin ON p."admin_id" = admin."user_id"
+      WHERE p."forum_id" = :forum_id
+      `,
+      {
+        replacements: { forum_id },
+        type: QueryTypes.SELECT,
+      }
+    );
 
-    if (forum) {
-      res.status(200).json(forum);
+    if (forum.length > 0) {
+      res.status(200).json(forum[0]);
     } else {
       res.status(404).json({ success: false, message: "Forum not found" });
     }
@@ -355,24 +336,32 @@ controllers.getUserInfo = async (req, res) => {
     return res.status(400).json({ success: false, message: "Invalid user ID" });
   }
   try {
-    const user = await db.Users.findByPk(user_id, {
-      attributes: { exclude: ["hashed_password", "join_date", "profile_pic"] },
-      include: [
-        {
-          model: db.OfficeWorkers,
-          as: "OfficeWorker",
-          include: [
-            {
-              model: db.Offices,
-              as: "Office",
-              attributes: ["office_id", "city"],
-            },
-          ],
-        },
-      ],
-    });
-    if (user) {
-      res.status(200).json({ success: true, data: user });
+    const user = await db.sequelize.query(
+      `
+      SELECT 
+        u."user_id",
+        u."first_name",
+        u."last_name",
+        u."email",
+        u."role_id",
+        u."last_access",
+        u."google_id",
+        ow."office_worker_id",
+        o."office_id",
+        o."city"
+      FROM "hr"."users" u
+      LEFT JOIN "hr"."office_workers" ow ON u."user_id" = ow."user_id"
+      LEFT JOIN "centers"."offices" o ON ow."office_id" = o."office_id"
+      WHERE u."user_id" = :user_id
+      `,
+      {
+        replacements: { user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (user.length > 0){
+      res.status(200).json({ success: true, data: user[0] });
     } else {
       res.status(404).json({ success: false, message: "User not found" });
     }
@@ -415,30 +404,61 @@ controllers.updateUserOffice = async (req, res) => {
   //     return res.status(400).json({ success: false, message: 'Invalid user ID or office ID' });
   // }
   try {
-    const user = await db.Users.findByPk(user_id);
-    if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+    // Check if the user exists
+    const user = await db.sequelize.query(
+      `SELECT * FROM "hr"."users" WHERE "user_id" = :user_id`,
+      {
+        replacements: { user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+    if (user.length === 0) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    const office = await db.Offices.findByPk(office_id);
-    if (!office) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Office not found" });
+    // Check if the office exists
+    const office = await db.sequelize.query(
+      `SELECT * FROM "centers"."offices" WHERE "office_id" = :office_id`,
+      {
+        replacements: { office_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+    if (office.length === 0) {
+      return res.status(404).json({ success: false, message: "Office not found" });
     }
 
-    const officeWorker = await db.OfficeWorkers.findOne({ where: { user_id } });
-    if (officeWorker) {
-      await officeWorker.destroy();
+    // Check if the office worker record exists
+    const officeWorker = await db.sequelize.query(
+      `SELECT * FROM "hr"."office_workers" WHERE "user_id" = :user_id`,
+      {
+        replacements: { user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+    
+    if (officeWorker.length > 0) {
+      // Delete the existing office worker record
+      await db.sequelize.query(
+        `DELETE FROM "hr"."office_workers" WHERE "user_id" = :user_id`,
+        {
+          replacements: { user_id },
+          type: QueryTypes.DELETE,
+        }
+      );
     }
 
-    await db.OfficeWorkers.create({ user_id, office_id });
+    // Create a new office worker record
+    await db.sequelize.query(
+      `INSERT INTO "hr"."office_workers" ("user_id", "office_id")
+       VALUES (:user_id, :office_id)`,
+      {
+        replacements: { user_id, office_id },
+        type: QueryTypes.INSERT,
+      }
+    );
 
-    res
-      .status(200)
-      .json({ success: true, message: "User office updated successfully" });
+    res.status(200).json({ success: true, message: "User office updated successfully" });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -468,16 +488,23 @@ controllers.getEventByDate = async (req, res) => {
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 1);
 
-    const events = await db.Events.findAll({
-      where: {
-        event_date: {
-          [Op.gte]: startDate,
-          [Op.lt]: endDate,
+    const events = await db.sequelize.query(
+      `
+      SELECT * FROM "dynamic_content"."events"
+      WHERE "event_date" >= :startDate
+      AND "event_date" < :endDate
+      ORDER BY "creation_date" DESC
+      `,
+      {
+        replacements: {
+          startDate: startDate.toISOString(), // Convert dates to UTC format
+          endDate: endDate.toISOString(),
         },
-      },
-      order: [["creation_date", "DESC"]],
-    });
+        type: QueryTypes.SELECT,
+      }
+    );
 
+    // Filter validated events
     const newEvents = events.filter((event) => event.validated === true);
 
     res.status(200).json({ success: true, data: newEvents });
@@ -555,12 +582,25 @@ module.exports = controllers;
 
 /*
 controllers.getUserPreferences = async (req, res) => {
-    const { user_id } = req.query;
-    try {
-        const userPreferences = await db.UserPref.findAll({ where: { user_id } });
-        res.status(200).json(userPreferences);
-    } catch (error) {
-        res.status(500).send('Error retrieving user preferences: ' + error.message);
-    }
+  const { user_id } = req.query;
+
+  try {
+    const userPreferences = await db.sequelize.query(
+      `
+      SELECT * FROM "hr"."user_prefs"
+      WHERE "user_id" = :user_id
+      `,
+      {
+        replacements: { user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    // Send the retrieved user preferences as JSON
+    res.status(200).json(userPreferences);
+  } catch (error) {
+    // Handle any errors that occur during the query execution
+    res.status(500).send('Error retrieving user preferences: ' + error.message);
+  }
 };
 */
