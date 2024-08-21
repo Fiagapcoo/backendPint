@@ -129,5 +129,5 @@ module.exports = {
     fnGetPostState,
     spEditPost,
     spDeletePost,
-    spGetPost
+    //spGetPost
 }

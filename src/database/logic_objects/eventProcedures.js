@@ -386,6 +386,6 @@ module.exports = {
   spRegisterUserForEvent,
   fnGetEventState,
   spEditEvent,
-  spGetEvent,
+  //spGetEvent,
   spGetParticipants,
 };

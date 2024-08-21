@@ -223,5 +223,5 @@ module.exports = {
   spEditForum,
   spChangeForumState,
   spDeleteForum,
-  spGetForum,
+  //spGetForum,
 };
