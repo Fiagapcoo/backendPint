@@ -5,7 +5,7 @@ const {
 } = require("../controllers/jwt_middlewareController");
 const router = express.Router();
 const authController = require("../controllers/authController");
-//const passport = require("../config/passport-setup"); 
+//const passport = require("../config/passport-setup");
 
 router.post("/register", authController.register);
 router.post("/setup-password", validation_noenc, authController.setupPassword);
@@ -22,7 +22,9 @@ router.post("/login_google", authController.login_google);
 router.get("/get-user-by-token", validation, authController.getUserByToken);
 router.post("/refresh-token", authController.refreshToken);
 //router.put('/update-last-access', validation, authController.updateLastAccess);
-router.post("/change-password", validation ,authController.updatePassword);
+router.post("/change-password", validation, authController.updatePassword);
+
+router.post("request-password-reset", authController.resetPassword);
 
 /*
 // Google Auth

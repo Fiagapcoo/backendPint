@@ -578,7 +578,7 @@ async function findUserByEmail(email) {
     });
     return user;
   } catch (error) {
-    console.error("Error finding user by email:", error);
+    console.error("Error occurred while searching user by email: ", error);
     throw error;
   }
 }

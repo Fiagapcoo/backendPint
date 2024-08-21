@@ -1,6 +1,6 @@
 const db = require("../models");
 const jwt = require("jsonwebtoken");
-const admin = require('firebase-admin');
+const admin = require("firebase-admin");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const { sendMail } = require("./emailController");
@@ -110,8 +110,6 @@ controllers.register = async (req, res) => {
           </div>
         `,
       });
-      
-      
 
       res.status(201).json({
         success: true,
@@ -126,7 +124,7 @@ controllers.register = async (req, res) => {
       .json({ success: false, message: "Internal server error: " + error });
   }
 };
-//TO ALTER - nao enviar email, dar set the password aqui. 
+//TODO ALTER - nao enviar email, dar set the password aqui.
 // so server admin pode usar
 controllers.register_admin = async (req, res) => {
   const { email, firstName, lastName, centerId } = req.body;
@@ -152,7 +150,7 @@ controllers.register_admin = async (req, res) => {
       console.log("userPayload:", userPayload);
 
       const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
-        expiresIn: 1300,
+        expiresIn: 1300, //1300 sec
       });
       //await sp_insertUserAccDetails(user[0].user_id);
       const random_sub_url = mashupAndRandomize(email, firstName, lastName);
@@ -160,11 +158,11 @@ controllers.register_admin = async (req, res) => {
       console.log("url:", url);
       console.log("user:", user);
 
-      await sendMail({
-        to: email,
-        subject: "Set up your new password",
-        body: `Link: ${url}`,
-      });
+      // await sendMail({
+      //   to: email,
+      //   subject: "Set up your new password",
+      //   body: `Link: ${url}`,
+      // });
 
       res.status(201).json({
         success: true,
@@ -248,6 +246,56 @@ controllers.updatePassword = async (req, res) => {
   }
 };
 
+controllers.resetPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    user = findUserByEmail(email);
+    if (user === null) {
+      console.log("User not found");
+      res
+        .status(200)
+        .json({
+          success: false,
+          message: "Could not found corresponding account with that email.",
+        });
+    } else {
+      console.log("User found:", user);
+      // Assegure que 'user' seja um objeto simples
+      if (Array.isArray(user) && user.length > 0) {
+        const userPayload = {
+          id: user[0].user_id, // Acesse o primeiro elemento do array
+        };
+      }
+      const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
+        expiresIn: 1300, //1300 sec
+      });
+      const random_sub_url = crypto.randomBytes(32).toString("hex");
+      const url = `${process.env.CLIENT_URL}/change-password/${random_sub_url}?token=${token}`;
+      console.log("url:", url);
+      console.log("user:", user);
+
+      await sendMail({
+        to: email,
+        subject: "Reset your password",
+        body: `Please use the following link to reset your password:  ${url}`,
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: "Password reset link sent. Please check your email.",
+      });
+    }
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message: "Server error. Please try again later.",
+      });
+  }
+};
+
 //check cookie
 // app.get('/data', cookieParser(),  function(req, res) {
 //   var csrf = req.get('CSRF');
@@ -287,7 +335,6 @@ const authenticateUser = async (email, password) => {
 
   const isMatch = await bcrypt.compare(password, user.hashed_password);
   if (!isMatch) {
-    
     return { authenticated: false, message: "Invalid email or password" };
   }
   await updateAccessOnLogin(user.user_id);
@@ -300,14 +347,19 @@ const handleResponseBasedOnRole = async (user, res) => {
     const token = generateToken(user.user_id);
     const refreshToken = generateRefreshToken(user.user_id);
     await sp_updateLastAccess(user.user_id);
-    res.status(200).json({ token, refreshToken,success: true, message: "Login successful" });
-  } else {
     res
-      .status(403)
+      .status(200)
       .json({
-        success: false,
-        message: "Don't have permission to access! Contact your admin!",
+        token,
+        refreshToken,
+        success: true,
+        message: "Login successful",
       });
+  } else {
+    res.status(403).json({
+      success: false,
+      message: "Don't have permission to access! Contact your admin!",
+    });
   }
 };
 
@@ -360,30 +412,25 @@ controllers.login_mobile = async (req, res) => {
     const token = generateToken(authResult.user.user_id);
     const refreshToken = generateRefreshToken(authResult.user.user_id);
     await sp_updateLastAccess(authResult.user.user_id); //TODO check this
-    res
-      .status(200)
-      .json({
-        token,
-        refreshToken,
-        success: true,
-        message: "Login successful",
-      });
+    res.status(200).json({
+      token,
+      refreshToken,
+      success: true,
+      message: "Login successful",
+    });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-
-
-controllers.login_google = async (req,res) => {
-  const { idToken  } = req.body;
-  
+controllers.login_google = async (req, res) => {
+  const { idToken } = req.body;
 
   try {
     // Verify the ID token
     const decodedToken = await admin.auth().verifyIdToken(idToken);
-    console.log('This is the decoded token');
+    console.log("This is the decoded token");
     console.log(decodedToken);
     const email = decodedToken.email;
     const googleId = decodedToken.uid;
@@ -399,35 +446,25 @@ controllers.login_google = async (req,res) => {
         await updateUser(user);
       } else {
         // Otherwise, create a new user
-        user = await createUser(
-          decodedToken
-        );
+        user = await createUser(decodedToken);
       }
     }
-    console.log ('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     console.log(user);
     const token = generateToken(user.user_id);
     const refreshToken = generateRefreshToken(user.user_id);
-    await sp_updateLastAccess(user.user_id); 
-    res
-      .status(200)
-      .json({
-        token,
-        refreshToken,
-        success: true,
-        message: "Login successful",
-      });
+    await sp_updateLastAccess(user.user_id);
+    res.status(200).json({
+      token,
+      refreshToken,
+      success: true,
+      message: "Login successful",
+    });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
-}
-
-
-
-
-
-
+};
 
 controllers.getUserByToken = async (req, res) => {
   const user_id = req.user.id;
@@ -449,17 +486,12 @@ controllers.refreshToken = async (req, res) => {
     const accessToken = generateToken(decoded.id);
     res.status(200).json({ accessToken, success: true });
   } catch (error) {
-    if(error instanceof jwt.TokenExpiredError){
+    if (error instanceof jwt.TokenExpiredError) {
       console.error("validation error:", error);
-      return res.status(401).json({ message: "refresh token expired"  });
+      return res.status(401).json({ message: "refresh token expired" });
     }
     console.error("Error refreshing token:", error);
   }
 };
-
-
-
-
-
 
 module.exports = controllers;
