@@ -1,4 +1,3 @@
-
 const db = require("../../../models");
 const { createFunction_logError } = require("./logSP");
 const {
@@ -24,8 +23,8 @@ const {
   createTriggerFunction_event_part_count,
   createTrigger_event_part_count,
   createTriggerFunction_create_album_for_validated_event,
-    createTrigger_create_album_after_event_insert,
-    createTrigger_create_album_after_event_update
+  createTrigger_create_album_after_event_insert,
+  createTrigger_create_album_after_event_update,
 } = require("./event_triggers");
 const {
   createTriggerFunction_trg_content_validation,
@@ -51,6 +50,13 @@ const {
   create_vw_forum_discussions,
   create_sp_get_forum_discussions_by_city,
 } = require("./dashbord");
+
+const {
+  createTriggerFunction_trg_increment_like_comment,
+  createTrigger_increment_like_count,
+  createTriggerFunction_trg_decrement_like_comment,
+  createTrigger_decrement_like_count,
+} = require("./commentsTriggers");
 
 const set_triggers = async () => {
   await createFunction_logError();
@@ -92,5 +98,11 @@ const set_triggers = async () => {
   await create_sp_get_events_by_city();
   await create_vw_forum_discussions();
   await create_sp_get_forum_discussions_by_city();
+
+  // comments
+  createTriggerFunction_trg_increment_like_comment();
+  createTrigger_increment_like_count();
+  createTriggerFunction_trg_decrement_like_comment();
+  createTrigger_decrement_like_count();
 };
 set_triggers();

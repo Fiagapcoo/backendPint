@@ -156,12 +156,12 @@ async function getCommentTree(contentID, contentType) {
       `,
       {
         replacements: { contentID, contentType },
-        type: QueryTypes.SELECT
+        type: QueryTypes.SELECT,
       }
     );
     return results;
   } catch (error) {
-    console.error('Error fetching comment tree:', error);
+    console.error("Error fetching comment tree:", error);
     throw error;
   }
 }
@@ -171,7 +171,7 @@ async function getCommentTree(contentID, contentType) {
 //     const results = await db.sequelize.query(
 //       `WITH RECURSIVE "CommentHierarchy" AS (
 //         -- Anchor member: start with the comments directly related to the content (post or forum)
-//         SELECT 
+//         SELECT
 //           c."comment_id",
 //           c."forum_id",
 //           c."post_id",
@@ -180,14 +180,14 @@ async function getCommentTree(contentID, contentType) {
 //           c."content",
 //           0 AS "depth"
 //         FROM "communication"."comments" c
-//         WHERE 
+//         WHERE
 //           (c."post_id" = :contentID AND :contentType = 'Post') OR
 //           (c."forum_id" = :contentID AND :contentType = 'Forum')
 
 //         UNION ALL
 
 //         -- Recursive member: join with the comment_path to get the child comments
-//         SELECT 
+//         SELECT
 //           c."comment_id",
 //           c."forum_id",
 //           c."post_id",
@@ -202,7 +202,7 @@ async function getCommentTree(contentID, contentType) {
 //           ((c."post_id" = :contentID AND :contentType = 'Post') OR
 //            (c."forum_id" = :contentID AND :contentType = 'Forum'))
 //       )
-//       SELECT 
+//       SELECT
 //         "comment_id",
 //         "forum_id",
 //         "post_id",
@@ -224,7 +224,137 @@ async function getCommentTree(contentID, contentType) {
 //   }
 // }
 
+async function likeComment(commentID, userID) {
+  const t = await db.sequelize.transaction();
+  try {
+    // Insert the like into the likes table
+    await db.sequelize.query(
+      `INSERT INTO "communication"."likes" ("comment_id", "user_id", "like_date")
+       VALUES (:commentID, :userID, CURRENT_TIMESTAMP)
+       ON CONFLICT ("comment_id", "user_id") DO NOTHING`,
+      {
+        replacements: { commentID, userID },
+        type: QueryTypes.INSERT,
+        transaction: t,
+      }
+    );
+
+    await t.commit();
+    console.log("Comment liked successfully.");
+  } catch (error) {
+    await t.rollback();
+    console.error("Error liking comment:", error.message);
+
+    try {
+      await db.sequelize.query(
+        `SELECT security.log_error(:errorMessage, :errorSeverity, :errorState)`,
+        {
+          replacements: {
+            errorMessage: error.message,
+            errorSeverity: "ERROR",
+            errorState: "ERROR",
+          },
+          type: QueryTypes.SELECT,
+        }
+      );
+    } catch (logError) {
+      console.error("Error logging the error:", logError.message);
+    }
+
+    throw error;
+  }
+}
+
+async function unlikeComment(commentID, userID) {
+  const t = await db.sequelize.transaction();
+  try {
+    // Delete the like from the likes table
+    const result = await db.sequelize.query(
+      `DELETE FROM "communication"."likes"
+       WHERE "comment_id" = :commentID AND "user_id" = :userID`,
+      {
+        replacements: { commentID, userID },
+        type: QueryTypes.DELETE,
+        transaction: t,
+      }
+    );
+
+    if (result[1] === 0) {
+      // If no rows were affected, the like did not exist
+      throw new Error("Like does not exist for the specified comment and user.");
+    }
+
+    await t.commit();
+    console.log("Comment unliked successfully.");
+  } catch (error) {
+    await t.rollback();
+    console.error("Error unliking comment:", error.message);
+
+    try {
+      await db.sequelize.query(
+        `SELECT security.log_error(:errorMessage, :errorSeverity, :errorState)`,
+        {
+          replacements: {
+            errorMessage: error.message,
+            errorSeverity: "ERROR",
+            errorState: "ERROR",
+          },
+          type: QueryTypes.SELECT,
+        }
+      );
+    } catch (logError) {
+      console.error("Error logging the error:", logError.message);
+    }
+
+    throw error;
+  }
+}
+
+
+async function reportComment(commentID, reporterID, observation) {
+  const t = await db.sequelize.transaction();
+  try {
+    // Insert the report into the reports table
+    await db.sequelize.query(
+      `INSERT INTO "communication"."reports" ("comment_id", "reporter_id", "report_date", "observation")
+       VALUES (:commentID, :reporterID, CURRENT_TIMESTAMP, :observation)`,
+      {
+        replacements: { commentID, reporterID, observation },
+        type: QueryTypes.INSERT,
+        transaction: t,
+      }
+    );
+
+    await t.commit();
+    console.log("Comment reported successfully.");
+  } catch (error) {
+    await t.rollback();
+    console.error("Error reporting comment:", error.message);
+
+    try {
+      await db.sequelize.query(
+        `SELECT security.log_error(:errorMessage, :errorSeverity, :errorState)`,
+        {
+          replacements: {
+            errorMessage: error.message,
+            errorSeverity: "ERROR",
+            errorState: "ERROR",
+          },
+          type: QueryTypes.SELECT,
+        }
+      );
+    } catch (logError) {
+      console.error("Error logging the error:", logError.message);
+    }
+
+    throw error;
+  }
+}
+
 module.exports = {
   spAddComment,
   getCommentTree,
+  likeComment,
+  unlikeComment,
+  reportComment,
 };

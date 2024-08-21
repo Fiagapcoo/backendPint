@@ -60,6 +60,7 @@ async function syncModels() {
             'Photographs',
             'Comments',
             'CommentPath',
+            'Likes',
             'Ratings',
             'Scores',
             'Reports',
