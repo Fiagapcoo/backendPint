@@ -1,5 +1,5 @@
-const { QueryTypes } = require('sequelize');
-const db = require('../../models'); 
+const { QueryTypes } = require("sequelize");
+const db = require("../../models");
 
 //Procedure to Validate Content
 /*
@@ -40,29 +40,39 @@ async function spValidateContent(contentType, contentId, adminId) {
 }
 */
 
-
 //Procedure to Insert a New Rating/Evaluation
-async function spInsertEvaluation(contentType, contentId, criticId, evaluation) {
-    const transaction = await db.sequelize.transaction();
-    try {
-        const validContentTypes = ['Post', 'Event'];
-        if (!validContentTypes.includes(contentType)) {
-            throw new Error('Invalid ContentType. Only "Post" and "Event" are allowed.');
-        }
-
-        const table = contentType === 'Post' ? 'posts' : 'events';
-
-        await db.sequelize.query(
-            `INSERT INTO "dynamic_content"."ratings" ("${table}_id", "critic_id", "evaluation_date", "evaluation")
-        VALUES (:contentId, :criticId, CURRENT_TIMESTAMP, :evaluation)`,
-            { replacements: { contentId, criticId, evaluation }, type: QueryTypes.INSERT, transaction }
-        );
-
-        await transaction.commit();
-    } catch (error) {
-        await transaction.rollback();
-        throw error;
+async function spInsertEvaluation(
+  contentType,
+  contentId,
+  criticId,
+  evaluation
+) {
+  const transaction = await db.sequelize.transaction();
+  try {
+    const validContentTypes = ["Post", "Event"];
+    if (!validContentTypes.includes(contentType)) {
+      throw new Error(
+        'Invalid ContentType. Only "Post" and "Event" are allowed.'
+      );
     }
+
+    const table = contentType === "Post" ? "posts" : "events";
+
+    await db.sequelize.query(
+      `INSERT INTO "dynamic_content"."ratings" ("${table}_id", "critic_id", "evaluation_date", "evaluation")
+        VALUES (:contentId, :criticId, CURRENT_TIMESTAMP, :evaluation)`,
+      {
+        replacements: { contentId, criticId, evaluation },
+        type: QueryTypes.INSERT,
+        transaction,
+      }
+    );
+
+    await transaction.commit();
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
 }
 
 //Function to Calculate New Average Rating
@@ -71,7 +81,6 @@ async function spInsertEvaluation(contentType, contentId, criticId, evaluation) 
 //     const newAvgRating = totalOfRatings / (numOfRatings + 1);
 //     return newAvgRating;
 // }
-
 
 //Trigger to Update Average Score on Content
 // async function trgUpdateAverageScore() {
@@ -114,43 +123,41 @@ async function spInsertEvaluation(contentType, contentId, criticId, evaluation) 
 //     }
 // }
 
-async function fnIsPublisherOfficeAdmin(publisherID) {
-    const result = await db.sequelize.query(
-        `SELECT EXISTS (SELECT 1 FROM "centers"."office_admins" WHERE "manager_id" = :publisherID) AS "exists"`,
-        {
-            replacements: { publisherID },
-            type: QueryTypes.SELECT,
-        }
-    );
+async function fnIsPublisherOfficeAdmin(publisherID, officeID) {
+  const result = await db.sequelize.query(
+    `SELECT EXISTS (SELECT 1 FROM "centers"."office_admins" WHERE "manager_id" = :publisherID AND "office_id" = :officeID) AS "exists"`,
+    {
+      replacements: { publisherID, officeID },
+      type: QueryTypes.SELECT,
+    }
+  );
 
-    return result[0].exists ? true : false;
+  return result[0].exists ? true : false;
 }
 
 const logError = async (errorMessage, errorSeverity, errorState) => {
-    try {
-      await db.sequelize.query(
-        `INSERT INTO "security"."error_log" ("error_message", "error_severity", "error_state", "error_time")
+  try {
+    await db.sequelize.query(
+      `INSERT INTO "security"."error_log" ("error_message", "error_severity", "error_state", "error_time")
          VALUES (:errorMessage, :errorSeverity, :errorState, NOW())`,
-        {
-          replacements: { errorMessage, errorSeverity, errorState },
-          type: QueryTypes.INSERT
-        }
-      );
-  
-      throw new Error(errorMessage);
-    } catch (error) {
-      throw error;
-    }
-  };
-  
+      {
+        replacements: { errorMessage, errorSeverity, errorState },
+        type: QueryTypes.INSERT,
+      }
+    );
+
+    throw new Error(errorMessage);
+  } catch (error) {
+    throw error;
+  }
+};
 
 module.exports = {
-    //spValidateContent,
-    //spRejectContent,
-    spInsertEvaluation,
-    // fnReverseRating,
-    // trgUpdateAverageScore,
-    fnIsPublisherOfficeAdmin,
-    logError
-    
-}
+  //spValidateContent,
+  //spRejectContent,
+  spInsertEvaluation,
+  // fnReverseRating,
+  // trgUpdateAverageScore,
+  fnIsPublisherOfficeAdmin,
+  logError,
+};

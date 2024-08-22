@@ -19,7 +19,7 @@ async function spCreateEvent(
   publisher_id,
   filePath
 ) {
-  const isOfficeAdmin = await fnIsPublisherOfficeAdmin(publisher_id);
+  const isOfficeAdmin = await fnIsPublisherOfficeAdmin(publisher_id, officeId);
   const validated = isOfficeAdmin ? true : false;
   let admin_id = isOfficeAdmin ? publisher_id : null;
 

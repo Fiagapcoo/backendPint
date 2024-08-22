@@ -11,7 +11,7 @@ async function spCreateForum(
   publisher_id
 ) {
   console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA" + officeID);
-  const isOfficeAdmin = await fnIsPublisherOfficeAdmin(publisher_id);
+  const isOfficeAdmin = await fnIsPublisherOfficeAdmin(publisher_id, officeID);
   const validated = isOfficeAdmin ? true : false;
   let adminId = isOfficeAdmin ? publisher_id : null;
 
