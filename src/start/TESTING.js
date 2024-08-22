@@ -3,13 +3,7 @@ const insertContentForTests = async () => {
   try {
     await db.sequelize.authenticate();
 
-    await db.sequelize.query(`
-      INSERT INTO "hr"."users" ("user_id","first_name", "last_name", "email", "join_date", "role_id")
-      VALUES 
-      (23,'Guilhermo', 'Pedrinho', 'guilopespedrinho@gmail.com', '2024-06-22', 3),
-      (24,'Jose', 'Machado', 'josemachado74@gmail.com', '2024-06-22', 3)
-      ON CONFLICT (email) DO NOTHING;
-  `);
+
 
     /*
     await db.sequelize.query(`
