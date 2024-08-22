@@ -10,7 +10,7 @@ const { getUserPreferences,
         createUserPreferences,
         getUsersToValidate,
         updateProfile,
-        getUserPosts,
+        getUserPublications,
         getUserRegisteredEvents,
         updateUserPassword
      } = require('../database/logic_objects/usersProcedures');
@@ -159,7 +159,7 @@ controllers.update_profile = async (req, res) => {
 controllers.get_user_content = async (req, res) => {
     try {
         const user = req.user.id;
-        const aux = await getUserPosts(user);
+        const aux = await getUserPublications(user);
         console.log(aux);
         res.status(200).json({success:true, data:aux, message:'Got content posted by user.'});
     } catch (error) {

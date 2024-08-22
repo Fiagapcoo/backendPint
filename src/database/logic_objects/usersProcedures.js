@@ -463,7 +463,7 @@ async function updateProfile(user, firstName, lastName, profile_pic) {
   }
 }
 
-async function getUserPosts(userID) {
+async function getUserPublications(userID) {
   try {
     // Fetch posts
     const posts = await db.sequelize.query(
@@ -718,7 +718,7 @@ module.exports = {
   getUsersToValidate,
   updateProfile,
   updateUserPassword,
-  getUserPosts,
+  getUserPublications,
   getUserRegisteredEvents,
   findUserByGoogleId,
   findUserByEmail,
