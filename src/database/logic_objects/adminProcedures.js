@@ -346,7 +346,7 @@ async function createCenter(city, admin, officeImage) {
   }
 }
 
-//WIP
+//TODO
 async function deleteCenter(center_id) {
   try {
     await db.sequelize.query(
@@ -460,15 +460,15 @@ async function spValidateContent(contentID, contentType, validatorID) {
       switch (contentType) {
         case "event":
           tableName = '"dynamic_content"."events"';
-          additionalCondition = 'p."event_id"'; // Replace with actual condition for type1
+          additionalCondition = 'p."event_id"'; 
           break;
         case "forum":
           tableName = '"dynamic_content"."forums"';
-          additionalCondition = 'p."forum_id"'; // Replace with actual condition for type2
+          additionalCondition = 'p."forum_id"'; 
           break;
         default:
           tableName = '"dynamic_content"."posts"';
-          additionalCondition = 'p."post_id"'; // Replace with actual default condition
+          additionalCondition = 'p."post_id"'; 
           break;
       }
 

@@ -124,15 +124,34 @@ async function spInsertEvaluation(
 // }
 
 async function fnIsPublisherOfficeAdmin(publisherID, officeID) {
-  const result = await db.sequelize.query(
-    `SELECT EXISTS (SELECT 1 FROM "centers"."office_admins" WHERE "manager_id" = :publisherID AND "office_id" = :officeID) AS "exists"`,
+  // Fetch the OfficeCenterID for the given publisherID, in case he is a admin
+  const offcAdmin = await db.sequelize.query(
+    `SELECT "office_id" FROM "centers"."office_admins" WHERE "manager_id" = :publisherID`,
     {
-      replacements: { publisherID, officeID },
+      replacements: { publisherID },
       type: QueryTypes.SELECT,
+      transaction,
     }
   );
+  //check wheter it got back an office, eg. the publisher is an admin. If not return false;
+  if (offcAdmin.length) {
+    const officeCenterID = offcAdmin[0].office_id;
 
-  return result[0].exists ? true : false;
+    if ( officeCenterID === 0 || officeCenterID == officeID ) {
+      return true;
+    }
+  }
+  return false;
+
+//   const result = await db.sequelize.query(
+//     `SELECT EXISTS (SELECT 1 FROM "centers"."office_admins" WHERE "manager_id" = :publisherID AND "office_id" = :officeID) AS "exists"`,
+//     {
+//       replacements: { publisherID, officeID },
+//       type: QueryTypes.SELECT,
+//     }
+//   );
+
+//   return result[0].exists ? true : false;
 }
 
 const logError = async (errorMessage, errorSeverity, errorState) => {
