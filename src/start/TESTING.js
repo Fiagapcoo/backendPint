@@ -2,6 +2,16 @@ const db = require("../models");
 const insertContentForTests = async () => {
   try {
     await db.sequelize.authenticate();
+
+    await db.sequelize.query(`
+      INSERT INTO "hr"."users" ("user_id","first_name", "last_name", "email", "join_date", "role_id")
+      VALUES 
+      (23,'Guilhermo', 'Pedrinho', 'guilopespedrinho@gmail.com', '2024-06-22', 3),
+      (24,'Jose', 'Machado', 'josemachado74@gmail.com', '2024-06-22', 3)
+      ON CONFLICT (email) DO NOTHING;
+  `);
+
+    /*
     await db.sequelize.query(`
       INSERT INTO "dynamic_content"."posts" ("sub_area_id", "office_id", "publisher_id", "title", "content", "type", "creation_date")
       VALUES
@@ -22,6 +32,7 @@ const insertContentForTests = async () => {
       (18, 1, 4002, 'FORUM TEST', 'VIBES? WHAT ARE THOSE',CURRENT_TIMESTAMP),
       (18, 5, 1002, 'PRECISO DFE AJUDO A TESTAR', 'TESTES E MAIKS TESTES',CURRENT_TIMESTAMP);
   `);
+  */
     console.log("All models were cleaned successfully.");
   } catch (error) {
     console.error("Unable to sync models:", error);
