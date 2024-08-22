@@ -500,7 +500,7 @@ async function getUserPosts(userID) {
         e.*
       FROM "dynamic_content"."events" e
       WHERE e."publisher_id" = :userID
-      ORDER BY e."CreationDate" DESC
+      ORDER BY e."creation_date" DESC
       `,
       {
         replacements: { userID },
