@@ -346,11 +346,11 @@ controllers.getUserInfo = async (req, res) => {
         u."role_id",
         u."last_access",
         u."google_id",
-        ow."office_worker_id",
+		    u."fcmToken",
         o."office_id",
         o."city"
       FROM "hr"."users" u
-      LEFT JOIN "hr"."office_workers" ow ON u."user_id" = ow."user_id"
+      LEFT JOIN "centers"."office_workers" ow ON u."user_id" = ow."user_id"
       LEFT JOIN "centers"."offices" o ON ow."office_id" = o."office_id"
       WHERE u."user_id" = :user_id
       `,
