@@ -249,18 +249,18 @@ async function bulkInsert() {
         (4002, 4, 5, 'Neon Byte Bistro', 'Restaurant with a cyberpunk theme', 'P',CURRENT_TIMESTAMP, true);
     `);
     await db.sequelize.query(`
-        INSERT INTO "dynamic_content"."events" ("publisher_id", "office_id", "sub_area_id", "name", "description", "event_location","event_date", "recurring","creation_date", "validated")
+        INSERT INTO "dynamic_content"."events" ("publisher_id", "office_id", "sub_area_id", "name", "description", "event_location","event_date", "recurring","creation_date", "validated", "start_time", "end_time")
         VALUES
-        (1, 2, 1001, 'Volunteering', 'Viseu hospital will be hosting an auction to gain funding for children in need', '40.65056885039045 -7.905631258488603','2023-11-15', false,CURRENT_TIMESTAMP, true),
-        (2, 2, 2001, 'Marathon', 'Next Friday Alves Martins school will host a marathon in support of cancer', '40.65434224001848 -7.916687987324942','2023-12-01', false,CURRENT_TIMESTAMP, true),
-        (3, 3, 3002, 'Football tournament', 'Every Sunday we will be playing football until the end of the tournament', '40.146181639547116 -7.483017349363566','2023-12-10', false,CURRENT_TIMESTAMP, true),
-        (4, 2, 4003, 'Rafael Mariano Live', 'Rafael Mariano will be hosting a live show in Old School Bar','40.11331582264235 -7.600471037595766' ,'2023-12-31', false,CURRENT_TIMESTAMP, true),
-        (5, 5, 6002, 'The Lord Of the Rings live', 'Nosso Shopping will be playing the OST of The Lord of the Rings with the movie', '41.29696712221882 -7.734768146829981','2024-01-05', false,CURRENT_TIMESTAMP, true),
-        (6, 1, 4001, 'Company dinner', 'We are celebrating a closed deal and will be having dinner at Canoa Wine Bar', '39.6048610997216 -8.414854011912372','2024-01-15', false,CURRENT_TIMESTAMP, true),
-        (7, 4, 2003, 'Live Reading', 'The library will be having a live reading directed to children', '39.29030284651063 -7.432249675738156' ,'2024-01-25', false,CURRENT_TIMESTAMP, true),
-        (8, 3, 1002, 'Donate Blood', 'Local pharmacy will be collecting blood for charity purposes', '40.13969717714694 -7.671405025696972','2024-02-05', false,CURRENT_TIMESTAMP, true),
-        (9, 4, 2002, 'Tecnico Open Day', 'Técnico will open its doors for everyone', '39.291450016171346 -7.43306862970031','2024-02-15', false,CURRENT_TIMESTAMP, true),
-        (10, 5, 3001, 'Workout competition', 'Fitness hut is opening a tournament and the prize is a free membership for a year', '41.29319651421935 -7.737093562591062','2024-03-01', false,CURRENT_TIMESTAMP, true);
+        (1, 2, 1001, 'Volunteering', 'Viseu hospital will be hosting an auction to gain funding for children in need', '40.65056885039045 -7.905631258488603','2023-11-15', false,CURRENT_TIMESTAMP, true, '12:00:00', '14:00:00'),
+        (2, 2, 2001, 'Marathon', 'Next Friday Alves Martins school will host a marathon in support of cancer', '40.65434224001848 -7.916687987324942','2023-12-01', false,CURRENT_TIMESTAMP, true, '12:00:00', '14:00:00'),
+        (3, 3, 3002, 'Football tournament', 'Every Sunday we will be playing football until the end of the tournament', '40.146181639547116 -7.483017349363566','2023-12-10', false,CURRENT_TIMESTAMP, true, '12:00:00', '14:00:00'),
+        (4, 2, 4003, 'Rafael Mariano Live', 'Rafael Mariano will be hosting a live show in Old School Bar','40.11331582264235 -7.600471037595766' ,'2023-12-31', false,CURRENT_TIMESTAMP, true, '12:00:00', '14:00:00'),
+        (5, 5, 6002, 'The Lord Of the Rings live', 'Nosso Shopping will be playing the OST of The Lord of the Rings with the movie', '41.29696712221882 -7.734768146829981','2024-01-05', false,CURRENT_TIMESTAMP, true, '12:00:00', '14:00:00'),
+        (6, 1, 4001, 'Company dinner', 'We are celebrating a closed deal and will be having dinner at Canoa Wine Bar', '39.6048610997216 -8.414854011912372','2024-01-15', false,CURRENT_TIMESTAMP, true, '12:00:00', '14:00:00'),
+        (7, 4, 2003, 'Live Reading', 'The library will be having a live reading directed to children', '39.29030284651063 -7.432249675738156' ,'2024-01-25', false,CURRENT_TIMESTAMP, true, '12:00:00', '14:00:00'),
+        (8, 3, 1002, 'Donate Blood', 'Local pharmacy will be collecting blood for charity purposes', '40.13969717714694 -7.671405025696972','2024-02-05', false,CURRENT_TIMESTAMP, true, '12:00:00', '14:00:00'),
+        (9, 4, 2002, 'Tecnico Open Day', 'Técnico will open its doors for everyone', '39.291450016171346 -7.43306862970031','2024-02-15', false,CURRENT_TIMESTAMP, true, '12:00:00', '14:00:00'),
+        (10, 5, 3001, 'Workout competition', 'Fitness hut is opening a tournament and the prize is a free membership for a year', '41.29319651421935 -7.737093562591062','2024-03-01', false,CURRENT_TIMESTAMP, true, '12:00:00', '14:00:00');
     `);
     await db.sequelize.query(`
         INSERT INTO "dynamic_content"."forums" ("publisher_id", "office_id", "sub_area_id", "title", "content","creation_date", "validated")
