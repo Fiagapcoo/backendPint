@@ -130,7 +130,6 @@ async function fnIsPublisherOfficeAdmin(publisherID, officeID) {
     {
       replacements: { publisherID },
       type: QueryTypes.SELECT,
-      transaction,
     }
   );
   //check wheter it got back an office, eg. the publisher is an admin. If not return false;
