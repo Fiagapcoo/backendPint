@@ -465,43 +465,50 @@ async function updateProfile(user, firstName, lastName, profile_pic) {
 
 async function getUserPosts(userID) {
   try {
+    // Fetch posts
     const posts = await db.sequelize.query(
-      `SELECT 
-        * from p 
-      FROM "dynamic_content"."posts" p
-      WHERE p."publisher_id" = :userID
-`,
-      {
-        replacements: { userID },
-        type: QueryTypes.SELECT,
-      }
-    );
-    const forums = await db.sequelize.query(
       `
       SELECT 
-        * from f
-      FROM "dynamic_content"."forums" f
-      WHERE f."publisher_id" = :userID
-
+        p.*
+      FROM "dynamic_content"."posts" p
+      WHERE p."publisher_id" = :userID
       `,
       {
         replacements: { userID },
         type: QueryTypes.SELECT,
       }
     );
-    const events = await db.sequelize.query(
+
+    // Fetch forums
+    const forums = await db.sequelize.query(
       `
       SELECT 
-        * from e
-      FROM "dynamic_content"."events" e
-      WHERE e."publisher_id" = :userID
-
-      ORDER BY "CreationDate" DESC`,
+        f.*
+      FROM "dynamic_content"."forums" f
+      WHERE f."publisher_id" = :userID
+      `,
       {
         replacements: { userID },
         type: QueryTypes.SELECT,
       }
     );
+
+    // Fetch events
+    const events = await db.sequelize.query(
+      `
+      SELECT 
+        e.*
+      FROM "dynamic_content"."events" e
+      WHERE e."publisher_id" = :userID
+      ORDER BY e."CreationDate" DESC
+      `,
+      {
+        replacements: { userID },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    // Return the results
     return { posts, forums, events };
   } catch (error) {
     console.error("Error fetching user-created content:", error);
