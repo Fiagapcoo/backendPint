@@ -92,7 +92,8 @@ async function spEditPost(
   pLocation = null,
   filePath = null,
   type = null,
-  price = null
+  price = null,
+  rating = null,
 ) {
   const transaction = await db.sequelize.transaction();
   try {
@@ -132,6 +133,19 @@ async function spEditPost(
           transaction,
         }
       );
+      if(rating != null){
+        await db.sequelize.query(
+          `UPDATE "dynamic_content"."ratings" 
+            SET
+            "rating" = COALESCE(:rating, "rating")
+            WHERE "post_id" = :postId AND "critic_id" = :publisher_id` ,
+          {
+            replacements: { postId, publisher_id, rating },
+            type: QueryTypes.UPDATE,
+            transaction,
+          }
+        );
+      }
     } else {
       console.log("Post is already validated and cannot be edited.");
     }

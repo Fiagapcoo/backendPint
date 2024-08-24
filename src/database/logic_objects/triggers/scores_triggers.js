@@ -106,7 +106,7 @@ $$ LANGUAGE plpgsql;
             DROP TRIGGER trg_update_average_score ON dynamic_content.ratings;
           END IF;
           CREATE TRIGGER trg_update_average_score
-          AFTER INSERT ON dynamic_content.ratings
+          AFTER INSERT OR UPDATE ON dynamic_content.ratings
           FOR EACH ROW
           EXECUTE FUNCTION dynamic_content.trg_update_average_score();
         END $$;

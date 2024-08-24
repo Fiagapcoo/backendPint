@@ -62,6 +62,7 @@ controllers.edit_post = async (req, res) => {
     filePath = null,
     type = null,
     price = null,
+    rating = null,
   } = req.body;
   console.log(req.query);
   try {
@@ -74,7 +75,9 @@ controllers.edit_post = async (req, res) => {
       content,
       pLocation,
       filePath,
-      type
+      type,
+      price,
+      rating
     );
     res
       .status(201)
