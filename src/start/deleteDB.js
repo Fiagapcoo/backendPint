@@ -15,14 +15,16 @@ async function deleteDB() {
                     FROM information_schema.schemata
                     WHERE schema_name NOT IN ('pg_catalog', 'information_schema', 'pg_toast', 'pg_temp_1', 'pg_toast_temp_1', 'public'))
                 LOOP
+                    RAISE NOTICE 'Dropping schema: %', schema_record.schema_name;
                     EXECUTE 'DROP SCHEMA IF EXISTS ' || quote_ident(schema_record.schema_name) || ' CASCADE';
                 END LOOP;
             END $$;
+
             `
         )
         console.log('All models were cleaned successfully.');
     } catch (error) {
-        console.error('Unable to sync models:', error);
+        console.error('Unable to clean models:', error);
     } 
 }
 deleteDB();
