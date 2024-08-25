@@ -121,6 +121,7 @@ async function getCommentTree(contentID, contentType) {
           c."publisher_id",
           c."comment_date",
           c."content",
+          c."likes",
           0 AS "depth",
           ARRAY[c."comment_id"] AS "path"
         FROM "communication"."comments" c
@@ -137,6 +138,7 @@ async function getCommentTree(contentID, contentType) {
           c."publisher_id",
           c."comment_date",
           c."content",
+          c."likes",
           ch."depth" + 1,
           ch."path" || c."comment_id"
         FROM "communication"."comments" c
@@ -151,6 +153,7 @@ async function getCommentTree(contentID, contentType) {
         "publisher_id",
         "comment_date",
         "content",
+        "likes",
         "depth"
       FROM "CommentHierarchy";
       `,
