@@ -232,9 +232,9 @@ async function likeComment(commentID, userID) {
   try {
     // Insert the like into the likes table
     await db.sequelize.query(
-      `INSERT INTO "communication"."likes" ("comment_id", "user_id", "like_date")
+      `INSERT INTO "communication"."likes" ("comment_id", "publisher_id", "like_date")
        VALUES (:commentID, :userID, CURRENT_TIMESTAMP)
-       ON CONFLICT ("comment_id", "user_id") DO NOTHING`,
+       ON CONFLICT ("comment_id", "publisher_id") DO NOTHING`,
       {
         replacements: { commentID, userID },
         type: QueryTypes.INSERT,
@@ -274,7 +274,7 @@ async function unlikeComment(commentID, userID) {
     // Delete the like from the likes table
     const result = await db.sequelize.query(
       `DELETE FROM "communication"."likes"
-       WHERE "comment_id" = :commentID AND "user_id" = :userID`,
+       WHERE "comment_id" = :commentID AND "publisher_id" = :userID`,
       {
         replacements: { commentID, userID },
         type: QueryTypes.DELETE,
