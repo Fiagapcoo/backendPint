@@ -71,16 +71,16 @@ async function createEventForm(eventID, customFieldsJson) {
     //   }
     // );
     // Log the JSON string before parsing
-    console.log('Original JSON string:', customFieldsJson);
+    console.log("Original JSON string:", customFieldsJson);
     // Parse the JSON string twice for some reason...
     const tempParsed = JSON.parse(customFieldsJson);
-    console.log('After first parse:', tempParsed);
+    console.log("After first parse:", tempParsed);
     // Convert JSON to array and insert custom fields
     const customFields = JSON.parse(tempParsed);
     // Log the parsed result
-    console.log('Parsed customFields:', customFields);
-    console.log('Type of parsed customFields:', typeof customFields);
-    console.log('Is Array:', Array.isArray(customFields));
+    console.log("Parsed customFields:", customFields);
+    console.log("Type of parsed customFields:", typeof customFields);
+    console.log("Is Array:", Array.isArray(customFields));
 
     // Ensure the parsed data is an array
     if (!Array.isArray(customFields)) {
@@ -136,17 +136,7 @@ async function createEventForm(eventID, customFieldsJson) {
   }
 }
 
-async function editEventFormField(
-  eventID,
-  fieldID,
-  {
-    fieldName = null,
-    fieldType = null,
-    fieldValue = null,
-    maxValue = null,
-    minValue = null,
-  }
-) {
+async function editEventFormField(eventID, customFieldsJson) {
   const t = await db.sequelize.transaction();
   try {
     // Check if the event is validated
@@ -164,32 +154,68 @@ async function editEventFormField(
       await t.rollback();
       return;
     }
+    // Log the JSON string before parsing
+    console.log("Original JSON string:", customFieldsJson);
+    // Parse the JSON string twice for some reason...
+    const tempParsed = JSON.parse(customFieldsJson);
+    console.log("After first parse:", tempParsed);
+    // Convert JSON to array and insert custom fields
+    const customFields = JSON.parse(tempParsed);
+    // Log the parsed result
+    console.log("Parsed customFields:", customFields);
+    console.log("Type of parsed customFields:", typeof customFields);
+    console.log("Is Array:", Array.isArray(customFields));
 
-    // Update the specified field for the event
-    await db.sequelize.query(
-      `UPDATE "forms"."fields"
-             SET
-                 "field_name" = COALESCE(:fieldName, "field_name"),
-                 "field_type" = COALESCE(:fieldType, "field_type"),
-                 "field_value" = COALESCE(:fieldValue, "field_value"),
-                 "max_value" = COALESCE(:maxValue, "max_value"),
-                 "min_value" = COALESCE(:minValue, "min_value")
-             WHERE "event_id" = :eventID AND "field_id" = :fieldID`,
-      {
-        replacements: {
-          eventID,
-          fieldID,
-          fieldName,
-          fieldType,
-          fieldValue,
-          maxValue,
-          minValue,
-        },
-        type: QueryTypes.UPDATE,
-        transaction: t,
+    // Ensure the parsed data is an array
+    if (!Array.isArray(customFields)) {
+      throw new Error("Parsed customFields is not an array");
+    }
+
+    for (const field of customFields) {
+      console.log("inside for");
+      console.log(field);
+      // Ensure all fields are properly logged
+      console.log("field_id:", field.field_id);
+      console.log("field_name:", field.field_name);
+      console.log("field_type:", field.field_type);
+      console.log("field_value:", field.field_value);
+      console.log("max_value:", field.max_value);
+      console.log("min_value:", field.min_value);
+      // Check if field has all the necessary properties
+      if (
+        typeof field.field_name === "undefined" ||
+        typeof field.field_type === "undefined" ||
+        typeof field.field_value === "undefined"
+      ) {
+        console.error("Field is missing required properties:", field);
+        continue; // Skip this iteration if properties are missing
       }
-    );
 
+      await db.sequelize.query(
+        `UPDATE "forms"."fields" 
+          SET
+            "field_name" = COALESCE(:fieldName, "field_name"),
+            "field_type" = COALESCE(:fieldType, "field_type"),
+            "field_value" = COALESCE(:fieldValue, "field_value"),
+            "max_value" = COALESCE(:maxValue, "max_value"),
+            "min_value" = COALESCE(:minValue, "min_value")
+          WHERE "event_id" = :eventID AND "field_id" = :fieldID
+`,
+        {
+          replacements: {
+            eventID,
+            fieldName: field.field_name,
+            fieldType: field.field_type,
+            fieldValue: field.field_value,
+            maxValue: field.max_value,
+            minValue: field.min_value,
+            fieldID: field.field_id,
+          },
+          type: QueryTypes.UPDATE,
+          transaction: t,
+        }
+      );
+    }
     await t.commit();
   } catch (error) {
     await t.rollback();
