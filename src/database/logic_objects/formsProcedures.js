@@ -294,9 +294,17 @@ async function insertFormAnswer(userID, eventID, fieldID, answer) {
 
 async function insertFormAnswers(userID, eventID, answersJson) {
   const t = await db.sequelize.transaction();
+  console.log(answersJson);
   try {
     // Convert JSON to array and insert answers
+    // const answers1st = JSON.parse(answersJson);
+    // const answers = JSON.parse(answers1st);
     const answers = JSON.parse(answersJson);
+
+    // console.log('BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB')
+    // console.log(answers1st)
+    console.log('CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC')
+    console.log(answers)
 
     for (const answer of answers) {
       await db.sequelize.query(
@@ -307,7 +315,7 @@ async function insertFormAnswers(userID, eventID, answersJson) {
             userID,
             eventID,
             fieldID: answer.field_id,
-            answer: answer.ANSWER,
+            answer: answer.ANSWERS,
           },
           type: QueryTypes.INSERT,
           transaction: t,
