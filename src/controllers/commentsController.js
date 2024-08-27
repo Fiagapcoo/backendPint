@@ -130,7 +130,6 @@ controllers.like_comment = async (req, res) => {
         message: "Liked comment successfuly.",
       });
   } catch (error) {
-    l;
     res
       .status(500)
       .json({
@@ -153,7 +152,6 @@ controllers.unlike_comment = async (req, res) => {
         message: "Liked comment successfuly.",
       });
   } catch (error) {
-    l;
     res
       .status(500)
       .json({
