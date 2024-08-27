@@ -49,7 +49,8 @@ const createTriggerFunction_trg_content_validation = async () => {
                                                     error_severity = RETURNED_SQLSTATE,
                                                     error_state = PG_EXCEPTION_DETAIL;
                             -- Log the error details (Assuming a log_error function exists)
-                            PERFORM security.log_error(error_message, error_severity, error_state);
+                            INSERT INTO security.error_log (error_message, error_severity, error_state, error_time)
+                            VALUES (error_message, error_severity, error_state, CURRENT_TIMESTAMP);
                             RAISE NOTICE 'Error: %', error_message;
                             RETURN NULL;
                     END;

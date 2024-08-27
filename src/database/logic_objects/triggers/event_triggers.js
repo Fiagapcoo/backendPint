@@ -122,7 +122,8 @@ const sp_for_next_trigger = async () => {
                                             error_severity = RETURNED_SQLSTATE,
                                             error_state = PG_EXCEPTION_DETAIL;
                     -- Log the error details (Assuming a log_error function exists)
-                    PERFORM security.log_error(error_message, error_severity, error_state);
+                    INSERT INTO security.error_log (error_message, error_severity, error_state, error_time)
+                    VALUES (error_message, error_severity, error_state, CURRENT_TIMESTAMP);
 
                     -- Rollback the transaction
                     ROLLBACK;
@@ -236,7 +237,8 @@ const createTriggerFunction_create_album_for_validated_event = async () => {
                                         error_state = PG_EXCEPTION_DETAIL;
 
                 -- Log the error details (if you have a logging function)
-                --PERFORM security.log_error(error_message, error_severity, error_state);
+                INSERT INTO security.error_log (error_message, error_severity, error_state, error_time)
+                VALUES (error_message, error_severity, error_state, CURRENT_TIMESTAMP);
 
                 -- Raise notice with error details (for debugging)
                 RAISE NOTICE 'Error: %', error_message;

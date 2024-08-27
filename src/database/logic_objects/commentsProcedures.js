@@ -1,9 +1,12 @@
 const db = require("../../models");
 const { QueryTypes } = require("sequelize");
-const contentTables = {
-  post: "post_id",
-  forum: "forum_id",
-};
+
+const {log_err} = require("../../utils/logError");
+
+// const contentTables = {
+//   post: "post_id",
+//   forum: "forum_id",
+// };
 async function spAddComment({
   parentCommentID = null,
   contentID,
@@ -248,21 +251,7 @@ async function likeComment(commentID, userID) {
     await t.rollback();
     console.error("Error liking comment:", error.message);
 
-    try {
-      await db.sequelize.query(
-        `SELECT security.log_error(:errorMessage, :errorSeverity, :errorState)`,
-        {
-          replacements: {
-            errorMessage: error.message,
-            errorSeverity: "ERROR",
-            errorState: "ERROR",
-          },
-          type: QueryTypes.SELECT,
-        }
-      );
-    } catch (logError) {
-      console.error("Error logging the error:", logError.message);
-    }
+    log_err(error.message);
 
     throw error;
   }
@@ -293,21 +282,7 @@ async function unlikeComment(commentID, userID) {
     await t.rollback();
     console.error("Error unliking comment:", error.message);
 
-    try {
-      await db.sequelize.query(
-        `SELECT security.log_error(:errorMessage, :errorSeverity, :errorState)`,
-        {
-          replacements: {
-            errorMessage: error.message,
-            errorSeverity: "ERROR",
-            errorState: "ERROR",
-          },
-          type: QueryTypes.SELECT,
-        }
-      );
-    } catch (logError) {
-      console.error("Error logging the error:", logError.message);
-    }
+    log_err(error.message);
 
     throw error;
   }
@@ -334,21 +309,7 @@ async function reportComment(commentID, reporterID, observation) {
     await t.rollback();
     console.error("Error reporting comment:", error.message);
 
-    try {
-      await db.sequelize.query(
-        `SELECT security.log_error(:errorMessage, :errorSeverity, :errorState)`,
-        {
-          replacements: {
-            errorMessage: error.message,
-            errorSeverity: "ERROR",
-            errorState: "ERROR",
-          },
-          type: QueryTypes.SELECT,
-        }
-      );
-    } catch (logError) {
-      console.error("Error logging the error:", logError.message);
-    }
+    log_err(error.message);
 
     throw error;
   }

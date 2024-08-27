@@ -1,7 +1,7 @@
 const db = require("../../models");
 const { QueryTypes } = require("sequelize");
 //const { parse } = require('json2sql'); /
-
+const {log_err} = require("../../utils/logError");
 //to add more forms to a pendent event that is already created
 async function addCustomFieldsToEventForm(eventID, customFieldsJson) {
   const t = await db.sequelize.transaction();
@@ -48,10 +48,7 @@ async function addCustomFieldsToEventForm(eventID, customFieldsJson) {
   } catch (error) {
     await t.rollback();
     console.error("Error adding custom fields:", error);
-    await db.sequelize.query(`EXEC "security"."log_error" :errorMessage`, {
-      replacements: { errorMessage: error.message },
-      type: QueryTypes.RAW,
-    });
+    log_err(error.message);
     throw error;
   }
 }
@@ -128,10 +125,7 @@ async function createEventForm(eventID, customFieldsJson) {
   } catch (error) {
     await t.rollback();
     console.error("Error creating event form:", error);
-    await db.sequelize.query(`EXEC "security"."log_error" :errorMessage`, {
-      replacements: { errorMessage: error.message },
-      type: QueryTypes.RAW,
-    });
+    log_err(error.message);
     throw error;
   }
 }
@@ -220,10 +214,7 @@ async function editEventFormField(eventID, customFieldsJson) {
   } catch (error) {
     await t.rollback();
     console.error("Error editing event form field:", error);
-    await db.sequelize.query(`EXEC "security"."log_error" :errorMessage`, {
-      replacements: { errorMessage: error.message },
-      type: QueryTypes.RAW,
-    });
+    log_err(error.message);
     throw error;
   }
 }
@@ -284,10 +275,7 @@ async function insertFormAnswer(userID, eventID, fieldID, answer) {
   } catch (error) {
     await t.rollback();
     console.error("Error inserting form answer:", error);
-    await db.sequelize.query(`EXEC "security"."log_error" :errorMessage`, {
-      replacements: { errorMessage: error.message },
-      type: QueryTypes.RAW,
-    });
+    log_err(error.message);
     throw error;
   }
 }
@@ -320,10 +308,7 @@ async function insertFormAnswers(userID, eventID, answersJson) {
   } catch (error) {
     await t.rollback();
     console.error("Error inserting multiple form answers:", error);
-    await db.sequelize.query(`EXEC "security"."log_error" :errorMessage`, {
-      replacements: { errorMessage: error.message },
-      type: QueryTypes.RAW,
-    });
+    log_err(error.message);
     throw error;
   }
 }
@@ -362,10 +347,7 @@ async function deleteEventFormField(eventID, fieldID) {
   } catch (error) {
     await t.rollback();
     console.error("Error deleting event form field:", error);
-    await db.sequelize.query(`EXEC "security"."log_error" :errorMessage`, {
-      replacements: { errorMessage: error.message },
-      type: QueryTypes.RAW,
-    });
+    log_err(error.message);
     throw error;
   }
 }
