@@ -16,9 +16,10 @@ router.patch(
 );
 router.post("/login", authController.login_web);
 router.post("/login_mobile", authController.login_mobile);
+/* @DEPRECATED
 router.post("/login_google", authController.login_google);
+*/
 router.post("/login_sso", authController.login_SSO);
-//router.post("/token-test", authController.testjwt);
 
 router.get("/get-user-by-token", validation, authController.getUserByToken);
 router.post("/refresh-token", authController.refreshToken);

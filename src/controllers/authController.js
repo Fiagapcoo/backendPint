@@ -420,6 +420,7 @@ controllers.login_mobile = async (req, res) => {
   }
 };
 
+/* @DEPRECATED
 controllers.login_google = async (req, res) => {
   const { idToken } = req.body;
 
@@ -461,6 +462,7 @@ controllers.login_google = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+*/
 
 controllers.login_SSO = async (req, res) => {
   const { idToken, provider } = req.body;
