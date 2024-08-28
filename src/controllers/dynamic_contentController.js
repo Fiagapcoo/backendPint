@@ -432,7 +432,7 @@ controllers.updateUserOffice = async (req, res) => {
 
     // Check if the office worker record exists
     const officeWorker = await db.sequelize.query(
-      `SELECT * FROM "hr"."office_workers" WHERE "user_id" = :user_id`,
+      `SELECT * FROM "centers"."office_workers" WHERE "user_id" = :user_id`,
       {
         replacements: { user_id },
         type: QueryTypes.SELECT,
@@ -442,7 +442,7 @@ controllers.updateUserOffice = async (req, res) => {
     if (officeWorker.length > 0) {
       // Delete the existing office worker record
       await db.sequelize.query(
-        `DELETE FROM "hr"."office_workers" WHERE "user_id" = :user_id`,
+        `DELETE FROM "centers"."office_workers" WHERE "user_id" = :user_id`,
         {
           replacements: { user_id },
           type: QueryTypes.DELETE,
@@ -452,7 +452,7 @@ controllers.updateUserOffice = async (req, res) => {
 
     // Create a new office worker record
     await db.sequelize.query(
-      `INSERT INTO "hr"."office_workers" ("user_id", "office_id")
+      `INSERT INTO "centers"."office_workers" ("user_id", "office_id")
        VALUES (:user_id, :office_id)`,
       {
         replacements: { user_id, office_id },
