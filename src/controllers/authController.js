@@ -23,6 +23,7 @@ const {
   sp_verifyUser,
   sp_updateLastAccess,
   findUserByGoogleId,
+  findUserBySSOId,
   findUserByEmail,
   updateUser,
   createUser,
@@ -460,6 +461,88 @@ controllers.login_google = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
+controllers.login_SSO = async (req, res) => {
+  const { idToken, provider } = req.body;
+  console.log('inside login SSO');
+  console.log(req.body);
+  console.log(idToken);
+  try {
+    let decodedToken;
+    
+    // Verify the ID token based on the provider
+    if (provider === "google") {
+      decodedToken = await admin.auth().verifyIdToken(idToken);
+    } else if (provider === "facebook") {
+      decodedToken = await admin.auth().verifyIdToken(idToken);//verifyFacebookToken(idToken); // You'll need to implement this
+    } else {
+      return res.status(400).json({ success: false, message: "Invalid provider" });
+    }
+      console.log(decodedToken);
+    const email = decodedToken.email;
+    const ssoId = decodedToken.user_id;  // This can be googleId or facebookId based on the provider
+    //exit(1);
+    // Check if the user exists in your database
+    let user = await findUserBySSOId(ssoId, provider);
+    if (!user) {
+      // If not, check by email to see if an account already exists
+      user = await findUserByEmail(email);
+      if (user) {
+        // Merge accounts if found by email
+        if (provider === "google") {
+          user.googleId = ssoId;
+          user.facebookId = '';
+        } else if (provider === "facebook") {
+          user.facebookId = ssoId;
+          user.googleId = '';
+        }
+          await updateUser(user);
+      } else {
+        // Otherwise, create a new user
+        user = await createUser(decodedToken, provider);
+      }
+    }
+
+    const token = generateToken(user.user_id);
+    const refreshToken = generateRefreshToken(user.user_id);
+    await sp_updateLastAccess(user.user_id);
+
+    res.status(200).json({
+      token,
+      refreshToken,
+      success: true,
+      message: "Login successful",
+    });
+  } catch (error) {
+    console.error("Error logging in:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+// // Example implementation for verifying a Facebook token
+// async function verifyFacebookToken(idToken) {
+//   // Use Facebook's API to verify the token
+//   const response = await fetch(`https://graph.facebook.com/oauth/access_token?client_id=${APP_ID}&client_secret=${APP_SECRET}&grant_type=client_credentials`);
+//   console.log(response);
+//   const data = await response.json();
+
+//   if (data && data.data && data.data.is_valid) {
+//     console.log('INSIDE VERIFY FACEBOOK TOKEN');
+//     console.log(data.data);
+//     exit(-1);
+//     return {
+//       uid: data.data.user_id,
+//       email: data.data.email, // You might need to get the email separately
+//     };
+//   } else {
+//     throw new Error("Invalid Facebook token");
+//   }
+// }
+
+
+
+
 
 controllers.getUserByToken = async (req, res) => {
   const user_id = req.user.id;

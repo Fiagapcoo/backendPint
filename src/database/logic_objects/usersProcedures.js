@@ -576,13 +576,53 @@ async function findUserByGoogleId(googleId) {
       `,
       {
         replacements: { googleId },
-        type: QueryTypes.SELECT, 
+        type: QueryTypes.SELECT,
       }
     );
 
     return user.length > 0 ? user[0] : null;
   } catch (error) {
     console.error("Error finding user by Google ID:", error);
+    throw error;
+  }
+}
+async function findUserByFacebookId(fbId) {
+  try {
+    const user = await db.sequelize.query(
+      `
+      SELECT * FROM "hr"."users"
+      WHERE "facebook_id" = :fbId
+      LIMIT 1
+      `,
+      {
+        replacements: { fbId },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    return user.length > 0 ? user[0] : null;
+  } catch (error) {
+    console.error("Error finding user by Facebook ID:", error);
+    throw error;
+  }
+}
+
+async function findUserBySSOId(ssoId, provider) {
+  try {
+    switch (provider) {
+      case "google": {
+        return findUserByGoogleId(ssoId);
+      }
+      case "facebook": {
+        return findUserByFacebookId(ssoId);
+      }
+      default:
+        throw new Error(
+          `There is no use-case for the given provider: ${provider}`
+        );
+    }
+  } catch (error) {
+    console.error("Error creating user:", error);
     throw error;
   }
 }
@@ -597,7 +637,7 @@ async function findUserByEmail(email) {
       `,
       {
         replacements: { email },
-        type: QueryTypes.SELECT, 
+        type: QueryTypes.SELECT,
       }
     );
 
@@ -615,6 +655,7 @@ async function updateUser(user) {
       UPDATE "hr"."users"
       SET
         "google_id" = :google_id,
+        "facebook_id" = :facebook_id
         "first_name" = :first_name,
         "last_name" = :last_name,
         "email" = :email,
@@ -628,6 +669,7 @@ async function updateUser(user) {
       {
         replacements: {
           google_id: user.google_id,
+          facebook_id: user.facebook_id,
           first_name: user.first_name,
           last_name: user.last_name,
           email: user.email,
@@ -647,20 +689,36 @@ async function updateUser(user) {
   }
 }
 
-async function createUser(userData) {
+async function createUser(userData, provider) {
   try {
-    console.log('inside createUser');
+    var _google_id = '';
+    var _facebook_id = '';
+    console.log('CREATE USER DFGJNOSDLIGHESDF');
+    console.log(userData);
+ 
+    if (provider === "google") {
+        _google_id = userData.uid;
+    } else if (provider === "facebook") {
+        _facebook_id = userData.uid;
+    }
+    console.log("inside createUser");
+    console.log(_google_id);
+    console.log("----------------------");
+    console.log(_facebook_id);
+    console.log("----------------------");
+
+
     const name = userData.name;
     console.log(name);
-    const nameArray = name.split(' ');
+    const nameArray = name.split(" ");
     console.log(nameArray);
-
     // Set default values if not provided
     const first_name = nameArray[0] || "";
     const last_name = nameArray[1] || "";
     const email = userData.email;
-    const google_id = userData.google_id;
-    const role_id = userData.role_id || 1; 
+    const role_id = userData.role_id || 1;
+    const google_id = _google_id;
+    const facebook_id = _facebook_id;
     const join_date = userData.join_date || new Date().toISOString(); // using ISO string for date
     const profile_pic = userData.profile_pic || null;
     const last_access = new Date().toISOString();
@@ -668,18 +726,19 @@ async function createUser(userData) {
 
     const result = await db.sequelize.query(
       `
-      INSERT INTO "hr"."users" 
-      ("first_name", "last_name", "email", "google_id", "role_id", "join_date", "isValidated", "profile_pic", "last_access", "hashed_password")
-      VALUES 
-      (:first_name, :last_name, :email, :google_id, :role_id, :join_date, false, :profile_pic, :last_access, :hashed_password)
-      RETURNING *;
-      `,
+            INSERT INTO "hr"."users" 
+            ("first_name", "last_name", "email", "google_id", "facebook_id", "role_id", "join_date", "profile_pic", "last_access", "hashed_password")
+            VALUES 
+            (:first_name, :last_name, :email, :google_id, :facebook_id, :role_id, :join_date, :profile_pic, :last_access, :hashed_password)
+            RETURNING *;
+          `,
       {
         replacements: {
           first_name,
           last_name,
           email,
-          google_id,
+          google_id: _google_id,
+          facebook_id: _facebook_id,
           role_id,
           join_date,
           profile_pic,
@@ -692,7 +751,7 @@ async function createUser(userData) {
 
     // Since the query returns an array, return the first element (the newly created user)
     const newUser = result[0][0];
-    console.log('INSIDE createUser FOR GOOGLE SSO AND FACEBOOK ');
+    console.log("INSIDE createUser FOR GOOGLE SSO");
     console.log(newUser);
     return newUser;
   } catch (error) {
@@ -721,6 +780,7 @@ module.exports = {
   getUserPublications,
   getUserRegisteredEvents,
   findUserByGoogleId,
+  findUserBySSOId,
   findUserByEmail,
   updateUser,
   createUser,
