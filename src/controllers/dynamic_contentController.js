@@ -179,12 +179,14 @@ controllers.getPostById = async (req, res) => {
         admin."first_name" AS "AdminFirstName",
         admin."last_name" AS "AdminLastName",
         sc."score",
-        sc."num_of_evals"
+        sc."num_of_evals",
+        sa.title as "SubAreaTitle"
       FROM "dynamic_content"."posts" p
       LEFT JOIN "hr"."users" pub ON p."publisher_id" = pub."user_id"
       LEFT JOIN "hr"."users" admin ON p."admin_id" = admin."user_id"
       LEFT JOIN "dynamic_content"."scores" sc ON p."post_id" = sc."post_id"
-      WHERE p."post_id" = :post_id
+      left join "static_content".sub_area sa on SA.sub_area_id = P.sub_area_id 
+      WHERE p."post_id" = 11
       `,
       {
         replacements: { post_id },
