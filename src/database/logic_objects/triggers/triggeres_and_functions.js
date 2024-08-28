@@ -52,6 +52,11 @@ const {
 } = require("./dashbord");
 
 const {
+  createTriggerFunction_create_album_for_area,
+  createTrigger_create_album_after_area_created,
+} = require("./album_trigger");
+
+const {
   createTriggerFunction_trg_increment_like_comment,
   createTrigger_increment_like_count,
   createTriggerFunction_trg_decrement_like_comment,
@@ -78,9 +83,12 @@ const set_triggers = async () => {
   await createTriggerFunction_event_part_count();
   await createTrigger_event_part_count();
 
+  //albuns
   await createTriggerFunction_create_album_for_validated_event();
   await createTrigger_create_album_after_event_insert();
   await createTrigger_create_album_after_event_update();
+  await createTriggerFunction_create_album_for_area();
+  await createTrigger_create_album_after_area_created();
 
   //for dashboard
   await create_spEngagementMetrics();
@@ -104,5 +112,8 @@ const set_triggers = async () => {
   await createTrigger_increment_like_count();
   await createTriggerFunction_trg_decrement_like_comment();
   await createTrigger_decrement_like_count();
+
+  
+
 };
 set_triggers();

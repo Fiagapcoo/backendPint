@@ -68,16 +68,16 @@ const createTriggerFunction_trg_moderate_event_content = async () => {
 
 const createTrigger_createEvent = async () => {
     await db.sequelize.query(`
-DO $$ 
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_moderate_event_content') THEN
-    DROP TRIGGER trg_moderate_event_content ON dynamic_content.events;
-  END IF;
-  CREATE TRIGGER trg_moderate_event_content
-  AFTER INSERT ON dynamic_content.events
-  FOR EACH ROW
-  EXECUTE FUNCTION dynamic_content.trg_moderate_event_content();
-END $$;
+            DO $$ 
+            BEGIN
+            IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_moderate_event_content') THEN
+                DROP TRIGGER trg_moderate_event_content ON dynamic_content.events;
+            END IF;
+            CREATE TRIGGER trg_moderate_event_content
+            AFTER INSERT ON dynamic_content.events
+            FOR EACH ROW
+            EXECUTE FUNCTION dynamic_content.trg_moderate_event_content();
+            END $$;
     `);
 };
 
