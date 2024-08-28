@@ -323,7 +323,7 @@ controllers.validate_user = async (req,res) => {
       .status(400)
       .json({ success: false, message: "Invalid User ID" });
   }
-  if (validator.isEmpty(user_id) ) {
+  if (validator.isEmpty(user_id.toString())) {
     return res
       .status(400)
       .json({ success: false, message: "User ID is required" });
@@ -351,7 +351,7 @@ controllers.deactivate_user = async (req,res) => {
       .status(400)
       .json({ success: false, message: "Invalid User ID" });
   }
-  if (validator.isEmpty(user_id) ) {
+  if (validator.isEmpty(user_id.toString()) ){
     return res
       .status(400)
       .json({ success: false, message: "User ID is required" });
