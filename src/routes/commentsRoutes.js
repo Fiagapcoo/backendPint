@@ -10,4 +10,6 @@ router.post('/add-like', validation, controller.like_comment);
 router.delete('/remove-like', validation, controller.unlike_comment);
 router.post('/report-coment', validation, controller.report_comment);
 
+router.get('/get-likes-per-content/content/:contentType/id/:contentID/', validation, controller.likes_per_content);
+
 module.exports = router;

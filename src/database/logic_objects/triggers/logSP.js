@@ -10,8 +10,8 @@ const createFunction_logError = async () => {
         VALUES (error_message, error_severity, error_state, CURRENT_TIMESTAMP);
 
         -- Raise the error to the caller
-        RAISE EXCEPTION '%', error_message
-        USING ERRCODE = error_severity, MESSAGE = error_message, DETAIL = 'Error state: ' || error_state::TEXT;
+        -- RAISE EXCEPTION '%', error_message
+        -- USING ERRCODE = error_severity, MESSAGE = error_message, DETAIL = 'Error state: ' || error_state::TEXT;
     END;
     $$ LANGUAGE plpgsql;
 `);

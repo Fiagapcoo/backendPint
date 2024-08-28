@@ -741,9 +741,25 @@ async function createUser(userData, provider) {
         type: QueryTypes.INSERT,
       }
     );
-
     // Since the query returns an array, return the first element (the newly created user)
     const newUser = result[0][0];
+    // const result2 = await db.sequelize.query(
+    //   `
+    //         INSERT INTO "centers"."office_workers" 
+    //         ("office_id", "user_id")
+    //         VALUES 
+    //         (2, :userID)
+    //       `,
+    //   {
+    //     replacements: {
+    //       //office_id: _office_id,
+    //       userID: newUser.user_id,
+    //     },
+    //     type: QueryTypes.INSERT,
+    //   }
+    // );
+
+    
     console.log("INSIDE createUser FOR GOOGLE SSO");
     console.log(newUser);
     return newUser;

@@ -335,7 +335,8 @@ const authenticateUser = async (email, password) => {
   if (!isMatch) {
     return { authenticated: false, message: "Invalid email or password" };
   }
-  await updateAccessOnLogin(user.user_id);
+  //ADD logic to check if its an admin and if the user has never logged in once, cause if not, he must change its password
+  //await updateAccessOnLogin(user.user_id);
   return { authenticated: true, user };
 };
 

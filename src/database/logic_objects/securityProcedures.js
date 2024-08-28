@@ -10,7 +10,7 @@ const sp_findUserById = async (userId) => {
       const [user] = await db.sequelize.query(
           `SELECT hr."user_id", hr."first_name", hr."last_name", hr."email", hr."last_access", hr."profile_pic", oa."office_id"
            FROM "hr"."users" hr
-           LEFT JOIN "centers"."office_admins" oa ON hr."user_id" = oa."manager_id"
+           LEFT JOIN "centers"."office_workers" oa ON hr."user_id" = oa."user_id"
            WHERE hr."user_id" = :userId`,
           {
               replacements: { userId },

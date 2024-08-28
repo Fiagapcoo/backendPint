@@ -1,7 +1,7 @@
 const db = require("../../models");
 const { QueryTypes } = require("sequelize");
 
-const {log_err} = require("../../utils/logError");
+const { log_err } = require("../../utils/logError");
 
 // const contentTables = {
 //   post: "post_id",
@@ -274,7 +274,9 @@ async function unlikeComment(commentID, userID) {
 
     if (result[1] === 0) {
       // If no rows were affected, the like did not exist
-      throw new Error("Like does not exist for the specified comment and user.");
+      throw new Error(
+        "Like does not exist for the specified comment and user."
+      );
     }
 
     await t.commit();
@@ -288,7 +290,6 @@ async function unlikeComment(commentID, userID) {
     throw error;
   }
 }
-
 
 async function reportComment(commentID, reporterID, observation) {
   const t = await db.sequelize.transaction();
@@ -316,10 +317,80 @@ async function reportComment(commentID, reporterID, observation) {
   }
 }
 
+async function getCommentTree_forlikes(contentID, contentType) {
+  try {
+    const results = await db.sequelize.query(
+      `
+        SELECT 
+          c."comment_id",
+          c."forum_id",
+          c."post_id",
+          c."publisher_id"
+        FROM "communication"."comments" c
+        WHERE 
+          c."post_id" = :contentID OR
+          c."forum_id" = :contentID
+      `,
+      {
+        replacements: { contentID, contentType },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return results;
+  } catch (error) {
+    console.error("Error fetching comment tree:", error);
+    throw error;
+  }
+}
+
+
+async function likes_per_content(comments, user_id) {
+  const t = await db.sequelize.transaction();
+  try {
+    const likedComments = [];
+    comments.forEach((comment) => {
+      console.log(comment);
+    });
+    for (const el of comments) {
+      const { comment_id } = el;
+
+      const [result] = await db.sequelize.query(
+        `
+        SELECT "comment_id"
+        FROM "communication"."likes"
+        WHERE "comment_id" = :comment_id AND "publisher_id" = :user_id
+        LIMIT 1;
+        `,
+        {
+          replacements: { comment_id, user_id },
+          type: QueryTypes.SELECT,
+        }
+      );
+
+      if (result) {
+        likedComments.push(result.comment_id);
+      }
+    }
+
+    console.log("Liked comment IDs:", likedComments);
+    // Return the array of liked comment IDs
+    return likedComments;
+  } catch (error) {
+    await t.rollback();
+    console.error("Error checking liked comments :", error.message);
+
+    log_err(error.message);
+
+    throw error;
+  }
+}
+
 module.exports = {
   spAddComment,
   getCommentTree,
   likeComment,
   unlikeComment,
   reportComment,
+  likes_per_content,
+  getCommentTree_forlikes,
 };
