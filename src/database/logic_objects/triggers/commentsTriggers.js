@@ -2,10 +2,11 @@ const db = require('../../../models');
 
 const createTriggerFunction_trg_increment_like_comment = async () => {
     await db.sequelize.query(`
-        CREATE OR REPLACE FUNCTION communication.increment_likes()
+        CREATE OR REPLACE FUNCTION communication.increment_like_count()
         RETURNS TRIGGER AS $$
         BEGIN
-            -- Update the likes in the comments table
+            RAISE NOTICE 'Trigger increment_like_count fired for comment_id %', NEW.comment_id;
+
             UPDATE "communication"."comments"
             SET likes = likes + 1
             WHERE comment_id = NEW.comment_id;
@@ -13,21 +14,29 @@ const createTriggerFunction_trg_increment_like_comment = async () => {
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
-        `);
+    `);
 };
 
-const createTrigger_increment_likes = async () => {
-     await db.sequelize.query(` 
-        CREATE TRIGGER trg_increment_likes
-        AFTER INSERT ON "communication"."likes"
-        FOR EACH ROW
-        EXECUTE FUNCTION communication.increment_likes();
-        `);
+const createTrigger_increment_like_count = async () => {
+    //await createTriggerFunction_trg_increment_like_comment();
+     await db.sequelize.query(`
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_increment_like_count') THEN
+                DROP TRIGGER trg_increment_like_count ON "communication"."likes";
+            END IF;
+
+            CREATE TRIGGER trg_increment_like_count
+            AFTER INSERT ON "communication"."likes"
+            FOR EACH ROW
+            EXECUTE FUNCTION communication.increment_like_count();
+        END $$;
+    `);
 }
 
 const createTriggerFunction_trg_decrement_like_comment = async () => {
     await db.sequelize.query(`
-        CREATE OR REPLACE FUNCTION communication.decrement_likes()
+        CREATE OR REPLACE FUNCTION communication.decrement_like_count()
         RETURNS TRIGGER AS $$
         BEGIN
             -- Update the likes in the comments table
@@ -38,22 +47,30 @@ const createTriggerFunction_trg_decrement_like_comment = async () => {
             RETURN OLD;
         END;
         $$ LANGUAGE plpgsql;
-        `);
+    `);
 };
 
-const createTrigger_decrement_likes = async () => {
-    await db.sequelize.query(` 
-       CREATE TRIGGER trg_decrement_likes
-        AFTER DELETE ON "communication"."likes"
-        FOR EACH ROW
-        EXECUTE FUNCTION communication.decrement_likes();
-       `);
-}
+const createTrigger_decrement_like_count = async () => {
+    //await createTriggerFunction_trg_decrement_like_comment(); 
 
+    await db.sequelize.query(`
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_decrement_like_count') THEN
+                DROP TRIGGER trg_decrement_like_count ON "communication"."likes";
+            END IF;
+
+            CREATE TRIGGER trg_decrement_like_count
+            AFTER DELETE ON "communication"."likes"
+            FOR EACH ROW
+            EXECUTE FUNCTION communication.decrement_like_count();
+        END $$;
+    `);
+}
 
 module.exports = {
     createTriggerFunction_trg_increment_like_comment,
-    createTrigger_increment_likes,
+    createTrigger_increment_like_count,
     createTriggerFunction_trg_decrement_like_comment,
-    createTrigger_decrement_likes
+    createTrigger_decrement_like_count
 };

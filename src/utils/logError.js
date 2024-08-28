@@ -8,7 +8,7 @@ async function log_err(error) {
       `SELECT security.log_error(:errorMessage, :errorSeverity, :errorState);`,
       {
         replacements: {
-          errorMessage: error.message,
+          errorMessage: error,
           errorSeverity: 'ERROR',  
           errorState: '1000',       
         },

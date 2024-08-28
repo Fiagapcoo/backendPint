@@ -100,9 +100,9 @@ const set_triggers = async () => {
   await create_sp_get_forum_discussions_by_city();
 
   // comments
-  createTriggerFunction_trg_increment_like_comment();
-  createTrigger_increment_like_count();
-  createTriggerFunction_trg_decrement_like_comment();
-  createTrigger_decrement_like_count();
+  await createTriggerFunction_trg_increment_like_comment();
+  await createTrigger_increment_like_count();
+  await createTriggerFunction_trg_decrement_like_comment();
+  await createTrigger_decrement_like_count();
 };
 set_triggers();
