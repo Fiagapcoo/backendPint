@@ -400,14 +400,7 @@ async function createUserPreferences(
           "User Preferences",
           "User Created preferences"
         );
-        // await db.sequelize.query(
-        //   `EXEC "user_interactions"."spLogUserAction" :userID, 'Created User Preferences', 'User Created preferences'`,
-        //   {
-        //     replacements: { userID },
-        //     type: QueryTypes.RAW,
-        //     transaction
-        //   }
-        // );
+
       } else {
         console.log("User preferences already exist.");
       }
