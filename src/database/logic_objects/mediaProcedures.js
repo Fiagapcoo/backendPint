@@ -44,8 +44,17 @@ async function spGetAlbums(){
     return albums;
 }
 
+async function spGetAlbumPhoto(photo_id){
+    const photo = await db.sequelize.query(
+        `SELECT * FROM "dynamic_content"."photographs" WHERE "album_id" = :photo_id`,
+        { replacements: { photo_id }, type: QueryTypes.SELECT }
+    );
+
+    return photo;
+}
 module.exports = {
     spCreateAlbum,
     spAddPhotograph,
-    spGetAlbums
+    spGetAlbums,
+    spGetAlbumPhoto
 }
