@@ -9,9 +9,9 @@ const createTriggerFunction_create_album_for_area = async () => {
             error_severity TEXT;
             error_state TEXT;
         BEGIN
-                -- Insert a new album associated with the validated event
+                -- Insert a new album associated with the area
                 INSERT INTO dynamic_content.albuns ( title, area_id)
-                VALUES ( NEW.title, NEW.area_id); -- Use the event title as the album name
+                VALUES ( NEW.title, NEW.area_id); -- Use the area title as the album name
 
             RETURN NEW;
         EXCEPTION
@@ -21,7 +21,7 @@ const createTriggerFunction_create_album_for_area = async () => {
                                         error_severity = RETURNED_SQLSTATE,
                                         error_state = PG_EXCEPTION_DETAIL;
 
-                -- Log the error details (if you have a logging function)
+                -- Log the error details 
                 INSERT INTO security.error_log (error_message, error_severity, error_state, error_time)
                 VALUES (error_message, error_severity, error_state, CURRENT_TIMESTAMP);
 

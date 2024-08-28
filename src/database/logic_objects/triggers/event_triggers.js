@@ -236,7 +236,7 @@ const createTriggerFunction_create_album_for_validated_event = async () => {
                                         error_severity = RETURNED_SQLSTATE,
                                         error_state = PG_EXCEPTION_DETAIL;
 
-                -- Log the error details (if you have a logging function)
+                -- Log the error details 
                 INSERT INTO security.error_log (error_message, error_severity, error_state, error_time)
                 VALUES (error_message, error_severity, error_state, CURRENT_TIMESTAMP);
 
