@@ -474,7 +474,7 @@ controllers.login_SSO = async (req, res) => {
     if (provider === "google") {
       decodedToken = await admin.auth().verifyIdToken(idToken);
     } else if (provider === "facebook") {
-      decodedToken = await admin.auth().verifyIdToken(idToken);//verifyFacebookToken(idToken); // You'll need to implement this
+      decodedToken = await admin.auth().verifyIdToken(idToken);
     } else {
       return res.status(400).json({ success: false, message: "Invalid provider" });
     }
