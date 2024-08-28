@@ -40,7 +40,7 @@ controllers.create_post = async (req, res) => {
       .json({ success: true, message: "Post created successfully." });
   } catch (error) {
     console.log("Error: " + error);
-    exit(-1);
+    //exit(-1);
     res
       .status(500)
       .json({

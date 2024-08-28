@@ -104,6 +104,11 @@ async function syncModels() {
             ALTER COLUMN "role_id" SET DEFAULT 1;
         `);
 
+        await db.sequelize.query(`
+            ALTER TABLE "communication"."likes"
+            ADD CONSTRAINT unique_comment_user_like UNIQUE ("comment_id", "publisher_id");
+        `);
+
         console.log('All models were synchronized successfully.');
     } catch (error) {
         console.error('Unable to sync models:', error);
