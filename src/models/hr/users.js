@@ -52,7 +52,7 @@ module.exports = (sequelize, DataTypes) => {
       join_date: { type: DataTypes.DATE, allowNull: false },
       last_access: {
         type: DataTypes.DATE,
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+        //defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
       },
       google_id: { type: DataTypes.STRING(255), allowNull: true },
       facebook_id: { type: DataTypes.STRING(255), allowNull: true },

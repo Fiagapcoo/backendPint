@@ -9,6 +9,8 @@ const {
   deleteEventFormField,
 } = require("../database/logic_objects/formsProcedures");
 
+const { spRegisterUserForEvent } = require("../database/logic_objects/eventProcedures");
+
 const controllers = {};
 
 //to create a new form for a new event
@@ -120,25 +122,29 @@ controllers.get_event_json_form = async (req, res) => {
 };
 
 //insert answer to field
-controllers.add_answer = async (req, res) => {
-  const { userID, eventID } = req.params;
-  const { fieldID, answer } = req.body;
-  console.log(req.query);
-  try {
-    await insertFormAnswer(userID, eventID, fieldID, answer);
+// controllers.add_answer = async (req, res) => {
+//   const { userID, eventID } = req.params;
+//   const { fieldID, answer } = req.body;
+//   console.log(req.query);
+//   try {
 
-    res
-      .status(201)
-      .json({ success: true, message: "Added answer to form field." });
-  } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error adding answer: " + error.message,
-      });
-  }
-};
+//     await insertFormAnswer(userID, eventID, fieldID, answer);
+
+//     await spRegisterUserForEvent(userID, eventID);
+
+
+//     res
+//       .status(201)
+//       .json({ success: true, message: "Added answer to form field." });
+//   } catch (error) {
+//     res
+//       .status(500)
+//       .json({
+//         success: false,
+//         message: "Error adding answer: " + error.message,
+//       });
+//   }
+// };
 //insert answers to form
 controllers.add_answers = async (req, res) => {
   const { userID, eventID } = req.params;
@@ -146,6 +152,8 @@ controllers.add_answers = async (req, res) => {
   console.log(req.query);
   try {
     await insertFormAnswers(userID, eventID, answersJson);
+    
+    await spRegisterUserForEvent(userID, eventID);
 
     res.status(201).json({ success: true, message: "Added answers to form." });
   } catch (error) {
