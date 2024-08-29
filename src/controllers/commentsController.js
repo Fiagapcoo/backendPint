@@ -91,11 +91,13 @@ controllers.add_comment = async (req, res) => {
 
 
     await sendNewCommentNotification(ownerID,contentID, contentType,fullname );
-
+    //exit(-1);
     res
       .status(201)
       .json({ success: true, message: "Comment added successfully." });
   } catch (error) {
+    console.log(error);
+    console.log(error.message);
     res.status(500).json({
       success: false,
       message: "Error adding Comment: " + error.message,

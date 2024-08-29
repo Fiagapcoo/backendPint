@@ -1,8 +1,17 @@
-const admin = require('../server');
+//const { admin } = require('../server');
+var admin = require("firebase-admin");
+const serviceAccount = require("../../softshares-000515-firebase-adminsdk-ds8og-d6087d42e3.json");
+
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+
 
 const {findUserById} = require("../database/logic_objects/usersProcedures");
 // Function to send a notification when someone replies to a comment
 const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
+  
     const user = await findUserById(replyToUserId);
     if (!user || !user.fcmToken) {console.log('fcmToken is null');return};
     const fcmtoken = user.fcmToken
@@ -16,7 +25,7 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
           channel_id: 'MESSAGE_CHANNEL',// *
           icon: 'message_icon', // *
           tag: 'message', // *
-          image: imageUrl,
+          //image: imageUrl,
         },
       },
       apns: {
@@ -53,7 +62,7 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
           channel_id: 'MESSAGE_CHANNEL',// *
           icon: 'message_icon', // *
           tag: 'message', // *
-          image: imageUrl,
+          //image: imageUrl,
         },
       },
       apns: {
@@ -72,11 +81,13 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
     };
     console.log('sending notification');
     await admin.messaging().send(payload);
+
   };
   
   // Function to send a notification when someone comments on a post or forum you created
   const sendNewCommentNotification = async (postOwnerId, postId, contentType, commenterName) => {
     const user = await findUserById(postOwnerId);
+    console.log(admin);
     if (!user || !user.fcmToken) {console.log('fcmToken is null');return};
     const fcmtoken = user.fcmToken
     const payload = {
@@ -85,12 +96,14 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
         body: `${commenterName} commented on your ${contentType}.`,
       },
       android: {
+        priority: 'high',
         notification: {
           channel_id: 'MESSAGE_CHANNEL',// *
           icon: 'message_icon', // *
           tag: 'message', // *
-          image: imageUrl,
+          //image: imageUrl,
         },
+        
       },
       apns: {
         payload: {
@@ -109,7 +122,18 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
       
     };
     console.log('sending notification');
-    await admin.messaging().send(payload);
+    try{
+      
+      var response = await admin.messaging().send(payload);
+      console.log('reposta notif');
+      console.log(response);
+
+     }
+    catch(error){
+      
+      console.log(error);
+      console.log(error.message);
+    }
   };
   
   // Function to send a notification when someone registers for an event you created
@@ -127,7 +151,7 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
           channel_id: 'MESSAGE_CHANNEL',// *
           icon: 'message_icon', // *
           tag: 'message', // *
-          image: imageUrl,
+         // image: imageUrl,
         },
       },
       apns: {
@@ -147,6 +171,7 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
     };
     console.log('sending notification');
     await admin.messaging().send(payload);
+    
   };
   
   module.exports = {

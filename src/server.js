@@ -15,8 +15,8 @@ const app = express();
 
 //por a correr 1 vez unica
 const {server} = require('./websockets');
-var admin = require("firebase-admin");
-const { getMessaging } = require ("firebase/messaging");
+
+
 
 
 
@@ -80,12 +80,11 @@ app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/email', emailRoute);
 
 
-const serviceAccount = require("../softshares-000515-firebase-adminsdk-ds8og-d6087d42e3.json");
 
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-  });
+
+
+
 /*
   async function sendNotification(token, title, body) {
     const message = {
@@ -124,4 +123,3 @@ server.listen(5000, () => {
     console.log("WebSocket server started on port 5000");
 });
 
-module.exports = admin;
