@@ -794,6 +794,30 @@ async function getUserFullName(userId) {
   }
 }
 
+async function findUserById(replyToUserId) {
+  try {
+    const userResult = await db.sequelize.query(
+      `SELECT *
+       FROM "hr"."users"
+       WHERE "user_id" = :userId
+       LIMIT 1`,
+      {
+        replacements: { userId: replyToUserId },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (userResult.length === 0) {
+      throw new Error("User not found.");
+    }
+
+    return userResult[0];
+  } catch (error) {
+    console.error("Error finding user by ID:", error.message);
+    throw error;
+  }
+}
+
 module.exports = {
   logUserAction,
   getUserPreferences,
@@ -820,4 +844,5 @@ module.exports = {
   createUser,
 
   getUserFullName,
+  findUserById,
 };

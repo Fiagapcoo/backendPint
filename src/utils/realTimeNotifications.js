@@ -1,9 +1,9 @@
 const admin = require('../server');
-
-
+const db = require("../models");
+const {findUserById} = require("../database/logic_objects/usersProcedures");
 // Function to send a notification when someone replies to a comment
 const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
-    const user = await db.Users.findByPk(replyToUserId);
+    const user = await findUserById(replyToUserId);
     if (!user || !user.fcmToken) return;
   
     const payload = {
@@ -21,7 +21,7 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
   
   // Function to send a notification when someone likes a comment
   const sendLikeNotification = async (commentOwnerId, likerName) => {
-    const user = await db.Users.findByPk(commentOwnerId);
+    const user = await findUserById(commentOwnerId);
     if (!user || !user.fcmToken) return;
   
     const payload = {
@@ -36,7 +36,7 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
   
   // Function to send a notification when someone comments on a post or forum you created
   const sendNewCommentNotification = async (postOwnerId, postId, contentType, commenterName) => {
-    const user = await db.Users.findByPk(postOwnerId);
+    const user = await findUserById(postOwnerId);
     if (!user || !user.fcmToken) return;
   
     const payload = {
@@ -54,7 +54,7 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
   
   // Function to send a notification when someone registers for an event you created
   const sendEventRegistrationNotification = async (eventOwnerId, eventId, registrantName) => {
-    const user = await db.Users.findByPk(eventOwnerId);
+    const user = await findUserById(eventOwnerId);
     if (!user || !user.fcmToken) return;
   
     const payload = {
