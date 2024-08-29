@@ -4,9 +4,10 @@ const {
   editEventFormField,
   getFormSchema,
   getFormSchemaAsJson,
-  insertFormAnswer,
+
   insertFormAnswers,
   deleteEventFormField,
+  getFormAnswersByEvent
 } = require("../database/logic_objects/formsProcedures");
 
 const { spRegisterUserForEvent } = require("../database/logic_objects/eventProcedures");
@@ -185,5 +186,24 @@ controllers.delete_field_from_form = async (req, res) => {
       });
   }
 };
+
+controllers.get_event_answers = async (req,res) => {
+  const { eventID } = req.params;
+  console.log(req.params);
+  try {
+    var answers = await getFormAnswersByEvent(eventID, fieldID);
+
+    res
+      .status(201)
+      .json({ success: true, data:answers ,message: "Got answers for event successfully."});
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Error getting answers from event: " + error.message,
+      });
+  }
+}
 
 module.exports = controllers;

@@ -8,6 +8,8 @@ router.post('/add-fields-to-form/event/:eventID/fields/:customFieldsJson', valid
 router.patch('/edit-form-fields/event/:eventID/', validation, controller.edit_fields_event_form); 
 router.get('/event-form/:eventID', validation, controller.get_event_form);
 router.get('/event-json-form/:eventID', validation, controller.get_event_json_form);
+
+router.get('/get-event-answers/:eventID', validation, controller.get_event_answers);
 //router.post('/add-answer/:eventID/:userID', validation, controller.add_answer);
 router.post('/add-answers/:eventID/:userID', validation, controller.add_answers);
 router.delete('/delete-field/:eventID/:fieldID', validation, controller.delete_field_from_form);
