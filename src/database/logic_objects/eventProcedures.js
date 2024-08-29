@@ -332,7 +332,8 @@ async function spEditEvent(
       { replacements: { eventId }, type: QueryTypes.SELECT, transaction }
     );
 
-    if (event.length && event[0].validated === false) {
+    // if (event.length && event[0].validated === false) {
+      if (event.length) {
       await db.sequelize.query(
         `UPDATE "dynamic_content"."events"
                 SET
