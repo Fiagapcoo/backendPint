@@ -164,12 +164,12 @@ controllers.unlike_comment = async (req, res) => {
     res.status(201).json({
       success: true,
       data: comments,
-      message: "Liked comment successfuly.",
+      message: "Unliked comment successfuly.",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error liking comment: " + error.message,
+      message: "Error unliking comment: " + error.message,
     });
   }
 };
