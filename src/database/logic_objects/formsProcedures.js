@@ -380,6 +380,34 @@ async function getFormAnswersByEvent(eventID) {
   }
 }
 
+async function getFormAnswersByEventAndUser(eventID, userID) {
+  try {
+    const answersResult = await db.sequelize.query(
+      `SELECT 
+          "user_id",
+          "event_id",
+          "field_id",
+          "answer",
+          "entry_date"
+       FROM "forms"."answers"
+       WHERE "event_id" = :eventID AND "user_id" = :userID`,
+      {
+        replacements: { eventID, userID },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (answersResult.length === 0) {
+      throw new Error("No answers found for the event and user.");
+    }
+
+    return answersResult;
+  } catch (error) {
+    console.error("Error retrieving form answers:", error.message);
+    throw error;
+  }
+}
+
 module.exports = {
   addCustomFieldsToEventForm,
   createEventForm,
@@ -390,4 +418,5 @@ module.exports = {
   insertFormAnswers,
   deleteEventFormField,
   getFormAnswersByEvent,
+  getFormAnswersByEventAndUser,
 };

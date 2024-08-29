@@ -7,7 +7,8 @@ const {
 
   insertFormAnswers,
   deleteEventFormField,
-  getFormAnswersByEvent
+  getFormAnswersByEvent,
+  getFormAnswersByEventAndUser
 } = require("../database/logic_objects/formsProcedures");
 
 const { spRegisterUserForEvent } = require("../database/logic_objects/eventProcedures");
@@ -191,11 +192,30 @@ controllers.get_event_answers = async (req,res) => {
   const { eventID } = req.params;
   console.log(req.params);
   try {
-    var answers = await getFormAnswersByEvent(eventID, fieldID);
+    var answers = await getFormAnswersByEvent(eventID);
 
     res
       .status(201)
       .json({ success: true, data:answers ,message: "Got answers for event successfully."});
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Error getting answers from event: " + error.message,
+      });
+  }
+}
+controllers.get_event_answers_for_user = async (req,res) => {
+  const { eventID } = req.params;
+  const userID = req.user.id; // Extracted from JWT
+  console.log(req.params);
+  try {
+    var answers = await getFormAnswersByEventAndUser(eventID, userID);
+
+    res
+      .status(201)
+      .json({ success: true, data: answers ,message: "Got answers for event successfully."});
   } catch (error) {
     res
       .status(500)
