@@ -4,8 +4,8 @@ const {findUserById} = require("../database/logic_objects/usersProcedures");
 // Function to send a notification when someone replies to a comment
 const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
     const user = await findUserById(replyToUserId);
-    if (!user || !user.fcmToken) return;
-    const token = user.fcmToken
+    if (!user || !user.fcmToken) {console.log('fcmToken is null');return};
+    const fcmtoken = user.fcmToken
     const payload = {
       notification: {
         title: "New Reply to Your Comment",
@@ -32,17 +32,17 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
         type: 'MESSAGE', // *
         commentId: String(commentId),
       },
-      token
+      token: fcmtoken
     };
-  
+    console.log('sending notification');
     await admin.messaging().send(payload);
   };
   
   // Function to send a notification when someone likes a comment
   const sendLikeNotification = async (commentOwnerId, likerName) => {
     const user = await findUserById(commentOwnerId);
-    if (!user || !user.fcmToken) return;
-    const token = user.fcmToken
+    if (!user || !user.fcmToken) {console.log('fcmToken is null');return};
+    const fcmtoken = user.fcmToken
     const payload = {
       notification: {
         title: "Your Comment was Liked",
@@ -68,17 +68,17 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
         click_action: 'FLUTTER_NOTIFICATION_CLICK', // *
         type: 'MESSAGE', // *
       },
-      token,
+      token: fcmtoken
     };
-  
+    console.log('sending notification');
     await admin.messaging().send(payload);
   };
   
   // Function to send a notification when someone comments on a post or forum you created
   const sendNewCommentNotification = async (postOwnerId, postId, contentType, commenterName) => {
     const user = await findUserById(postOwnerId);
-    if (!user || !user.fcmToken) return;
-    const token = user.fcmToken
+    if (!user || !user.fcmToken) {console.log('fcmToken is null');return};
+    const fcmtoken = user.fcmToken
     const payload = {
       notification: {
         title: "New Comment on Your Publication",
@@ -105,18 +105,18 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
         type: 'MESSAGE', // *
         postId: String(postId),
       },
-      token,
+      token: fcmtoken
       
     };
-  
+    console.log('sending notification');
     await admin.messaging().send(payload);
   };
   
   // Function to send a notification when someone registers for an event you created
   const sendEventRegistrationNotification = async (eventOwnerId, eventId, registrantName) => {
     const user = await findUserById(eventOwnerId);
-    if (!user || !user.fcmToken) return;
-    const token = user.fcmToken
+    if (!user || !user.fcmToken) {console.log('fcmToken is null');return};
+    const fcmtoken = user.fcmToken
     const payload = {
       notification: {
         title: "New Event Registration",
@@ -143,9 +143,9 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
         type: 'MESSAGE', // *
         eventId: String(eventId),
       },
-      token
+      token: fcmtoken
     };
-  
+    console.log('sending notification');
     await admin.messaging().send(payload);
   };
   
