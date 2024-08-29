@@ -13,6 +13,8 @@ const {getForumCreator} = require("../database/logic_objects/forumProcedures");
 
 const {getUserFullName} = require("../database/logic_objects/usersProcedures");
 
+const {sendNewCommentNotification} = require("../utils/realTimeNotifications");
+
 const validator = require("validator");
 const controllers = {};
 
@@ -138,6 +140,9 @@ controllers.like_comment = async (req, res) => {
   const userID = req.user.id; // Extracted from JWT
   try {
     const comments = await likeComment(commentID, userID);
+
+    //sendLikeNotification();
+
     res.status(201).json({
       success: true,
       data: comments,
