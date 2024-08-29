@@ -306,10 +306,12 @@ controllers.getForumById = async (req, res) => {
     pub."first_name" AS "PublisherFirstName",
     pub."last_name" AS "PublisherLastName",
     admin."first_name" AS "AdminFirstName",
-    admin."last_name" AS "AdminLastName"
+    admin."last_name" AS "AdminLastName",
+    sa.title as "SubAreaTitle"
 FROM "dynamic_content"."forums" p
 LEFT JOIN "hr"."users" pub ON p."publisher_id" = pub."user_id"
 LEFT JOIN "hr"."users" admin ON p."admin_id" = admin."user_id"
+LEFT JOIN static_content.sub_area sa ON p.sub_area_id = sa.sub_area_id 
 WHERE p."forum_id" = :forum_id
       `,
       {
