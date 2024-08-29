@@ -24,7 +24,7 @@ const { getMessaging } = require ("firebase/messaging");
 const emailRoute = require('./routes/emailRoute');
 const uploadRoute = require('./routes/uploadRoute');
 
-const categoryRoutes = require('./routes/static_contentController');
+const categoryRoutes = require('./routes/static_contentRoutes');
 const forumRoutes = require('./routes/forumRoutes');
 const postRoutes = require('./routes/postRoutes');
 const eventRoutes = require('./routes/eventRoutes');

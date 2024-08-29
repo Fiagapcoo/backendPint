@@ -179,7 +179,7 @@ controllers.delete_sub_category = async (req, res) => {
   }
 };
 
-controllers.getAllCenters() = async (req, res) => {
+controllers.getAllCenters = async (req, res) => {
   try {
     const centers = await db.sequelize.query(
       `
