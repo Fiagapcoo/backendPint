@@ -1,5 +1,5 @@
 const admin = require('../server');
-const db = require("../models");
+
 const {findUserById} = require("../database/logic_objects/usersProcedures");
 // Function to send a notification when someone replies to a comment
 const sendReplyNotification = async (replyToUserId, commentId, replierName) => {

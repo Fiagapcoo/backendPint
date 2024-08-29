@@ -122,3 +122,5 @@ app.listen(app.get('port'), () => {
 server.listen(5000, () => {
     console.log("WebSocket server started on port 5000");
 });
+
+module.exports = admin;
