@@ -83,7 +83,7 @@ controllers.add_comment = async (req, res) => {
       // });
     }
 
-    var username = await getUserFullName(userId);
+    var username = await getUserFullName(userID);
     var fullname = username.firstName + ' ' +username.lastName;
 
 
