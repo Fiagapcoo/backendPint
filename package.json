@@ -23,7 +23,7 @@
     "dotenv": "^16.4.5",
     "emailjs": "^4.0.3",
     "express": "^4.19.2",
-    "firebase": "^10.12.5",
+    "firebase": "^10.13.0",
     "firebase-admin": "^12.2.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",

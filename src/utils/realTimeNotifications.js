@@ -11,12 +11,13 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
         title: "New Reply to Your Comment",
         body: `${replierName} replied to your comment.`,
       },
+      token: user.fcmToken,
       data: {
         commentId: String(commentId),
       },
     };
   
-    await admin.messaging().sendToDevice(user.fcmToken, payload);
+    await admin.messaging().send(payload);
   };
   
   // Function to send a notification when someone likes a comment

@@ -520,6 +520,12 @@ async function getUserRegisteredEvents(userID) {
         e."start_time" AS "Start Time",
         e."end_time" AS "End Time",
         e."event_location" AS "Location",
+        e."sub_area_id",
+        e."creation_date",
+        e."filepath",
+        e."recurring",
+        e."recurring_pattern",
+        e."validated",
         p."entry_date" AS "RegistrationDate"
       FROM "control"."participation" p
       JOIN "dynamic_content"."events" e ON p."event_id" = e."event_id"
