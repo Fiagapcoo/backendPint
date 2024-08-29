@@ -769,6 +769,31 @@ async function createUser(userData, provider) {
   }
 }
 
+
+async function getUserFullName(userId) {
+  try {
+    const userResult = await db.sequelize.query(
+      `SELECT "first_name", "last_name"
+       FROM "hr"."users"
+       WHERE "user_id" = :userId`,
+      {
+        replacements: { userId },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (userResult.length === 0) {
+      throw new Error("User not found.");
+    }
+
+    const { first_name, last_name } = userResult[0];
+    return { firstName: first_name, lastName: last_name };
+  } catch (error) {
+    console.error("Error retrieving user full name:", error.message);
+    throw error;
+  }
+}
+
 module.exports = {
   logUserAction,
   getUserPreferences,
@@ -793,4 +818,6 @@ module.exports = {
   findUserByEmail,
   updateUser,
   createUser,
+
+  getUserFullName,
 };

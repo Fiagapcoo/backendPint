@@ -7,7 +7,13 @@ const {
   spEditEvent,
   spGetParticipants,
   spGetEvent,
+  getEventCreator,
 } = require("../database/logic_objects/eventProcedures");
+
+const { sendEventRegistrationNotification } = require("../utils/realTimeNotifications");
+
+const {getUserFullName} = require("../database/logic_objects/usersProcedures");
+
 const validator = require("validator");
 const controllers = {};
 
@@ -94,6 +100,10 @@ controllers.register_user_for_event = async (req, res) => {
   console.log(req.params);
   try {
     await spRegisterUserForEvent(userId, eventId);
+    var creator_id = await getEventCreator(eventId);
+    var username = await getUserFullName(userId);
+    var fullname = username.firstName + ' ' +username.lastName;
+    sendEventRegistrationNotification(creator_id, eventId, fullname);
     res
       .status(201)
       .json({ success: true, message: "Registered for event successfully." });

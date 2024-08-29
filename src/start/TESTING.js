@@ -3,7 +3,13 @@ const insertContentForTests = async () => {
   try {
     await db.sequelize.authenticate();
 
-
+    await db.sequelize.query(`
+      INSERT INTO "hr"."users" ("user_id","first_name", "last_name", "email", "join_date", "role_id")
+      VALUES 
+      (23,'Guilhermo', 'Pedrinho', 'guilopespedrinho@gmail.com', '2024-06-22', 3),
+      (24,'Jose', 'Machado', 'josemachado74@gmail.com', '2024-06-22', 3)
+      ON CONFLICT (email) DO NOTHING;
+  `);
 
     /*
     await db.sequelize.query(`
@@ -34,3 +40,67 @@ const insertContentForTests = async () => {
 };
 
 insertContentForTests();
+
+
+
+const axios = require('axios');
+
+async function loginAndGetTokens() {
+    try {
+        const response = await axios.post('localhost:8000/api/auth/mobile_login', {
+            username: 'softshares-viseu@yopmail.com',
+            password: '123456@Softshares'
+        });
+
+        const { accessToken, refreshToken } = response.data;
+        return { accessToken, refreshToken };
+    } catch (error) {
+        console.error('Login failed:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+}
+
+async function testRoute(accessToken, route) {
+    try {
+        const response = await axios.get(`localhost:8000/api/${route}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        console.log(`Response from ${route}:`, response.data);
+    } catch (error) {
+        console.error(`Error testing route ${route}:`, error.response ? error.response.data : error.message);
+    }
+}
+
+// async function refreshAccessToken(refreshToken) {
+//     try {
+//         const response = await axios.post('https://api.example.com/refresh-token', {
+//             refreshToken
+//         });
+//         return response.data.accessToken;
+//     } catch (error) {
+//         console.error('Token refresh failed:', error.response ? error.response.data : error.message);
+//         throw error;
+//     }
+// }
+
+async function main() {
+    try {
+        let { accessToken, refreshToken } = await loginAndGetTokens();
+
+        const routesToTest = ['route1', 'route2', 'route3'];
+
+        for (let route of routesToTest) {
+            await testRoute(accessToken, route);
+
+            // Optional: Refresh the access token if needed
+            // accessToken = await refreshAccessToken(refreshToken);
+        }
+    } catch (error) {
+        console.error('Script failed:', error.message);
+    }
+}
+
+main();
+

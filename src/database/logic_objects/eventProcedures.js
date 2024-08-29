@@ -119,8 +119,8 @@ async function spEventParticipationCleanup() {
     const inactiveUsers = await db.sequelize.query(
       `SELECT ep."user_id", ep."event_id"
         FROM "control"."participation" ep
-        JOIN "hr"."users" u ON ep."user_id" = u."user_id"
-        WHERE u."is_active" = 0`,
+        JOIN "security"."user_account_details" ua ON ua."user_id" = ep."user_id"
+        WHERE ua."account_status" = false`,
       { type: QueryTypes.SELECT, transaction }
     );
 
@@ -270,6 +270,31 @@ async function spRegisterUserForEvent(userId, eventId) {
   }
 }
 
+async function getEventCreator(eventId) {
+  try {
+    const creatorResult = await db.sequelize.query(
+      `SELECT "publisher_id" AS "user_id"
+       FROM "dynamic_content"."events"
+       WHERE "event_id" = :eventId`,
+      {
+        replacements: { eventId },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (creatorResult.length === 0) {
+      throw new Error("Event not found.");
+    }
+
+    const userId = creatorResult[0].user_id;
+    return userId;
+  } catch (error) {
+    console.error("Error retrieving event creator:", error.message);
+    throw error;
+  }
+}
+
+
 //Function to Get Event State
 async function fnGetEventState(eventId) {
   const result = await db.sequelize.query(
@@ -388,4 +413,5 @@ module.exports = {
   spEditEvent,
   //spGetEvent,
   spGetParticipants,
+  getEventCreator,
 };
