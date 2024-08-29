@@ -5,16 +5,34 @@ const {findUserById} = require("../database/logic_objects/usersProcedures");
 const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
     const user = await findUserById(replyToUserId);
     if (!user || !user.fcmToken) return;
-  
+    const token = user.fcmToken
     const payload = {
       notification: {
         title: "New Reply to Your Comment",
         body: `${replierName} replied to your comment.`,
       },
-      token: user.fcmToken,
+      android: {
+        notification: {
+          channel_id: 'MESSAGE_CHANNEL',// *
+          icon: 'message_icon', // *
+          tag: 'message', // *
+          image: imageUrl,
+        },
+      },
+      apns: {
+        payload: {
+          aps: {
+            //badge,
+            sound: 'chime.caf',
+          },
+        },
+      },
       data: {
+        click_action: 'FLUTTER_NOTIFICATION_CLICK', // *
+        type: 'MESSAGE', // *
         commentId: String(commentId),
       },
+      token
     };
   
     await admin.messaging().send(payload);
@@ -24,13 +42,33 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
   const sendLikeNotification = async (commentOwnerId, likerName) => {
     const user = await findUserById(commentOwnerId);
     if (!user || !user.fcmToken) return;
-  
+    const token = user.fcmToken
     const payload = {
       notification: {
         title: "Your Comment was Liked",
         body: `${likerName} liked your comment.`,
       },
-      token: user.fcmToken,
+      android: {
+        notification: {
+          channel_id: 'MESSAGE_CHANNEL',// *
+          icon: 'message_icon', // *
+          tag: 'message', // *
+          image: imageUrl,
+        },
+      },
+      apns: {
+        payload: {
+          aps: {
+            //badge,
+            sound: 'chime.caf',
+          },
+        },
+      },
+      data: {
+        click_action: 'FLUTTER_NOTIFICATION_CLICK', // *
+        type: 'MESSAGE', // *
+      },
+      token,
     };
   
     await admin.messaging().send(payload);
@@ -40,16 +78,35 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
   const sendNewCommentNotification = async (postOwnerId, postId, contentType, commenterName) => {
     const user = await findUserById(postOwnerId);
     if (!user || !user.fcmToken) return;
-  
+    const token = user.fcmToken
     const payload = {
       notification: {
         title: "New Comment on Your Publication",
         body: `${commenterName} commented on your ${contentType}.`,
       },
-      token: user.fcmToken,
+      android: {
+        notification: {
+          channel_id: 'MESSAGE_CHANNEL',// *
+          icon: 'message_icon', // *
+          tag: 'message', // *
+          image: imageUrl,
+        },
+      },
+      apns: {
+        payload: {
+          aps: {
+            //badge,
+            sound: 'chime.caf',
+          },
+        },
+      },
       data: {
+        click_action: 'FLUTTER_NOTIFICATION_CLICK', // *
+        type: 'MESSAGE', // *
         postId: String(postId),
       },
+      token,
+      
     };
   
     await admin.messaging().send(payload);
@@ -59,16 +116,34 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
   const sendEventRegistrationNotification = async (eventOwnerId, eventId, registrantName) => {
     const user = await findUserById(eventOwnerId);
     if (!user || !user.fcmToken) return;
-  
+    const token = user.fcmToken
     const payload = {
       notification: {
         title: "New Event Registration",
         body: `${registrantName} registered for your event.`,
       },
-      token: user.fcmToken,
+      android: {
+        notification: {
+          channel_id: 'MESSAGE_CHANNEL',// *
+          icon: 'message_icon', // *
+          tag: 'message', // *
+          image: imageUrl,
+        },
+      },
+      apns: {
+        payload: {
+          aps: {
+            //badge,
+            sound: 'chime.caf',
+          },
+        },
+      },
       data: {
+        click_action: 'FLUTTER_NOTIFICATION_CLICK', // *
+        type: 'MESSAGE', // *
         eventId: String(eventId),
       },
+      token
     };
   
     await admin.messaging().send(payload);
