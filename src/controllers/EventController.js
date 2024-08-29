@@ -103,7 +103,7 @@ controllers.register_user_for_event = async (req, res) => {
     var creator_id = await getEventCreator(eventId);
     var username = await getUserFullName(userId);
     var fullname = username.firstName + ' ' +username.lastName;
-    sendEventRegistrationNotification(creator_id, eventId, fullname);
+    await sendEventRegistrationNotification(creator_id, eventId, fullname);
     res
       .status(201)
       .json({ success: true, message: "Registered for event successfully." });

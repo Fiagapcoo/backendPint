@@ -35,14 +35,14 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
   };
   
   // Function to send a notification when someone comments on a post or forum you created
-  const sendNewCommentNotification = async (postOwnerId, postId, commenterName) => {
+  const sendNewCommentNotification = async (postOwnerId, postId, contentType, commenterName) => {
     const user = await db.Users.findByPk(postOwnerId);
     if (!user || !user.fcmToken) return;
   
     const payload = {
       notification: {
-        title: "New Comment on Your Post",
-        body: `${commenterName} commented on your post.`,
+        title: "New Comment on Your Publication",
+        body: `${commenterName} commented on your ${contentType}.`,
       },
       data: {
         postId: String(postId),

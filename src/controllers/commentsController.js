@@ -7,6 +7,12 @@ const {
   likes_per_content,
   getCommentTree_forlikes,
 } = require("../database/logic_objects/commentsProcedures");
+
+const {getPostCreator} = require("../database/logic_objects/postProcedures");
+const {getForumCreator} = require("../database/logic_objects/forumProcedures");
+
+const {getUserFullName} = require("../database/logic_objects/usersProcedures");
+
 const validator = require("validator");
 const controllers = {};
 
@@ -59,20 +65,31 @@ controllers.add_comment = async (req, res) => {
       userID,
       commentText,
     });
+    var ownerID;
     if (contentType == "Post") {
-      sendCommentpostNotif({
-        post_id: contentID,
-        comment_id: id,
-        content: commentText,
-      });
+      ownerID = await getPostCreator(contentID);
+      // sendCommentpostNotif({
+      //   post_id: contentID,
+      //   comment_id: id,
+      //   content: commentText,
+      // });
     }
     if (contentType == "Forum") {
-      sendCommentforumNotif({
-        forum_id: contentID,
-        comment_id: id,
-        content: commentText,
-      });
+      ownerID = await getForumCreator(contentID);
+      // sendCommentforumNotif({
+      //   forum_id: contentID,
+      //   comment_id: id,
+      //   content: commentText,
+      // });
     }
+
+    var username = await getUserFullName(userId);
+    var fullname = username.firstName + ' ' +username.lastName;
+
+
+
+    await sendNewCommentNotification(ownerID,contentID, contentType,fullname );
+
     res
       .status(201)
       .json({ success: true, message: "Comment added successfully." });

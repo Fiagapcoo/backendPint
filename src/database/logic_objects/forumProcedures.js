@@ -206,7 +206,29 @@ async function spDeleteForum(forumId) {
     throw error;
   }
 }
+async function getForumCreator(forumId) {
+  try {
+    const creatorResult = await db.sequelize.query(
+      `SELECT "publisher_id" AS "user_id"
+       FROM "dynamic_content"."forums"
+       WHERE "forum_id" = :forumId`,
+      {
+        replacements: { forumId },
+        type: QueryTypes.SELECT,
+      }
+    );
 
+    if (creatorResult.length === 0) {
+      throw new Error("Post not found.");
+    }
+
+    const userId = creatorResult[0].user_id;
+    return userId;
+  } catch (error) {
+    console.error("Error retrieving forum creator:", error.message);
+    throw error;
+  }
+}
 // async function spGetForum(forumId) {
 //   const forum = await db.sequelize.query(
 //     `SELECT * FROM "dynamic_content"."forums" WHERE "forum_id" = :forumId`,
@@ -223,5 +245,6 @@ module.exports = {
   spEditForum,
   spChangeForumState,
   spDeleteForum,
+  getForumCreator,
   //spGetForum,
 };

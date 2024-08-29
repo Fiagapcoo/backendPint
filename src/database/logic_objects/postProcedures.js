@@ -172,6 +172,30 @@ async function spDeletePost(postId) {
   }
 }
 
+async function getPostCreator(postId) {
+  try {
+    const creatorResult = await db.sequelize.query(
+      `SELECT "publisher_id" AS "user_id"
+       FROM "dynamic_content"."posts"
+       WHERE "post_id" = :postId`,
+      {
+        replacements: { postId },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (creatorResult.length === 0) {
+      throw new Error("Post not found.");
+    }
+
+    const userId = creatorResult[0].user_id;
+    return userId;
+  } catch (error) {
+    console.error("Error retrieving post creator:", error.message);
+    throw error;
+  }
+}
+
 //   async function spGetPost(postId) {
 //     const post = await db.sequelize.query(
 //       `SELECT * FROM "dynamic_content"."posts" WHERE "post_id" = :postId`,
@@ -186,5 +210,6 @@ module.exports = {
   fnGetPostState,
   spEditPost,
   spDeletePost,
+  getPostCreator,
   //spGetPost
 };
