@@ -30,9 +30,10 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
         title: "Your Comment was Liked",
         body: `${likerName} liked your comment.`,
       },
+      token: user.fcmToken,
     };
   
-    await admin.messaging().sendToDevice(user.fcmToken, payload);
+    await admin.messaging().send(payload);
   };
   
   // Function to send a notification when someone comments on a post or forum you created
@@ -45,12 +46,13 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
         title: "New Comment on Your Publication",
         body: `${commenterName} commented on your ${contentType}.`,
       },
+      token: user.fcmToken,
       data: {
         postId: String(postId),
       },
     };
   
-    await admin.messaging().sendToDevice(user.fcmToken, payload);
+    await admin.messaging().send(payload);
   };
   
   // Function to send a notification when someone registers for an event you created
@@ -63,12 +65,13 @@ const sendReplyNotification = async (replyToUserId, commentId, replierName) => {
         title: "New Event Registration",
         body: `${registrantName} registered for your event.`,
       },
+      token: user.fcmToken,
       data: {
         eventId: String(eventId),
       },
     };
   
-    await admin.messaging().sendToDevice(user.fcmToken, payload);
+    await admin.messaging().send(payload);
   };
   
   module.exports = {
