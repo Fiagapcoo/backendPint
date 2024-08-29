@@ -11,4 +11,6 @@ router.patch('/update-category/:categoryID', validation, static_contentControlle
 router.patch('/update-sub-category/:subCategoryID', validation, static_contentController.update_sub_category);
 router.delete('/delete-category/:categoryID', validation, static_contentController.delete_category);
 router.delete('/delete-sub-category/:subCategoryID', validation, static_contentController.delete_sub_category);
+
+router.get('/get-offices', validation, static_contentController.getAllCenters);
 module.exports = router;
