@@ -7,7 +7,9 @@ controllers.getAllContent = async (req, res) => {
   try {
     // Raw query to get all posts ordered by creation_date in descending order
     const posts = await db.sequelize.query(
-      `SELECT * FROM "dynamic_content"."posts" p ORDER BY p.creation_date DESC `,
+      `SELECT * FROM "dynamic_content"."posts" p 
+LEFT JOIN "dynamic_content"."scores" sc ON p."post_id" = sc."post_id"
+ORDER BY p.creation_date DESC `,
       { type: QueryTypes.SELECT }
     );
 
@@ -207,9 +209,6 @@ controllers.getPostById = async (req, res) => {
   }
 };
 
-
-
-
 controllers.getEventById = async (req, res) => {
   const { event_id } = req.params;
   const user_id = req.user.id; // Extracted from JWT
@@ -247,7 +246,7 @@ controllers.getEventById = async (req, res) => {
       }
     );
 
-    if (!(event.length > 0))  {
+    if (!(event.length > 0)) {
       return res
         .status(404)
         .json({ success: false, message: "Event not found" });
@@ -362,7 +361,7 @@ controllers.getUserInfo = async (req, res) => {
       }
     );
 
-    if (user.length > 0){
+    if (user.length > 0) {
       res.status(200).json({ success: true, data: user[0] });
     } else {
       res.status(404).json({ success: false, message: "User not found" });
@@ -415,7 +414,9 @@ controllers.updateUserOffice = async (req, res) => {
       }
     );
     if (user.length === 0) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     // Check if the office exists
@@ -427,7 +428,9 @@ controllers.updateUserOffice = async (req, res) => {
       }
     );
     if (office.length === 0) {
-      return res.status(404).json({ success: false, message: "Office not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Office not found" });
     }
 
     // Check if the office worker record exists
@@ -438,7 +441,7 @@ controllers.updateUserOffice = async (req, res) => {
         type: QueryTypes.SELECT,
       }
     );
-    
+
     if (officeWorker.length > 0) {
       // Delete the existing office worker record
       await db.sequelize.query(
@@ -460,7 +463,9 @@ controllers.updateUserOffice = async (req, res) => {
       }
     );
 
-    res.status(200).json({ success: true, message: "User office updated successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "User office updated successfully" });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -474,12 +479,10 @@ controllers.getEventByDate = async (req, res) => {
 
   // Validate the date format (assuming YYYY-MM-DD)
   if (!validator.isISO8601(date)) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message: "Invalid date format. Please use YYYY-MM-DD.",
-      });
+    return res.status(400).json({
+      success: false,
+      message: "Invalid date format. Please use YYYY-MM-DD.",
+    });
   }
 
   try {
