@@ -225,5 +225,23 @@ controllers.get_event_answers_for_user = async (req,res) => {
       });
   }
 }
+controllers.get_event_answers_for_users = async (req,res) => {
+  const { eventID, userID } = req.params;
+  console.log(req.params);
+  try {
+    var answers = await getFormAnswersByEventAndUser(eventID, userID);
+
+    res
+      .status(201)
+      .json({ success: true, data: answers ,message: "Got answers for event successfully."});
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Error getting answers from event: " + error.message,
+      });
+  }
+}
 
 module.exports = controllers;
