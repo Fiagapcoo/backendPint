@@ -302,15 +302,15 @@ controllers.getForumById = async (req, res) => {
     const forum = await db.sequelize.query(
       `
       SELECT 
-        p.*,
-        pub."first_name" AS "PublisherFirstName",
-        pub."last_name" AS "PublisherLastName",
-        admin."first_name" AS "AdminFirstName",
-        admin."last_name" AS "AdminLastName",
-      FROM "dynamic_content"."forums" p
-      LEFT JOIN "hr"."users" pub ON p."publisher_id" = pub."user_id"
-      LEFT JOIN "hr"."users" admin ON p."admin_id" = admin."user_id"
-      WHERE p."forum_id" = :forum_id
+    p.*,
+    pub."first_name" AS "PublisherFirstName",
+    pub."last_name" AS "PublisherLastName",
+    admin."first_name" AS "AdminFirstName",
+    admin."last_name" AS "AdminLastName"
+FROM "dynamic_content"."forums" p
+LEFT JOIN "hr"."users" pub ON p."publisher_id" = pub."user_id"
+LEFT JOIN "hr"."users" admin ON p."admin_id" = admin."user_id"
+WHERE p."forum_id" = :forum_id
       `,
       {
         replacements: { forum_id },
