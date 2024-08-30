@@ -238,6 +238,58 @@ async function getForumCreator(forumId) {
 //   return forum.length ? forum[0] : null;
 // }
 
+async function checkIfForumBelongsToEvent(forumID) {
+  try {
+    const result = await db.sequelize.query(
+      `SELECT 
+          f."event_id"
+       FROM "dynamic_content"."forums" f
+       WHERE f."forum_id" = :forumID`,
+      {
+        replacements: { forumID },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (result.length === 0) {
+      throw new Error("Forum not found.");
+    }
+
+    // Check if event_id is not null, meaning the forum belongs to an event
+    const belongsToEvent = result[0].event_id !== null;
+
+    return belongsToEvent;
+  } catch (error) {
+    console.error("Error checking forum's event association:", error.message);
+    throw error;
+  }
+}
+
+async function getEventIdByForumId(forumID) {
+  try {
+    const result = await db.sequelize.query(
+      `SELECT 
+          f."event_id"
+       FROM "dynamic_content"."forums" f
+       WHERE f."forum_id" = :forumID`,
+      {
+        replacements: { forumID },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (result.length === 0) {
+      throw new Error("Forum not found.");
+    }
+
+    // Return the event_id associated with the forum
+    return result[0].event_id;
+  } catch (error) {
+    console.error("Error retrieving event ID:", error.message);
+    throw error;
+  }
+}
+
 module.exports = {
   spCreateForum,
   spCreateForumForEvent,
@@ -246,5 +298,7 @@ module.exports = {
   spChangeForumState,
   spDeleteForum,
   getForumCreator,
+  checkIfForumBelongsToEvent,
+  getEventIdByForumId,
   //spGetForum,
 };

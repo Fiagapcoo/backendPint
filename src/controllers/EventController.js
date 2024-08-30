@@ -6,11 +6,14 @@ const {
   fnGetEventState,
   spEditEvent,
   spGetParticipants,
-  spGetEvent,
+
   getEventCreator,
 } = require("../database/logic_objects/eventProcedures");
 
-const { sendEventRegistrationNotification } = require("../utils/realTimeNotifications");
+const { sendEventRegistrationNotification, 
+  sendEventAlterationNotificationForParticipants
+
+ } = require("../utils/realTimeNotifications");
 
 const {getUserFullName} = require("../database/logic_objects/usersProcedures");
 
@@ -187,6 +190,17 @@ controllers.edit_event = async (req, res) => {
       maxParticipants,
       currentParticipants
     );
+    
+    const participants = await spGetParticipants(eventId);
+    const eventName = await getEventNameById(eventId);
+    await sendEventAlterationNotificationForParticipants(
+      eventId,
+      participants,
+      eventName,
+      "Form Fields were altered"
+    );
+
+
 
     res
       .status(201)
@@ -228,6 +242,8 @@ controllers.get_participants = async (req, res) => {
       data: participants,
     });
   } catch (error) {
+    console.log(error);
+    console.log(error.message);
     res.status(500).json({
       success: false,
       message: "Error getting participants: " + error.message,

@@ -12,7 +12,11 @@ const {
 const { getPostCreator } = require("../database/logic_objects/postProcedures");
 const {
   getForumCreator,
+  checkIfForumBelongsToEvent,
+  getEventIdByForumId
 } = require("../database/logic_objects/forumProcedures");
+
+const { getEventNameById } = require("../database/logic_objects/eventProcedures");
 
 const {
   getUserFullName,
@@ -26,10 +30,10 @@ const {
 const validator = require("validator");
 const controllers = {};
 
-const {
-  sendCommentforumNotif,
-  sendCommentpostNotif,
-} = require("../websockets");
+// const {
+//   sendCommentforumNotif,
+//   sendCommentpostNotif,
+// } = require("../websockets");
 
 controllers.add_comment = async (req, res) => {
   const {
@@ -67,6 +71,7 @@ controllers.add_comment = async (req, res) => {
   }
   const userID = req.user.id; // Extracted from JWT
   //const intContID = parseInt(contentID);
+  var flag = false;
   try {
     var id = await spAddComment({
       parentCommentID,
@@ -78,25 +83,25 @@ controllers.add_comment = async (req, res) => {
     var ownerID;
     if (contentType == "Post") {
       ownerID = await getPostCreator(contentID);
-      // sendCommentpostNotif({
-      //   post_id: contentID,
-      //   comment_id: id,
-      //   content: commentText,
-      // });
     }
     if (contentType == "Forum") {
       ownerID = await getForumCreator(contentID);
-      // sendCommentforumNotif({
-      //   forum_id: contentID,
-      //   comment_id: id,
-      //   content: commentText,
-      // });
+      var belongsToEvent = await checkIfForumBelongsToEvent(contentID);
+      if(belongsToEvent){
+        flag = true;
+      }
     }
 
     var username = await getUserFullName(userID);
     var fullname = username.firstName + " " + username.lastName;
-
-    await sendNewCommentNotification(ownerID, contentID, contentType, fullname);
+    if (flag){
+      var eventID = await getEventIdByForumId(contentID);
+      const eventName = await getEventNameById(eventID);
+      const contentString = "Forum of Event: " + eventName;
+      await sendNewCommentNotification(ownerID, contentID, contentString, fullname);
+    }else {
+      await sendNewCommentNotification(ownerID, contentID, contentType, fullname);
+    }
     res
       .status(201)
       .json({ success: true, message: "Comment added successfully." });
