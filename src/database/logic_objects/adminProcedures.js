@@ -218,7 +218,7 @@ async function getActiveWarnings() {
     const results = await db.sequelize.query(
       `SELECT "warning_id", "warning_level", "description", "state", "creation_date", "admin_id", "office_id"
          FROM "control"."warnings"
-         WHERE "state" = 1`,
+         WHERE "state" = TRUE`,
       {
         type: QueryTypes.SELECT,
       }
