@@ -6,14 +6,22 @@ const {
   reportComment,
   likes_per_content,
   getCommentTree_forlikes,
+  getCommentPublisher,
 } = require("../database/logic_objects/commentsProcedures");
 
-const {getPostCreator} = require("../database/logic_objects/postProcedures");
-const {getForumCreator} = require("../database/logic_objects/forumProcedures");
+const { getPostCreator } = require("../database/logic_objects/postProcedures");
+const {
+  getForumCreator,
+} = require("../database/logic_objects/forumProcedures");
 
-const {getUserFullName} = require("../database/logic_objects/usersProcedures");
+const {
+  getUserFullName,
+} = require("../database/logic_objects/usersProcedures");
 
-const {sendNewCommentNotification} = require("../utils/realTimeNotifications");
+const {
+  sendNewCommentNotification,
+  sendLikeNotification,
+} = require("../utils/realTimeNotifications");
 
 const validator = require("validator");
 const controllers = {};
@@ -86,12 +94,9 @@ controllers.add_comment = async (req, res) => {
     }
 
     var username = await getUserFullName(userID);
-    var fullname = username.firstName + ' ' +username.lastName;
+    var fullname = username.firstName + " " + username.lastName;
 
-
-
-    await sendNewCommentNotification(ownerID,contentID, contentType,fullname );
-    //exit(-1);
+    await sendNewCommentNotification(ownerID, contentID, contentType, fullname);
     res
       .status(201)
       .json({ success: true, message: "Comment added successfully." });
@@ -142,8 +147,10 @@ controllers.like_comment = async (req, res) => {
   const userID = req.user.id; // Extracted from JWT
   try {
     const comments = await likeComment(commentID, userID);
-
-    //sendLikeNotification();
+    var username = await getUserFullName(userID);
+    var fullname = username.firstName + " " + username.lastName;
+    const commentOwnerId = await getCommentPublisher(commentID);
+    await sendLikeNotification(commentOwnerId, fullname);
 
     res.status(201).json({
       success: true,
@@ -151,6 +158,8 @@ controllers.like_comment = async (req, res) => {
       message: "Liked comment successfuly.",
     });
   } catch (error) {
+    console.log(error);
+    console.log(error.message);
     res.status(500).json({
       success: false,
       message: "Error liking comment: " + error.message,
@@ -220,6 +229,7 @@ controllers.likes_per_content = async (req, res) => {
       message: "Got comments likes succesfuly per user.",
     });
   } catch (error) {
+    
     res.status(500).json({
       success: false,
       message: "Error reporting comment: " + error.message,

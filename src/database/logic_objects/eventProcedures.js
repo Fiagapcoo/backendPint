@@ -396,13 +396,62 @@ async function spEditEvent(
 
 async function spGetParticipants(eventId) {
   const participants = await db.sequelize.query(
-    `SELECT u.user_id, u.first_name, u.last_name, u.profile_pic from "control".participation p 
+    `SELECT u.user_id from "control".participation p 
          JOIN hr.users u on p.user_id = u.user_id 
          WHERE  event_id = :eventId`,
     { replacements: { eventId }, type: QueryTypes.SELECT }
   );
 
   return participants;
+}
+
+async function getEventCreator(eventId) {
+  try {
+    const creatorResult = await db.sequelize.query(
+      `SELECT "publisher_id" AS "user_id"
+       FROM "dynamic_content"."events"
+       WHERE "event_id" = :eventId`,
+      {
+        replacements: { eventId },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (creatorResult.length === 0) {
+      throw new Error("Event not found.");
+    }
+
+    const userId = creatorResult[0].user_id;
+    return userId;
+  } catch (error) {
+    console.error("Error retrieving event creator:", error.message);
+    throw error;
+  }
+}
+
+
+async function getEventNameById(eventID) {
+  try {
+    const eventResult = await db.sequelize.query(
+      `SELECT 
+          e."name" 
+       FROM "dynamic_content"."events" e
+       WHERE e."event_id" = :eventID`,
+      {
+        replacements: { eventID },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (eventResult.length === 0) {
+      throw new Error("Event not found.");
+    }
+
+    return eventResult[0].name;
+  } catch (error) {
+    console.error("Error retrieving event name:", error.message);
+    throw error;
+  }
 }
 
 module.exports = {
@@ -415,4 +464,5 @@ module.exports = {
   //spGetEvent,
   spGetParticipants,
   getEventCreator,
+  getEventNameById,
 };

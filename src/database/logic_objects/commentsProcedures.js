@@ -385,6 +385,32 @@ async function likes_per_content(comments, user_id) {
   }
 }
 
+async function getCommentPublisher(commentID) {
+  try {
+    const publisherResult = await db.sequelize.query(
+      `
+       SELECT "publisher_id" AS "user_id"
+       FROM "communication"."comments" 
+       WHERE "comment_id" = :commentID`,
+      {
+        replacements: { commentID },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (publisherResult.length === 0) {
+      throw new Error("Comment or publisher not found.");
+    }
+
+    return publisherResult[0].user_id;
+  } catch (error) {
+    console.error("Error retrieving comment publisher:", error.message);
+    log_err(error.message);
+
+    throw error;
+  }
+}
+
 module.exports = {
   spAddComment,
   getCommentTree,
@@ -393,4 +419,5 @@ module.exports = {
   reportComment,
   likes_per_content,
   getCommentTree_forlikes,
+  getCommentPublisher,
 };
