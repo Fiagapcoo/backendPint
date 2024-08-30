@@ -6,6 +6,7 @@ const {
   fnGetEventState,
   spEditEvent,
   spGetParticipants,
+  spGetParticipants_adm,
 
   getEventCreator,
 } = require("../database/logic_objects/eventProcedures");
@@ -237,6 +238,26 @@ controllers.get_participants = async (req, res) => {
   try {
     const participants = await spGetParticipants(eventId);
     res.status(201).json({
+      success: true,
+      message: "Got participants successfully.",
+      data: participants,
+    });
+  } catch (error) {
+    console.log(error);
+    console.log(error.message);
+    res.status(500).json({
+      success: false,
+      message: "Error getting participants: " + error.message,
+    });
+  }
+};
+
+controllers.get_participants_adm = async (req, res) => {
+  const { eventId } = req.params;
+  console.log(req.params);
+  try {
+    const participants = await spGetParticipants_adm(eventId);
+    res.status(200).json({
       success: true,
       message: "Got participants successfully.",
       data: participants,
