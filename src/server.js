@@ -3,18 +3,15 @@ const cors = require('cors');
 const path = require('path');
 const logger = require('morgan');
 
-//const passport = require("./config/passport-setup"); 
-// const session = require("express-session");
 
 const app = express();
 //require('dotenv').config();
 
-// correr antes de tudo o src/syncModels
-//seguido do src/database/logic_objects/insertData
+
 
 
 //por a correr 1 vez unica
-const {server} = require('./websockets');
+//const {server} = require('./websockets');
 
 
 
@@ -55,9 +52,7 @@ app.use((req, res, next) => {
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-// app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
-// app.use(passport.initialize());
-// app.use(passport.session());
+
          
 
 //API
@@ -119,7 +114,7 @@ app.listen(app.get('port'), () => {
     //console.log(process.env.ENCRYPTION_KEY);
 });
 
-server.listen(5000, () => {
-    console.log("WebSocket server started on port 5000");
-});
+// server.listen(5000, () => {
+//     console.log("WebSocket server started on port 5000");
+// });
 

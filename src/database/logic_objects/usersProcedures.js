@@ -824,6 +824,33 @@ async function findUserById(replyToUserId) {
   }
 }
 
+async function isLastAccessNull(userID) {
+  try {
+    const result = await db.sequelize.query(
+      `SELECT 
+          u."last_access" 
+       FROM "hr"."users" u
+       WHERE u."user_id" = :userID`,
+      {
+        replacements: { userID },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (result.length === 0) {
+      throw new Error("User not found.");
+    }
+
+    // Check if last_access is null
+    const isNull = result[0].last_access === null;
+
+    return isNull;
+  } catch (error) {
+    console.error("Error checking last_access:", error.message);
+    throw error;
+  }
+}
+
 module.exports = {
   logUserAction,
   getUserPreferences,
@@ -851,4 +878,5 @@ module.exports = {
 
   getUserFullName,
   findUserById,
+  isLastAccessNull,
 };

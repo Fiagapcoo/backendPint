@@ -27,6 +27,7 @@ const {
   findUserByEmail,
   updateUser,
   createUser,
+  isLastAccessNull,
 } = require("../database/logic_objects/usersProcedures");
 
 const {
@@ -336,6 +337,15 @@ const authenticateUser = async (email, password) => {
     return { authenticated: false, message: "Invalid email or password" };
   }
   //ADD logic to check if its an admin and if the user has never logged in once, cause if not, he must change its password
+
+  var neverLogged = isLastAccessNull(user.user_id);
+  if(neverLogged){
+    return {
+      authenticated: true,
+      redirect: "/api/auth/change-password", 
+      user,
+    };
+  }
   //await updateAccessOnLogin(user.user_id);
   return { authenticated: true, user };
 };
@@ -379,6 +389,9 @@ controllers.login_web = async (req, res) => {
         .status(401)
         .json({ success: false, message: authResult.message });
     }
+    if (authResult.redirect) {
+      return res.redirect(authResult.redirect);
+    }
 
     await handleResponseBasedOnRole(authResult.user, res);
   } catch (error) {
@@ -404,6 +417,9 @@ controllers.login_mobile = async (req, res) => {
       return res
         .status(401)
         .json({ success: false, message: authResult.message });
+    }
+    if (authResult.redirect) {
+      return res.redirect(authResult.redirect);
     }
 
     const token = generateToken(authResult.user.user_id);
