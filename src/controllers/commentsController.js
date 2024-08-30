@@ -7,6 +7,7 @@ const {
   likes_per_content,
   getCommentTree_forlikes,
   getCommentPublisher,
+  deleteComment
 } = require("../database/logic_objects/commentsProcedures");
 
 const { getPostCreator } = require("../database/logic_objects/postProcedures");
@@ -241,5 +242,23 @@ controllers.likes_per_content = async (req, res) => {
     });
   }
 };
+
+controllers.delete_comment = async (req, res) => {
+  const { commentID } = req.params;
+  console.log(req.params);
+  try {
+    const comments = await deleteComment(commentID);
+    res.status(200).json({
+      success: true,
+      data: comments,
+      message: "Deleted comment successfuly.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting comment: " + error.message,
+    });
+  }
+}
 
 module.exports = controllers;

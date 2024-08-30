@@ -411,6 +411,50 @@ async function getCommentPublisher(commentID) {
   }
 }
 
+async function deleteComment(comment_id) {
+  const t = await db.sequelize.transaction();
+  try {
+    // Delete related reports first
+    await db.sequelize.query(
+      `DELETE FROM "control"."reports"
+       WHERE "comment_id" = :comment_id`,
+      {
+        replacements: { comment_id },
+        type: QueryTypes.DELETE,
+        transaction: t,
+      }
+    );
+
+    // Delete the comment
+    const result = await db.sequelize.query(
+      `DELETE FROM "communication"."comments"
+       WHERE "comment_id" = :comment_id`,
+      {
+        replacements: { comment_id },
+        type: QueryTypes.DELETE,
+        transaction: t,
+      }
+    );
+
+    if (result[1] === 0) {
+      // If no rows were affected, the comment did not exist
+      throw new Error("Comment does not exist.");
+    }
+
+    await t.commit();
+    console.log("Comment deleted successfully.");
+  } catch (error) {
+    await t.rollback();
+    console.error("Error deleting comment:", error.message);
+
+    log_err(error.message);
+
+    throw error;
+  }
+}
+
+
+
 module.exports = {
   spAddComment,
   getCommentTree,
@@ -420,4 +464,5 @@ module.exports = {
   likes_per_content,
   getCommentTree_forlikes,
   getCommentPublisher,
+  deleteComment,
 };

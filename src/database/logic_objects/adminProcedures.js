@@ -460,15 +460,15 @@ async function spValidateContent(contentID, contentType, validatorID) {
       switch (contentType) {
         case "event":
           tableName = '"dynamic_content"."events"';
-          additionalCondition = 'p."event_id"'; 
+          additionalCondition = 'p."event_id"';
           break;
         case "forum":
           tableName = '"dynamic_content"."forums"';
-          additionalCondition = 'p."forum_id"'; 
+          additionalCondition = 'p."forum_id"';
           break;
         default:
           tableName = '"dynamic_content"."posts"';
-          additionalCondition = 'p."post_id"'; 
+          additionalCondition = 'p."post_id"';
           break;
       }
 
@@ -584,7 +584,7 @@ async function spMakeWarningInactive(warningId, adminId, officeId) {
 async function getCenters() {
   try {
     const results = await db.sequelize.query(
-   `SELECT 
+      `SELECT 
     co.office_id AS officeid,
     co.city AS city,
     co."officeImage" AS officeImage,
@@ -611,8 +611,6 @@ ORDER BY
   }
 }
 
-
-
 async function updateCenter(center_id, city, officeImage) {
   const transaction = await db.sequelize.transaction();
   try {
@@ -623,10 +621,10 @@ async function updateCenter(center_id, city, officeImage) {
            "officeImage" = COALESCE(:officeImage, "officeImage")
        WHERE "office_id" = :center_id`,
       {
-        replacements: { 
-          center_id, 
-          city: city !== undefined ? city : null, 
-          officeImage: officeImage !== undefined ? officeImage : null 
+        replacements: {
+          center_id,
+          city: city !== undefined ? city : null,
+          officeImage: officeImage !== undefined ? officeImage : null,
         },
         type: QueryTypes.UPDATE,
         transaction,
@@ -641,8 +639,6 @@ async function updateCenter(center_id, city, officeImage) {
     throw error;
   }
 }
-
-
 
 //WIP
 async function makeCenterAdmin(officeId, admin) {
@@ -667,7 +663,52 @@ async function makeCenterAdmin(officeId, admin) {
   }
 }
 
+async function getReports() {
+  try {
+    const results = await db.sequelize.query(
+      `
+     SELECT 
+    cp.*, 
+    u.first_name , 
+    u.last_name, 
+    c.*,
+    f.office_id 
+FROM 
+    "control"."reports" cp
+JOIN 
+    hr.users u ON u.user_id = cp.reporter_id
+JOIN 
+    communication."comments" c ON c.comment_id = cp.comment_id
+join dynamic_content.forums f on f.forum_id = c.forum_id 
 
+
+`,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return results;
+  } catch (error) {
+    console.error("Error fetching reports:", error);
+    throw error;
+  }
+}
+
+async function deleteReport(reportID) {
+  try {
+    await db.sequelize.query(
+      `DELETE FROM "control"."reports"
+         WHERE "report_id" = :reportID`,
+      {
+        replacements: { reportID },
+        type: QueryTypes.DELETE,
+      }
+    );
+  } catch (error) {
+    console.error("Error deleting report:", error);
+    throw error;
+  }
+}
 
 module.exports = {
   getUserEngagementMetrics,
@@ -686,4 +727,6 @@ module.exports = {
   getCenters,
   updateCenter,
   makeCenterAdmin,
+  getReports,
+  deleteReport,
 };

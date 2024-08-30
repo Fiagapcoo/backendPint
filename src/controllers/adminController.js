@@ -14,6 +14,8 @@ const {
   getCenters,
   makeCenterAdmin,
   updateCenter,
+  getReports,
+  deleteReport,
 } = require("../database/logic_objects/adminProcedures");
 const {
   spSetCenterAdmin,
@@ -369,6 +371,42 @@ controllers.deactivate_user = async (req,res) => {
       .json({
         success: false,
         message: "Error deactivating user: " + error.message,
+      });
+  }
+}
+
+controllers.getReports = async (req, res) => {
+  try {
+    const results = await getReports();
+    res.status(200).json({ success: true, data: results });
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Error fetching reports: " + error.message,
+      });
+  }
+}
+controllers.deleteReport = async (req, res) => {
+  const { reportID } = req.params;
+  // Validate Inputs
+  if (!validator.isInt(reportID.toString())) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid report ID" });
+  }
+  try {
+    await deleteReport(reportID);
+    res
+      .status(200)
+      .json({ success: true, message: "Report deleted successfully." });
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Error deleting report: " + error.message,
       });
   }
 }

@@ -23,4 +23,8 @@ router.patch('/update-center/:center_id', validation, controller.updateCenter);
 router.patch('/validate-user', validation, controller.validate_user);
 router.patch('/deactivate-user', validation, controller.deactivate_user);
 
+//reports
+router.get('/get-reports', validation, controller.getReports);
+router.delete('/delete-report/:reportID', validation, controller.deleteReport);
+
 module.exports = router;
