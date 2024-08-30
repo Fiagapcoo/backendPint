@@ -396,7 +396,7 @@ async function spEditEvent(
 
 async function spGetParticipants(eventId) {
   const participants = await db.sequelize.query(
-    `SELECT u.user_id, u.first_name, u.last_name from "control".participation p 
+    `SELECT u.user_id from "control".participation p 
          JOIN hr.users u on p.user_id = u.user_id 
          WHERE  event_id = :eventId`,
     { replacements: { eventId }, type: QueryTypes.SELECT }
