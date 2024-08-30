@@ -840,11 +840,11 @@ async function isLastAccessNull(userID) {
     if (result.length === 0) {
       throw new Error("User not found.");
     }
-
+    console.log(result[0].last_access);
     // Check if last_access is null
-    const isNull = result[0].last_access === null;
+    const hasLogged = result[0].last_access ? true : false;
 
-    return isNull;
+    return hasLogged;
   } catch (error) {
     console.error("Error checking last_access:", error.message);
     throw error;

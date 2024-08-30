@@ -28,6 +28,7 @@ const {
   updateUser,
   createUser,
   isLastAccessNull,
+  getUserRole,
 } = require("../database/logic_objects/usersProcedures");
 
 const {
@@ -337,9 +338,13 @@ const authenticateUser = async (email, password) => {
     return { authenticated: false, message: "Invalid email or password" };
   }
   //ADD logic to check if its an admin and if the user has never logged in once, cause if not, he must change its password
-
-  var neverLogged = isLastAccessNull(user.user_id);
-  if(neverLogged){
+  var roleName = await getUserRole(user.user_id);
+  //const role = roleName[0].role_name
+  console.log(roleName);
+  var neverLogged = await isLastAccessNull(user.user_id);
+  console.log('user has logged?');
+  console.log(neverLogged);
+  if(!neverLogged && roleName=='CenterAdmin'){
     return {
       authenticated: true,
       redirect: "/api/auth/change-password", 
