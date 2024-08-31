@@ -5,7 +5,8 @@ const {
   spDeletePost,
   spGetPost,
 } = require("../database/logic_objects/postProcedures");
-
+const db = require("../models");
+const { QueryTypes } = require("sequelize");
 const controllers = {};
 
 controllers.create_post = async (req, res) => {
@@ -133,11 +134,9 @@ controllers.delete_post = async (req, res) => {
 
 controllers.getPostScoreByID = async (req, res) => {
   const { post_id } = req.params;
-  if (!validator.isInt(post_id)) {
-    return res.status(400).json({ success: false, message: "Invalid post ID" });
-  }
+  
   try {
-    const post = await db.sequelize.query(
+    const result = await db.sequelize.query(
       `
       SELECT 
         sc."score"
@@ -155,6 +154,8 @@ controllers.getPostScoreByID = async (req, res) => {
       res.status(404).json({ success: false, message: "Post not found" });
     }
   } catch (error) {
+    console.log(error);
+    console.log(error.message);
     res.status(500).json({
       success: false,
       message: "Error retrieving post: " + error.message,
