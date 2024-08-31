@@ -19,7 +19,48 @@ async function logUserAction(userID, type, description) {
     throw error;
   }
 }
+async function getUserPreferences(userID) {
+  try {
+    const [userPreferences] = await db.sequelize.query(
+      `SELECT 
+          "user_id", 
+          "notifications_topic", 
+          "receive_notifications", 
+          "language_id", 
+          "additional_preferences"
+       FROM "user_interactions"."user_pref"
+       WHERE "user_id" = :userID`,
+      {
+        replacements: { userID },
+        type: QueryTypes.SELECT,
+      }
+    );
 
+    if (userPreferences) {
+      // Parse JSONB fields
+      if (userPreferences.notifications_topic) {
+        userPreferences.notifications_topic = JSON.parse(
+          userPreferences.notifications_topic
+        );
+      }
+
+      if (userPreferences.additional_preferences) {
+        userPreferences.additional_preferences = JSON.parse(
+          userPreferences.additional_preferences
+        );
+      }
+
+      return userPreferences;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching user preferences:', error);
+    throw error;
+  }
+}
+
+/* @DEPRECATED
 async function getUserPreferences(userID) {
   try {
     const results = await db.sequelize.query(
@@ -53,7 +94,9 @@ async function getUserPreferences(userID) {
     throw error;
   }
 }
+  */
 
+/* @DEPRECATED
 async function updateUserPreferences(
   userID,
   preferredlanguage_id,
@@ -119,6 +162,65 @@ async function updateUserPreferences(
         userID,
         "User Preferences",
         "User changed preferences"
+      );
+    });
+  } catch (error) {
+    console.error("Error updating user preferences:", error);
+    throw error;
+  }
+}
+*/
+async function updateUserPreferences(
+  userID,
+  preferredLanguageID = null,
+  preferredAreas = null,
+  preferredSubAreas = null,
+  receiveNotifications = null,
+  notificationsTopic = null // New parameter for notifications topic
+) {
+  try {
+    await db.sequelize.transaction(async (transaction) => {
+      const updates = {};
+
+      if (preferredLanguageID !== null) {
+        updates.language_id = preferredLanguageID;
+      }
+
+      if (preferredAreas !== null) {
+        updates.areas = preferredAreas;
+      }
+
+      if (preferredSubAreas !== null) {
+        updates.sub_areas = preferredSubAreas;
+      }
+
+      if (receiveNotifications !== null) {
+        updates.receive_notifications = receiveNotifications;
+      }
+
+      if (notificationsTopic !== null) {
+        updates.notifications_topic = JSON.stringify(notificationsTopic); // Store JSONB
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await db.sequelize.query(
+          `UPDATE "user_interactions"."user_pref"
+           SET ${Object.keys(updates)
+             .map((key) => `"${key}" = :${key}`)
+             .join(", ")}
+           WHERE "user_id" = :userID`,
+          {
+            replacements: { userID, ...updates },
+            type: QueryTypes.UPDATE,
+            transaction,
+          }
+        );
+      }
+
+      await logUserAction(
+        userID,
+        "User Preferences",
+        "User updated preferences"
       );
     });
   } catch (error) {
@@ -352,6 +454,7 @@ async function updateAccStatus(userID, accountStatus) {
   }
 }
 
+/* @DEPRECATED
 async function createUserPreferences(
   userID,
   areas = null,
@@ -410,6 +513,8 @@ async function createUserPreferences(
     throw error;
   }
 }
+*/
+
 async function getUsersToValidate() {
   try {
     const results = await db.sequelize.query(
@@ -850,6 +955,66 @@ async function isLastAccessNull(userID) {
     throw error;
   }
 }
+
+
+async function createUserPreferences(
+  userID,
+  notificationsTopic = null,  // New parameter for notifications topic JSON
+  receiveNotifications = null,
+  languageID = null,
+  additionalPreferences = null
+) {
+  try {
+    await db.sequelize.transaction(async (transaction) => {
+      // Check if the user preferences already exist
+      const [results] = await db.sequelize.query(
+        `SELECT 1 FROM "user_interactions"."user_pref" WHERE "user_id" = :userID`,
+        {
+          replacements: { userID },
+          type: QueryTypes.SELECT,
+          transaction,
+        }
+      );
+
+      if (!results) {
+        // Insert the new user preferences with notifications topic JSON
+        await db.sequelize.query(
+          `INSERT INTO "user_interactions"."user_pref" (
+            "user_id", "notifications_topic", "receive_notifications", "language_id", "additional_preferences"
+          ) VALUES (
+            :userID, :notificationsTopic, :receiveNotifications, :languageID, :additionalPreferences
+          )`,
+          {
+            replacements: {
+              userID,
+              notificationsTopic: JSON.stringify(notificationsTopic),  // Ensure the JSON is stored correctly
+              receiveNotifications,
+              languageID,
+              additionalPreferences,
+            },
+            type: QueryTypes.INSERT,
+            transaction,
+          }
+        );
+
+        // Log the user action
+        await logUserAction(
+          userID,
+          "User Preferences",
+          "User Created preferences",
+          transaction
+        );
+
+      } else {
+        console.log("User preferences already exist.");
+      }
+    });
+  } catch (error) {
+    console.error("Error creating user preferences:", error);
+    throw error;
+  }
+}
+
 
 module.exports = {
   logUserAction,

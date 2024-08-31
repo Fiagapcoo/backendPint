@@ -21,23 +21,56 @@ const controllers = {};
 
 controllers.get_user_preferences = async (req, res) => {
   const { userID } = req.params;
-  console.log(req.params);
+
   try {
-    data = await getUserPreferences(userID);
-    res
-      .status(201)
-      .json({
+    const userPreferences = await getUserPreferences(userID);
+
+    if (userPreferences) {
+      res.status(200).json({
         success: true,
-        data: data,
-        message: " Got User preferences successfully.",
+        message: 'User preferences fetched successfully.',
+        data: userPreferences,
       });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User preferences not found.',
+      });
+    }
   } catch (error) {
     console.log(error);
-    console.log(error.message);
-    res.status(500).send("Error getting user preferences: " + error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching user preferences: ' + error.message,
+    });
   }
 };
 
+controllers.create_user_preferences = async (req, res) => {
+  const { userID } = req.params;
+  const {
+    notificationsTopic,  // New field to receive notifications topic as JSON
+    receiveNotifications = null,
+    languageID = null,
+    additionalPreferences = null,
+  } = req.body;
+
+  try {
+    await createUserPreferences(
+      userID,
+      notificationsTopic,  // Pass the notifications topic JSON
+      receiveNotifications,
+      languageID,
+      additionalPreferences
+    );
+    res.status(201).send("User preferences created successfully.");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error creating user preferences: " + error.message);
+  }
+};
+
+/* @DEPRECATED
 controllers.update_user_preferences = async (req, res) => {
   const { userID } = req.params;
   const {
@@ -62,6 +95,33 @@ controllers.update_user_preferences = async (req, res) => {
     res.status(500).send("Error updating user preferences: " + error.message);
   }
 };
+*/
+controllers.update_user_preferences = async (req, res) => {
+  const { userID } = req.params;
+  const {
+    preferredLanguageID = null,
+    preferredAreas = null,
+    preferredSubAreas = null,
+    receiveNotifications = null,
+    notificationsTopic = null, // Add notificationsTopic field
+  } = req.body;
+
+  try {
+    await updateUserPreferences(
+      userID,
+      preferredLanguageID,
+      preferredAreas,
+      preferredSubAreas,
+      receiveNotifications,
+      notificationsTopic // Pass notificationsTopic to the function
+    );
+    res.status(201).send("Updated User successfully.");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error updating user preferences: " + error.message);
+  }
+};
+/* @DEPRECATED
 controllers.createUserPreferences = async (req, res) => {
   const { userID } = req.params;
   const {
@@ -89,8 +149,8 @@ controllers.createUserPreferences = async (req, res) => {
     res.status(500).send("Error creating user preferences: " + error.message);
   }
 };
-
-//change this controller later as to not be a controller maybe?
+*/
+/* @DEPECRATED
 controllers.update_access_on_login = async (req, res) => {
   const { userID } = req.params;
   console.log(req.params);
@@ -105,6 +165,7 @@ controllers.update_access_on_login = async (req, res) => {
       .send("Error updating user last access on login: " + error.message);
   }
 };
+*/
 
 controllers.get_user_role = async (req, res) => {
   const { userID } = req.params;
