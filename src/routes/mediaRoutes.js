@@ -6,7 +6,7 @@ const controller = require('../controllers/mediaController.js');
 
 router.post('/create-album', validation, controller.create_album);
 router.post('/add-photo/:albumId/:publisherId', validation, controller.add_photograph);
-router.post('/add-photo-event/:eventId/:publisherId', validation, controller.add_photograph_event);
+router.post('/add-photo-event/:eventID/:publisherId', validation, controller.add_photograph_event);
 router.get('/get-albums', validation, controller.get_albums);
 router.get('/get-album-photo/:photo_id', validation, controller.get_album_photo);
 
