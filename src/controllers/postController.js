@@ -129,20 +129,38 @@ controllers.delete_post = async (req, res) => {
     });
   }
 };
-// controllers.get_post = async (req, res) => {
-//   const { postId } = req.params;
-//   console.log(req.params);
-//   try {
-//     const post = await spGetPost(postId);
-//     res
-//       .status(201)
-//       .json({ success: true, message: "Got event successfully.", data: post });
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: "Error getting event: " + error.message,
-//     });
-//   }
-// };
+
+
+controllers.getPostScoreByID = async (req, res) => {
+  const { post_id } = req.params;
+  if (!validator.isInt(post_id)) {
+    return res.status(400).json({ success: false, message: "Invalid post ID" });
+  }
+  try {
+    const post = await db.sequelize.query(
+      `
+      SELECT 
+        sc."score"
+      FROM  "dynamic_content"."scores" sc
+      WHERE sc."post_id" = :post_id
+      `,
+      {
+        replacements: { post_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+    if (result.length > 0) {
+      res.status(200).json({ success: true, score: result[0].score });
+    } else {
+      res.status(404).json({ success: false, message: "Post not found" });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving post: " + error.message,
+    });
+  }
+};
+
 
 module.exports = controllers;
