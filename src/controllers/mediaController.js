@@ -31,6 +31,21 @@ controllers.add_photograph = async (req, res) => {
         res.status(500).json({success:false, message:'Error adding photograph: ' + error.message});
     }
 };
+controllers.add_photograph_event = async (req, res) => {
+    const { eventID, publisherId } = req.params; 
+    const {filePath} = req.body;
+    console.log(req.query);
+
+    try {
+        const albumId = await getAlbumIdByEventId(eventID);
+        await spAddPhotograph(albumId, publisherId, filePath);
+        res.status(201).json({success:true, message:'Photograph added successfully to event.'});
+    } catch (error) {
+        console.log(error);
+        console.log(error.message);
+        res.status(500).json({success:false, message:'Error adding photograph to event: ' + error.message});
+    }
+};
 
 controllers.get_albums = async (req, res) => {
 
