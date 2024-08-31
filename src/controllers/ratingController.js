@@ -6,10 +6,11 @@ const controllers = {};
 
 controllers.add_evaluation = async (req, res) => { //Only "Post" and "Event" for contentType
     const { contentType, contentId } = req.params; 
-    const {criticId, evaluation } = req.body;
+    const { evaluation } = req.body;
+    const user_id = req.user.id; // Extracted from JWT
     console.log(req.query);
     try {
-        await spInsertEvaluation(contentType, contentId, criticId, evaluation);
+        await spInsertEvaluation(contentType, contentId, user_id, evaluation);
 
         //await trgUpdateAverageScore(evaluation);
 
