@@ -315,6 +315,17 @@ async function bulkInsert() {
         WHERE office_id IN (1, 2, 3, 4, 5);
     `);
 
+    await db.sequelize.query(`
+        INSERT INTO "dynamic_content"."albuns" ("area_id", "title")
+        VALUES
+        (100, 'Health'),
+        (200, 'Education'),
+        (300, 'Sports'),
+        (400, 'Gastronomy'),
+        (500, 'Housing'),
+        (600, 'Leisure'),
+        (700, 'Transportation');
+    `);
     
     
 }
