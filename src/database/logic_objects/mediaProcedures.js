@@ -53,18 +53,98 @@ async function spGetAlbums() {
 
 async function spGetAlbumPhoto(photo_id) {
   const photo = await db.sequelize.query(
-    `SELECT p.filepath, u.first_name, u.last_name 
-FROM "dynamic_content"."photographs" p
-JOIN "hr"."users" u ON u.user_id = p.publisher_id 
-WHERE p.album_id = :photo_id`,
+    ` SELECT p.filepath, u.first_name, u.last_name 
+      FROM "dynamic_content"."photographs" p
+      JOIN "hr"."users" u ON u.user_id = p.publisher_id 
+      WHERE p.album_id = :photo_id`,
     { replacements: { photo_id }, type: QueryTypes.SELECT }
   );
 
   return photo;
 }
+
+async function getAlbumIdByEventId(eventID) {
+  try {
+    const result = await db.sequelize.query(
+      `SELECT 
+          a."album_id"
+       FROM "dynamic_content"."albuns" a
+       WHERE a."event_id" = :eventID`,
+      {
+        replacements: { eventID },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (result.length === 0) {
+      throw new Error("No album found for the event.");
+    }
+
+    return result[0].album_id;
+  } catch (error) {
+    console.error("Error retrieving album ID:", error.message);
+    throw error;
+  }
+}
+
+async function getPhotosByAlbumId(albumID) {
+  try {
+    const photos = await db.sequelize.query(
+      `SELECT 
+          p."photo_id",
+          p."album_id",
+          p."publisher_id",
+          p."filepath",
+          p."upload_date"
+       FROM "dynamic_content"."photographs" p
+       WHERE p."album_id" = :albumID`,
+      {
+        replacements: { albumID },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (photos.length === 0) {
+      throw new Error("No photos found for the album.");
+    }
+
+    return photos;
+  } catch (error) {
+    console.error("Error retrieving photos for the album:", error.message);
+    throw error;
+  }
+}
+
+async function getAlbumsWithNonNullAreaId() {
+  try {
+    const albums = await db.sequelize.query(
+      `SELECT 
+          a."album_id"
+       FROM "dynamic_content"."albuns" a
+       WHERE a."area_id" IS NOT NULL`,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (albums.length === 0) {
+      throw new Error("No albums found with a non-null area_id.");
+    }
+
+    return albums.map(album => album.album_id);
+  } catch (error) {
+    console.error("Error retrieving albums with non-null area_id:", error.message);
+    throw error;
+  }
+}
+
 module.exports = {
   spCreateAlbum,
   spAddPhotograph,
   spGetAlbums,
   spGetAlbumPhoto,
+  getAlbumIdByEventId,
+  getPhotosByAlbumId,
+  getAlbumsWithNonNullAreaId,
+
 };

@@ -1,7 +1,11 @@
 const { spCreateAlbum, 
         spAddPhotograph, 
         spGetAlbums,
-        spGetAlbumPhoto} = require('../database/logic_objects/mediaProcedures');
+        spGetAlbumPhoto,
+        getAlbumIdByEventId,
+        getPhotosByAlbumId,
+
+    } = require('../database/logic_objects/mediaProcedures');
 
 const controllers = {};
 
@@ -48,5 +52,55 @@ controllers.get_album_photo = async (req, res) => {
         res.status(500).json({success:false, message:'Error fetching photograph: ' + error.message});
     }
 };
+
+controllers.get_event_photos = async (req, res) => {
+    const { eventID } = req.params; 
+    console.log(req.query);
+    try {
+        const albumID = await getAlbumIdByEventId(eventID);
+        const photos = await getPhotosByAlbumId(albumID);
+
+        res.status(200).json({success:true, message:'Photos fetched successfully.', data: photos});
+    } catch (error) {
+        console.log(error);
+        console.log(error.message);
+        res.status(500).json({success:false, message:'Error fetching photographs: ' + error.message});
+    }
+};
+
+controllers.get_albums_of_areas = async (req,res) => {
+    try{
+        const albums_ids = await getAlbumsWithNonNullAreaId();
+        // const albumsWithPhotos = {};
+
+        // for (const albumID of albums_ids) {
+        //   const photos = await getPhotosByAlbumId(albumID);
+        //   albumsWithPhotos[albumID] = photos;  // Store photos in the map with albumID as the key
+        // }
+
+        res.status(200).json({success:true, message:'Albums Ids of areas fetched successfully.', data: albums_ids});
+    }
+    catch (error) {
+        console.log(error);
+        console.log(error.message);
+        res.status(500).json({success:false, message:'Error fetching photographs: ' + error.message});
+    }
+}
+
+controllers.get_photos_of_areas_albums = async (req,res) => {
+    try {
+        const { albumID } = req.params; 
+
+        const photos = await getPhotosByAlbumId(albumID);
+
+        res.status(200).json({success:true, message:'Photos fetched successfully.', data: photos});
+    }
+    catch (error) {
+        console.log(error);
+        console.log(error.message);
+        res.status(500).json({success:false, message:'Error fetching photographs: ' + error.message});
+    }
+}
+
 
 module.exports = controllers;

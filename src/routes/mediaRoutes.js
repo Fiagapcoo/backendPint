@@ -8,4 +8,8 @@ router.post('/create-album', validation, controller.create_album);
 router.post('/add-photo/:albumId/:publisherId', validation, controller.add_photograph);
 router.get('/get-albums', validation, controller.get_albums);
 router.get('/get-album-photo/:photo_id', validation, controller.get_album_photo);
+
+router.get('/get-album/:eventID', validation, controller.get_event_photos);
+router.get('/get-areas-albums_IDS', validation, controller.get_albums_of_areas);
+router.get('/get-area-photos/:albumID', validation, controller.get_photos_of_areas_albums);
 module.exports = router;
