@@ -49,7 +49,8 @@ async function spCreatePost(
     const postId = result[0].post_id; // Extracting post_id from result
     //console.log('aaaaaaaaaaaaaaaaaaadasdasdasdasdasd' );
 
-    if (type === "P" && rating != null) {
+    if ( //type === "P" && 
+      rating != null) {
       await db.sequelize.query(
         `INSERT INTO "dynamic_content"."ratings" 
                 ( "event_id", "post_id", "critic_id", "evaluation", "evaluation_date")
