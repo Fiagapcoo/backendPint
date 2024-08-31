@@ -215,21 +215,21 @@ async function bulkInsert() {
         (4, 10)
         ON CONFLICT ("office_id", "user_id") DO NOTHING;  
     `);
-    await db.sequelize.query(`
-        INSERT INTO "user_interactions"."user_pref" ("user_id", "areas", "sub_areas", "receive_notifications", "language_id")
-        VALUES
-        (1, '[100,200]', '[1001,2001]', true, 1),
-        (2, '[300,400]', '[3001,4001]', true, 2),
-        (3, '[500,600]', '[5001,6001]', false, 3),
-        (4, '[700,400]', '[7001,2001]', true, 1),
-        (5, '[500,100]', '[2001,4001]', false, 1),
-        (6, '[100,300]', '[1001,3001]', true, 1),
-        (7, '[200,400]', '[2001,4001]', false, 2),
-        (8, '[500,200]', '[5001,7001]', true, 2),
-        (9, '[600,100]', '[6001,3001]', false, 3),
-        (10, '[500,100]', '[2001,1001]', true, 3)
-        ON CONFLICT ("user_id") DO NOTHING; 
-    `);
+    // await db.sequelize.query(`
+    //     INSERT INTO "user_interactions"."user_pref" ("user_id", "areas", "sub_areas", "receive_notifications", "language_id")
+    //     VALUES
+    //     (1, '[100,200]', '[1001,2001]', true, 1),
+    //     (2, '[300,400]', '[3001,4001]', true, 2),
+    //     (3, '[500,600]', '[5001,6001]', false, 3),
+    //     (4, '[700,400]', '[7001,2001]', true, 1),
+    //     (5, '[500,100]', '[2001,4001]', false, 1),
+    //     (6, '[100,300]', '[1001,3001]', true, 1),
+    //     (7, '[200,400]', '[2001,4001]', false, 2),
+    //     (8, '[500,200]', '[5001,7001]', true, 2),
+    //     (9, '[600,100]', '[6001,3001]', false, 3),
+    //     (10, '[500,100]', '[2001,1001]', true, 3)
+    //     ON CONFLICT ("user_id") DO NOTHING; 
+    // `);
     await db.sequelize.query(`
         INSERT INTO "dynamic_content"."posts" ("sub_area_id", "office_id", "publisher_id", "title", "content", "p_location","creation_date", "validated")
         VALUES
