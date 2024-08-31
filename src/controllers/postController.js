@@ -149,7 +149,7 @@ controllers.getPostScoreByID = async (req, res) => {
       }
     );
     if (result.length > 0) {
-      res.status(200).json({ success: true, score: result[0].score });
+      res.status(200).json({ success: true, data: result[0].score });
     } else {
       res.status(404).json({ success: false, message: "Post not found" });
     }
