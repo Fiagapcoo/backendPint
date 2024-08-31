@@ -16,13 +16,18 @@ const {
   updateCenter,
   getReports,
   deleteReport,
+  getAllWarnings,
+  createWarnings,
+  updateWarnings,
 } = require("../database/logic_objects/adminProcedures");
 const {
   spSetCenterAdmin,
   spDeactivateUser,
   spActivateUser,
 } = require("../database/logic_objects/securityProcedures");
-const {spEventParticipationCleanup} = require("../database/logic_objects/eventProcedures");
+const {
+  spEventParticipationCleanup,
+} = require("../database/logic_objects/eventProcedures");
 const controllers = {};
 
 controllers.validate_content = async (req, res) => {
@@ -52,12 +57,10 @@ controllers.validate_content = async (req, res) => {
       .status(201)
       .json({ success: true, message: "Content validated successfully." });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error validating content: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error validating content: " + error.message,
+    });
   }
 };
 
@@ -87,12 +90,10 @@ controllers.reject_content = async (req, res) => {
       .status(201)
       .json({ success: true, message: "Content rejected successfully." });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error rejecting content: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error rejecting content: " + error.message,
+    });
   }
 };
 
@@ -102,12 +103,10 @@ controllers.getUserEngagementMetrics = async (req, res) => {
     const results = await getUserEngagementMetrics();
     res.status(200).json({ success: true, data: results });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error fetching user engagement metrics: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching user engagement metrics: " + error.message,
+    });
   }
 };
 
@@ -124,13 +123,11 @@ controllers.getContentValidationStatusByadmin = async (req, res) => {
     const results = await getContentValidationStatusByadmin(adminID);
     res.status(200).json({ success: true, data: results });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message:
-          "Error fetching content validation status by admin: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message:
+        "Error fetching content validation status by admin: " + error.message,
+    });
   }
 };
 
@@ -140,12 +137,10 @@ controllers.getContentValidationStatus = async (req, res) => {
     const results = await getContentValidationStatus();
     res.status(200).json({ success: true, data: results });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error fetching content validation status: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching content validation status: " + error.message,
+    });
   }
 };
 
@@ -155,12 +150,10 @@ controllers.getActiveDiscussions = async (req, res) => {
     const results = await getActiveDiscussions();
     res.status(200).json({ success: true, data: results });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error fetching active discussions: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching active discussions: " + error.message,
+    });
   }
 };
 // Get active warnings
@@ -169,12 +162,22 @@ controllers.getActiveWarnings = async (req, res) => {
     const results = await getActiveWarnings();
     res.status(200).json({ success: true, data: results });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error fetching active warnings: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching active warnings: " + error.message,
+    });
+  }
+};
+
+controllers.getAllWarnings = async (req, res) => {
+  try {
+    const results = await getAllWarnings();
+    res.status(200).json({ success: true, data: results });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching active warnings: " + error.message,
+    });
   }
 };
 
@@ -191,13 +194,11 @@ controllers.getContentCenterToBeValidated = async (req, res) => {
     const results = await getContentCenterToBeValidated(center_id);
     res.status(200).json({ success: true, data: results });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message:
-          "Error fetching content center to be validated: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message:
+        "Error fetching content center to be validated: " + error.message,
+    });
   }
 };
 
@@ -226,12 +227,10 @@ controllers.createCenter = async (req, res) => {
       .status(201)
       .json({ success: true, message: "Center created successfully." });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error creating center: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error creating center: " + error.message,
+    });
   }
 };
 
@@ -250,12 +249,10 @@ controllers.deleteCenter = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Center deleted successfully." });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error deleting center: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error deleting center: " + error.message,
+    });
   }
 };
 
@@ -264,12 +261,10 @@ controllers.getCenters = async (req, res) => {
     const results = await getCenters();
     res.status(200).json({ success: true, data: results });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error fetching centers: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching centers: " + error.message,
+    });
   }
 };
 
@@ -281,12 +276,10 @@ controllers.makeCenterAdmin = async (req, res) => {
     const results = await spSetCenterAdmin(office_id, admin_id);
     res.status(200).json({ success: true, data: results });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error setting admin: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error setting admin: " + error.message,
+    });
   }
 };
 
@@ -306,24 +299,18 @@ controllers.updateCenter = async (req, res) => {
       .status(201)
       .json({ success: true, message: "Center updated successfully." });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error updating center: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error updating center: " + error.message,
+    });
   }
 };
 
-
-
-controllers.validate_user = async (req,res) => {
+controllers.validate_user = async (req, res) => {
   const { user_id } = req.body;
   // Validate inputs
   if (!validator.isInt(user_id.toString())) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid User ID" });
+    return res.status(400).json({ success: false, message: "Invalid User ID" });
   }
   if (validator.isEmpty(user_id.toString())) {
     return res
@@ -337,23 +324,19 @@ controllers.validate_user = async (req,res) => {
       .status(201)
       .json({ success: true, message: "User validated successfully." });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error validating user: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error validating user: " + error.message,
+    });
   }
-}
-controllers.deactivate_user = async (req,res) => {
+};
+controllers.deactivate_user = async (req, res) => {
   const { user_id } = req.body;
   // Validate inputs
   if (!validator.isInt(user_id.toString())) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid User ID" });
+    return res.status(400).json({ success: false, message: "Invalid User ID" });
   }
-  if (validator.isEmpty(user_id.toString()) ){
+  if (validator.isEmpty(user_id.toString())) {
     return res
       .status(400)
       .json({ success: false, message: "User ID is required" });
@@ -366,28 +349,24 @@ controllers.deactivate_user = async (req,res) => {
       .status(201)
       .json({ success: true, message: "User deactivated successfully." });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error deactivating user: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error deactivating user: " + error.message,
+    });
   }
-}
+};
 
 controllers.getReports = async (req, res) => {
   try {
     const results = await getReports();
     res.status(200).json({ success: true, data: results });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error fetching reports: " + error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching reports: " + error.message,
+    });
   }
-}
+};
 controllers.deleteReport = async (req, res) => {
   const { reportID } = req.params;
   // Validate Inputs
@@ -402,14 +381,80 @@ controllers.deleteReport = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Report deleted successfully." });
   } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting report: " + error.message,
+    });
+  }
+};
+
+
+controllers.createWarnings = async (req, res) => {
+  const {warning_level, description, admin_id, office_id} = req.body;
+  // Validate inputs
+  // if (!validator.isInt(warning_level.toString())) {
+  //   return res
+  //     .status(400)
+  //     .json({ success: false, message: "Invalid warning level" });
+  // }
+  // if (validator.isEmpty(description)) {
+  //   return res
+  //     .status(400)
+  //     .json({ success: false, message: "Description is required" });
+  // }
+  // if (!validator.isBoolean(state)) {
+  //   return res
+  //     .status(400)
+  //     .json({ success: false, message: "Invalid state" });
+  // }
+
+  // if (!validator.isInt(admin_id.toString())) {
+  //   return res
+  //     .status(400)
+  //     .json({ success: false, message: "Invalid admin ID" });
+  // }
+
+  // if (!validator.isInt(office_id.toString())) {
+  //   return res
+  //     .status(400)
+  //     .json({ success: false, message: "Invalid office ID" });
+  // }
+
+  try {
+    await createWarnings(warning_level, description, true, admin_id, office_id);
     res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error deleting report: " + error.message,
-      });
+      .status(201)
+      .json({ success: true, message: "Warning created successfully." });
+  }
+  catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error creating warning: " + error.message,
+    });
+  }
+
+};
+
+controllers.updateWarning = async (req, res) => {
+
+  const { warning_id } = req.params;
+  console.log(`Warning ID: ${warning_id}`);
+  
+  const { warning_level, description, state } = req.body;
+  console.log(`Received data - Warning Level: ${warning_level}, Description: ${description}, State: ${state}`);
+  
+  
+  try{
+   await updateWarnings(warning_id, warning_level, description, state);
+    res
+      .status(201)
+      .json({ success: true, message: "Warning updated successfully." });
+  }catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error updating warning: " + error.message,
+    });
   }
 }
-
 
 module.exports = controllers;

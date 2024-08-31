@@ -230,6 +230,25 @@ async function getActiveWarnings() {
   }
 }
 
+
+
+async function getAllWarnings() {
+  try {
+    const results = await db.sequelize.query(
+      `SELECT "warning_id", "warning_level", "description", "state", "creation_date", "admin_id", "office_id"
+         FROM "control"."warnings"
+         `,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return results;
+  } catch (error) {
+    console.error("Error fetching active warnings:", error);
+    throw error;
+  }
+}
+
 async function getContentCenterToBeValidated(center_id) {
   try {
     const results = await db.sequelize.query(
@@ -710,6 +729,46 @@ async function deleteReport(reportID) {
   }
 }
 
+async function createWarnings(warning_level, description, state, admin_id, office_id) {
+  try {
+    const results = await db.sequelize.query(
+      `INSERT INTO "control"."warnings" ("warning_level", "description", "state", "creation_date", "admin_id", "office_id")
+         VALUES (:warning_level, :description, :state, CURRENT_TIMESTAMP, :admin_id, :office_id)
+         RETURNING "warning_id"`,
+      {
+        replacements: { warning_level, description, state, admin_id, office_id },
+        type: QueryTypes.INSERT,
+      }
+    );
+    return results;
+  } catch (error) {
+    console.error("Error creating warning:", error);
+    throw error;
+  }
+};
+
+async function updateWarnings(warning_id, warning_level =  null, description = null, state = null) {
+  try {
+    const results = await db.sequelize.query(
+      `UPDATE "control"."warnings"
+         SET "warning_level" = COALESCE(:warning_level, "warning_level"),
+             "description" = COALESCE(:description, "description"),
+             "state" = COALESCE(:state, "state")
+         WHERE "warning_id" = :warning_id`,
+      {
+        replacements: { warning_id, warning_level, description, state },
+        type: QueryTypes.UPDATE,
+      }
+    );
+    return results;
+  } catch (error) {
+    console.error("Error updating warning:", error);
+    throw error;
+  }
+}
+
+
+
 module.exports = {
   getUserEngagementMetrics,
   getContentValidationStatusByadmin,
@@ -729,4 +788,7 @@ module.exports = {
   makeCenterAdmin,
   getReports,
   deleteReport,
+  getAllWarnings,
+  createWarnings,
+  updateWarnings,
 };

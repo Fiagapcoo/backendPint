@@ -11,7 +11,10 @@ router.get('/user-engagement-metrics', validation, controller.getUserEngagementM
 router.get('/content-validation-status/admin/:adminID', validation, controller.getContentValidationStatusByadmin);
 router.get('/content-validation-status', validation,  controller.getContentValidationStatus);
 router.get('/active-discussions', validation, controller.getActiveDiscussions);
+router.post('/create-warnings', validation, controller.createWarnings);
 router.get('/active-warnings', validation, controller.getActiveWarnings);
+router.get('/get-all-warnings', validation, controller.getAllWarnings);
+router.patch('/update-warning/:warning_id', validation, controller.updateWarning);
 router.get('/content-center-to-be-validated/:center_id', validation, controller.getContentCenterToBeValidated);
 router.post('/create-center', validation, controller.createCenter);
 router.delete('/delete-center/:center_id', validation, controller.deleteCenter);
