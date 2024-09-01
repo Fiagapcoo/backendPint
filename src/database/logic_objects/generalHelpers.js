@@ -49,31 +49,95 @@ async function spInsertEvaluation(
 ) {
   const transaction = await db.sequelize.transaction();
   try {
-    const validContentTypes = ["Post", "Event"];
+    const validContentTypes = ["post", "event"];
     if (!validContentTypes.includes(contentType)) {
       throw new Error(
-        'Invalid ContentType. Only "Post" and "Event" are allowed.'
+        'Invalid ContentType. Only "post" and "event" are allowed.'
       );
     }
 
-    const table = contentType === "Post" ? "posts" : "events";
+    const contentIdColumn = contentType === "post" ? "post_id" : "event_id";
 
-    await db.sequelize.query(
-      `INSERT INTO "dynamic_content"."ratings" ("${table}_id", "critic_id", "evaluation_date", "evaluation")
-        VALUES (:contentId, :criticId, CURRENT_TIMESTAMP, :evaluation)`,
+    // Check if an evaluation already exists
+    const [existingEvaluation] = await db.sequelize.query(
+      `SELECT 1 FROM "dynamic_content"."ratings"
+       WHERE "${contentIdColumn}" = :contentId AND "critic_id" = :criticId`,
       {
-        replacements: { contentId, criticId, evaluation },
-        type: QueryTypes.INSERT,
+        replacements: { contentId, criticId },
+        type: QueryTypes.SELECT,
         transaction,
       }
     );
 
+    if (existingEvaluation) {
+      // If an evaluation exists, update it
+      await db.sequelize.query(
+        `UPDATE "dynamic_content"."ratings"
+         SET "evaluation" = :evaluation, "evaluation_date" = CURRENT_TIMESTAMP
+         WHERE "${contentIdColumn}" = :contentId AND "critic_id" = :criticId`,
+        {
+          replacements: { contentId, criticId, evaluation },
+          type: QueryTypes.UPDATE,
+          transaction,
+        }
+      );
+    } else {
+      // If no evaluation exists, insert a new one
+      await db.sequelize.query(
+        `INSERT INTO "dynamic_content"."ratings" ("${contentIdColumn}", "critic_id", "evaluation_date", "evaluation")
+         VALUES (:contentId, :criticId, CURRENT_TIMESTAMP, :evaluation)`,
+        {
+          replacements: { contentId, criticId, evaluation },
+          type: QueryTypes.INSERT,
+          transaction,
+        }
+      );
+    }
+
     await transaction.commit();
   } catch (error) {
+    console.error("Error inserting or updating evaluation:", error.message);
     await transaction.rollback();
     throw error;
   }
 }
+
+// async function spInsertEvaluation(
+//   contentType,
+//   contentId,
+//   criticId,
+//   evaluation
+// ) {
+//   const transaction = await db.sequelize.transaction();
+//   try {
+//     const validContentTypes = ["post", "event"];
+//     if (!validContentTypes.includes(contentType)) {
+//       throw new Error(
+//         'Invalid ContentType. Only "post" and "event" are allowed.'
+//       );
+//     }
+
+//     const table = contentType === "post" ? "post" : "event";
+
+//     await db.sequelize.query(
+//       `INSERT INTO "dynamic_content"."ratings" ("${table}_id", "critic_id", "evaluation_date", "evaluation")
+//         VALUES (:contentId, :criticId, CURRENT_TIMESTAMP, :evaluation)`,
+//       {
+//         replacements: { contentId, criticId, evaluation },
+//         type: QueryTypes.INSERT,
+//         transaction,
+//       }
+//     );
+
+//     await transaction.commit();
+//   } catch (error) {
+//     console.log('HEHEHEHEHEHHEHEHERHEHREHRERHERHERHERHEREHRHREREHREREHREHREREREREHREHREHREREHREREHRHERHERHERHERHERHERHEHREHREHREHRHEERHEHRE');
+//       console.log(error);
+//       console.log(error.message);
+//     await transaction.rollback();
+//     throw error;
+//   }
+// }
 
 //Function to Calculate New Average Rating
 // async function fnReverseRating(avgRating, numOfRatings, newRating) {
