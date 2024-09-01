@@ -7,7 +7,8 @@ const {
   likes_per_content,
   getCommentTree_forlikes,
   getCommentPublisher,
-  deleteComment
+  deleteComment,
+  likes_per_user,
 } = require("../database/logic_objects/commentsProcedures");
 
 const { getPostCreator } = require("../database/logic_objects/postProcedures");
@@ -257,6 +258,32 @@ controllers.delete_comment = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error deleting comment: " + error.message,
+    });
+  }
+}
+
+controllers.likes_per_user = async (req, res) => {
+  const { userID } = req.params;
+  console.log(req.params);
+
+  // Validate inputs
+  if (!validator.isInt(userID.toString())) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid user ID" });
+  }
+
+  try {
+    const comments = await likes_per_user(userID);
+    res.status(200).json({
+      success: true,
+      data: comments,
+      message: "Got likes per user successfuly.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error getting likes per user: " + error.message,
     });
   }
 }

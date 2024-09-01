@@ -453,6 +453,28 @@ async function deleteComment(comment_id) {
   }
 }
 
+async function likes_per_user(userID) {
+  try {
+    const results = await db.sequelize.query(
+      `
+      SELECT 
+        "comment_id"
+      FROM "communication"."likes"
+      WHERE "publisher_id" = :userID
+      `,
+      {
+        replacements: { userID },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return results;
+  } catch (error) {
+    console.error("Error fetching likes per user:", error);
+    throw error;
+  }
+  
+}
+
 
 
 module.exports = {
@@ -465,4 +487,5 @@ module.exports = {
   getCommentTree_forlikes,
   getCommentPublisher,
   deleteComment,
+  likes_per_user,
 };
