@@ -8,10 +8,10 @@ const authController = require("../controllers/authController");
 //const passport = require("../config/passport-setup");
 
 router.post("/register", authController.register);
-router.post("/setup-password", validation_noenc, authController.setupPassword);
+router.post("/setup-password", validation, authController.setupPassword);
 router.patch(
   "/change-password",
-  validation_noenc,
+  validation,
   authController.updatePassword
 );
 router.post("/login", authController.login_web);
@@ -29,7 +29,7 @@ router.post("/change-password", validation, authController.updatePassword);
 router.post("request-password-reset", authController.resetPassword);
 
 
-router.patch("/store-fcm-token", authController.updateFcmToken);
+router.patch("/store-fcm-token", validation ,authController.updateFcmToken);
 
 /*
 // Google Auth
