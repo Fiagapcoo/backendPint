@@ -75,8 +75,23 @@ const generateToken = (id) => {
   console.log('token gerado: ' + token);   
   return encrypt(token);
 };
+const generateTokenAccountCreation_resetpasword = (id) => {
+  console.log(process.env.JWT_TOKEN_EXPIRATION);
 
+  const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn:  1300});
 
+  console.log('token account creation gerado: ' + token);   
+  return encrypt(token);
+};
+
+const generateTokenFor1stLog = (id) => {
+  console.log(process.env.JWT_TOKEN_EXPIRATION);
+
+  const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn:  '30m'});
+
+  console.log('token 1st login gerado: ' + token);   
+  return encrypt(token);
+};
 
 const generateRefreshToken = (id) => {
   const token = jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
@@ -121,7 +136,8 @@ module.exports = {
   generateRefreshToken,
   verifyToken,
   verifyRefreshToken,
-
+  generateTokenFor1stLog,
+  generateTokenAccountCreation_resetpasword,
 };
 
 

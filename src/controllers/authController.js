@@ -10,6 +10,8 @@ const {
   generateToken,
   generateRefreshToken,
   verifyRefreshToken,
+  generateTokenFor1stLog,
+  generateTokenAccountCreation_resetpasword
 } = require("../utils/tokenUtils");
 
 const {
@@ -38,6 +40,8 @@ const {
   sp_findUserByEmail,
   spChangeUserPassword,
 } = require("../database/logic_objects/securityProcedures");
+
+
 
 const controllers = {};
 
@@ -82,15 +86,13 @@ controllers.register = async (req, res) => {
     console.log("user:", user);
 
     // Assegure que 'user' seja um objeto simples
-    if (Array.isArray(user) && user.length > 0) {
-      const userPayload = {
-        id: user[0].user_id, // Acesse o primeiro elemento do array
-      };
+    // if (Array.isArray(user) && user.length > 0) {
+    //   const userPayload = {
+    //     id: user[0].user_id, // Acesse o primeiro elemento do array
+    //   };
       console.log("userPayload:", userPayload);
 
-      const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
-        expiresIn: 1300,
-      });
+      const token = generateTokenAccountCreation_resetpasword(user[0].user_id);
       //await sp_insertUserAccDetails(user[0].user_id);
       const random_sub_url = mashupAndRandomize(email, firstName, lastName);
 
@@ -104,8 +106,8 @@ controllers.register = async (req, res) => {
         body: `
           <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px;">
             <h2 style="text-align: center; color: #00c2ff;">Set Up Your New Password</h2>
-            <p>Hello,</p>
-            <p>We received a request to reset your password. Please click the button below to set up your new password:</p>
+            <p>Hello, dear ${user.name}</p>
+            <p>We received a request to create an account. Please click the button below to set up your new password:</p>
             <div style="text-align: center; margin: 20px 0;">
               <a href="${url}" style="background-color: #00c2ff; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;">Set Up New Password</a>
             </div>
@@ -120,7 +122,7 @@ controllers.register = async (req, res) => {
         message:
           "User registered successfully. Please check your email to set up your password.",
       });
-    }
+    //}
   } catch (error) {
     console.error("CONSOLE LOG REGISTER:", error);
     res
@@ -128,59 +130,7 @@ controllers.register = async (req, res) => {
       .json({ success: false, message: "Internal server error: " + error });
   }
 };
-//TODO ALTER - nao enviar email, dar set the password aqui.
-// so server admin pode usar
-controllers.register_admin = async (req, res) => {
-  const { email, firstName, lastName, centerId } = req.body;
-  console.log("req.body:", req.body);
 
-  const validationResult = validateInput_register(email, firstName, lastName);
-  if (!validationResult.valid) {
-    return res
-      .status(400)
-      .json({ success: false, message: validationResult.message });
-  }
-
-  try {
-    const user = await spRegisterNewUser(firstName, lastName, email, centerId);
-
-    console.log("user:", user);
-
-    // makes sure user is a simple object
-    if (Array.isArray(user) && user.length > 0) {
-      const userPayload = {
-        id: user[0].user_id, // access 1st elemnt of arrat
-      };
-      console.log("userPayload:", userPayload);
-
-      const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
-        expiresIn: 1300, //1300 sec
-      });
-      //await sp_insertUserAccDetails(user[0].user_id);
-      const random_sub_url = mashupAndRandomize(email, firstName, lastName);
-      const url = `${process.env.CLIENT_URL}/setup-password/${random_sub_url}?token=${token}`;
-      console.log("url:", url);
-      console.log("user:", user);
-
-      // await sendMail({
-      //   to: email,
-      //   subject: "Set up your new password",
-      //   body: `Link: ${url}`,
-      // });
-
-      res.status(201).json({
-        success: true,
-        message:
-          "User registered successfully. Please check your email to set up your password.",
-      });
-    }
-  } catch (error) {
-    console.error("CONSOLE LOG REGISTER:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Internal server error: " + error });
-  }
-};
 
 controllers.setupPassword = async (req, res) => {
   const { password } = req.body;
@@ -201,7 +151,13 @@ controllers.setupPassword = async (req, res) => {
     await sendMail({
       to: user.email,
       subject: "Password Setup Successful",
-      body: "Your password has been set up successfully.",
+      body: `Dear ${user.name},
+      
+              Your password has been set up successfully.
+
+              Thank you,
+                The Softinsa Team
+              `,
     });
 
     await logUserAction(
@@ -238,7 +194,12 @@ controllers.updatePassword = async (req, res) => {
     await sendMail({
       to: user.email,
       subject: "Password Updated Successful",
-      body: "Your password has been Updated successfully.",
+      body: ` Dear ${user.name},
+      
+              Your password has been Updated successfully.
+              
+              Thank you,
+                The Softinsa Team`,
     });
 
     res
@@ -263,14 +224,12 @@ controllers.resetPassword = async (req, res) => {
     } else {
       console.log("User found:", user);
       // Assegure que 'user' seja um objeto simples
-      if (Array.isArray(user) && user.length > 0) {
-        const userPayload = {
-          id: user[0].user_id, // Acesse o primeiro elemento do array
-        };
-      }
-      const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
-        expiresIn: 1300, //1300 sec
-      });
+      // if (Array.isArray(user) && user.length > 0) {
+      //   const userPayload = {
+      //     id: user[0].user_id, // Acesse o primeiro elemento do array
+      //   };
+      // }
+      const token = generateTokenAccountCreation_resetpasword(user[0].user_id);
       const random_sub_url = crypto.randomBytes(32).toString("hex");
       const url = `${process.env.CLIENT_URL}/change-password/${random_sub_url}?token=${token}`;
       console.log("url:", url);
@@ -279,7 +238,21 @@ controllers.resetPassword = async (req, res) => {
       await sendMail({
         to: email,
         subject: "Reset your password",
-        body: `Please use the following link to reset your password:  ${url}`,
+        body: `Dear ${user.name},
+
+                We received a request to reset the password for your account. Please use the following link to reset your password:
+
+                ${url}
+
+                If you are accessing this request via our mobile app, please copy and paste the following token when prompted:
+
+                Token: ${token}
+
+                If you did not request a password reset, please notify your administrator or supervisor immediately and forward this email to them for further investigation.
+
+                Thank you,
+                The Softinsa Team
+    `,
       });
 
       return res.status(201).json({
@@ -337,7 +310,7 @@ const authenticateUser = async (email, password) => {
   if (!isMatch) {
     return { authenticated: false, message: "Invalid email or password" };
   }
-  //ADD logic to check if its an admin and if the user has never logged in once, cause if not, he must change its password
+  // logic to check if its an admin and if the user has never logged in once, cause if not, he must change its password
   var roleName = await getUserRole(user.user_id);
   //const role = roleName[0].role_name
   console.log(roleName);
@@ -345,9 +318,13 @@ const authenticateUser = async (email, password) => {
   console.log('user has logged?');
   console.log(neverLogged);
   if(!neverLogged && roleName=='CenterAdmin'){
+    
+    const token = generateTokenFor1stLog(user.user_id);
+    const redirectUrl = `/api/auth/change-password?token=${token}`;
+
     return {
       authenticated: true,
-      redirect: "/api/auth/change-password", 
+      redirect: redirectUrl, 
       user,
     };
   }
