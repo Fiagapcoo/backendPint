@@ -603,21 +603,21 @@ async function spMakeWarningInactive(warningId, adminId, officeId) {
 async function getCenters() {
   try {
     const results = await db.sequelize.query(
-      `SELECT 
-    co.office_id AS officeid,
-    co.city AS city,
-    co."officeImage" AS officeImage,
-    array_agg(u.first_name || ' ' || u.last_name) AS name
-FROM 
-    "centers"."offices" co
-LEFT JOIN 
-    "centers"."office_admins" oa ON co.office_id = oa.office_id
-LEFT JOIN 
-    "hr"."users" u ON oa.manager_id = u.user_id
-GROUP BY 
-    co.office_id, co.city, co."officeImage"
-ORDER BY 
-    co.office_id;
+      ` SELECT 
+            co.office_id AS officeid,
+            co.city AS city,
+            co."officeImage" AS officeImage,
+            array_agg(u.first_name || ' ' || u.last_name) AS name
+        FROM 
+            "centers"."offices" co
+        LEFT JOIN 
+            "centers"."office_admins" oa ON co.office_id = oa.office_id
+        LEFT JOIN 
+            "hr"."users" u ON oa.manager_id = u.user_id
+        GROUP BY 
+            co.office_id, co.city, co."officeImage"
+        ORDER BY 
+            co.office_id;
 `,
       {
         type: QueryTypes.SELECT,
@@ -686,19 +686,19 @@ async function getReports() {
   try {
     const results = await db.sequelize.query(
       `
-     SELECT 
-    cp.*, 
-    u.first_name , 
-    u.last_name, 
-    c.*,
-    f.office_id 
-FROM 
-    "control"."reports" cp
-JOIN 
-    hr.users u ON u.user_id = cp.reporter_id
-JOIN 
-    communication."comments" c ON c.comment_id = cp.comment_id
-join dynamic_content.forums f on f.forum_id = c.forum_id 
+      SELECT 
+          cp.*, 
+          u.first_name , 
+          u.last_name, 
+          c.*,
+          f.office_id 
+      FROM 
+          "control"."reports" cp
+      JOIN 
+          hr.users u ON u.user_id = cp.reporter_id
+      JOIN 
+          communication."comments" c ON c.comment_id = cp.comment_id
+      join dynamic_content.forums f on f.forum_id = c.forum_id 
 
 
 `,
@@ -767,6 +767,31 @@ async function updateWarnings(warning_id, warning_level =  null, description = n
   }
 }
 
+async function getCityNameByOfficeId(officeId) {
+  try {
+    const result = await db.sequelize.query(
+      `
+      SELECT city
+      FROM "centers"."offices"
+      WHERE office_id = :officeId
+      `,
+      {
+        replacements: { officeId },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (result.length > 0) {
+      return result[0].city;
+    } else {
+      throw new Error('Office not found');
+    }
+  } catch (error) {
+    console.error('Error fetching city name:', error.message);
+    throw error;
+  }
+}
+
 
 
 module.exports = {
@@ -791,4 +816,5 @@ module.exports = {
   getAllWarnings,
   createWarnings,
   updateWarnings,
+  getCityNameByOfficeId
 };

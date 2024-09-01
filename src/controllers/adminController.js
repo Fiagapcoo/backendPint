@@ -19,6 +19,7 @@ const {
   getAllWarnings,
   createWarnings,
   updateWarnings,
+  getCityNameByOfficeId
 } = require("../database/logic_objects/adminProcedures");
 const {
   spSetCenterAdmin,
@@ -28,6 +29,8 @@ const {
 const {
   spEventParticipationCleanup,
 } = require("../database/logic_objects/eventProcedures");
+
+const { getUserRole } = require("../database/logic_objects/usersProcedures");
 const controllers = {};
 
 controllers.validate_content = async (req, res) => {
@@ -353,6 +356,50 @@ controllers.deactivate_user = async (req, res) => {
       success: false,
       message: "Error deactivating user: " + error.message,
     });
+  }
+};
+
+
+controllers.register_admin = async (req, res) => {
+  const { email, firstName, lastName, centerId } = req.body;
+  console.log("req.body:", req.body);
+
+  const validationResult = validateInput_register(email, firstName, lastName);
+  if (!validationResult.valid) {
+    return res
+      .status(400)
+      .json({ success: false, message: validationResult.message });
+  }
+
+  const user_role = getUserRole(user.user_id);
+  if ( user_role != 'ServerAdmin' ){
+    return res
+      .status(404) //could be a 404 for unforbidden but we dont want to let it know of this possibility to outsiders
+      .json({ success: false});
+  }
+  try {
+    const user = await spRegisterNewUser(firstName, lastName, email, centerId);
+    
+    console.log("user:", user);
+    const id = user[0].user_id
+    const city_name = await getCityNameByOfficeId(centerId);
+    const passwd = '123456@Softshares-' + city_name;
+    await spCreatePassword(id,passwd);
+    await spActivateUser(id);
+    await spSetCenterAdmin(id, centerId);
+
+      res.status(201).json({
+        success: true,
+        message:
+          "Admin created successfully.",
+      });
+   // }
+  } catch (error) {
+    console.error("CREATING ADMIN:", error);
+    console.log(error.message);
+    res
+      .status(500)
+      .json({ success: false, message: "Internal server error: " + error });
   }
 };
 

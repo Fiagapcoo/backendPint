@@ -26,6 +26,9 @@ router.patch('/update-center/:center_id', validation, controller.updateCenter);
 router.patch('/validate-user', validation, controller.validate_user);
 router.patch('/deactivate-user', validation, controller.deactivate_user);
 
+//create center admin
+router.post('/create-center-admin', validation, controller.register_admin);
+
 //reports
 router.get('/get-reports', validation, controller.getReports);
 router.delete('/delete-report/:reportID', validation, controller.deleteReport);
