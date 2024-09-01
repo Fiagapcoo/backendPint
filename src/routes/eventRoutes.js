@@ -12,4 +12,6 @@ router.delete('/unregister-user/:userId/event/:eventId', validation, controller.
 router.get('/state/:eventId', validation, controller.get_event_state);
 router.patch('/edit/:eventId', validation, controller.edit_event); 
 //router.get('/get/:eventId', validation, controller.get_event);
+
+router.get('/get-event-score/:event_id', validation, controller.getEventScoreByID);
 module.exports = router;

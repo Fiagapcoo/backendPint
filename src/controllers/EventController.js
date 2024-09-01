@@ -1,3 +1,6 @@
+const db = require("../models");
+const { QueryTypes } = require("sequelize");
+
 const {
   spCreateEvent,
   spEventParticipationCleanup,
@@ -10,6 +13,8 @@ const {
 
   getEventCreator,
 } = require("../database/logic_objects/eventProcedures");
+
+
 
 const { sendEventRegistrationNotification, 
   sendEventAlterationNotificationForParticipants
@@ -272,4 +277,35 @@ controllers.get_participants_adm = async (req, res) => {
   }
 };
 
+
+controllers.getEventScoreByID = async (req, res) => {
+  const { event_id } = req.params;
+  
+  try {
+    const result = await db.sequelize.query(
+      `
+      SELECT 
+        sc."score"
+      FROM  "dynamic_content"."scores" sc
+      WHERE sc."event_id" = :event_id
+      `,
+      {
+        replacements: { event_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+    if (result.length > 0) {
+      res.status(200).json({ success: true, data: result[0].score });
+    } else {
+      res.status(404).json({ success: false, message: "Event not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    console.log(error.message);
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving Event: " + error.message,
+    });
+  }
+};
 module.exports = controllers;
