@@ -30,6 +30,7 @@ const {
 const {
   sendNewCommentNotification,
   sendLikeNotification,
+  sendNewCommentNotificationForEventsParticipants
 } = require("../utils/realTimeNotifications");
 
 const validator = require("validator");
