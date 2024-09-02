@@ -165,6 +165,9 @@ controllers.setupPassword = async (req, res) => {
       "PASSWORD CREATED",
       "Created user account password"
     );
+
+   // await sp_updateLastAccess(userId);
+
     res
       .status(200)
       .json({ success: true, message: "Password set up successfully." });
@@ -201,7 +204,7 @@ controllers.updatePassword = async (req, res) => {
               Thank you,
                 The Softinsa Team`,
     });
-
+    await sp_updateLastAccess(userId);
     res
       .status(200)
       .json({ success: true, message: "Password changed successfully." });
