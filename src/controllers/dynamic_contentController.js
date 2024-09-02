@@ -146,9 +146,10 @@ controllers.getEventsByCity = async (req, res) => {
   try {
     const events = await db.sequelize.query(
       `
-            SELECT e.*, o.city
+            SELECT e.*, o.city, s.score
             FROM "dynamic_content"."events" e
             JOIN "centers"."offices" o ON e.office_id = o.office_id
+            JOIN "dynamic_content"."scores" s ON e.event_id = s.event_id
             WHERE o.office_id = :city_id AND e.validated=true
             ORDER BY e.creation_date DESC
         `,
@@ -497,10 +498,11 @@ controllers.getEventByDate = async (req, res) => {
 
     const events = await db.sequelize.query(
       `
-      SELECT * FROM "dynamic_content"."events"
-      WHERE "event_date" >= :startDate
-      AND "event_date" < :endDate
-      ORDER BY "creation_date" DESC
+      SELECT * FROM "dynamic_content"."events" e, s.score
+      JOIN "dynamic_content"."scores" s ON e.event_id = s.event_id
+      WHERE e."event_date" >= :startDate
+      AND e."event_date" < :endDate
+      ORDER BY e."creation_date" DESC
       `,
       {
         replacements: {
@@ -568,8 +570,9 @@ controllers.getEvents = async (req, res) => {
   try {
     const events = await db.sequelize.query(
       `
-            SELECT e.*
+            SELECT e.*, s.score
             FROM "dynamic_content"."events" e
+            JOIN "dynamic_content"."scores" s ON e.event_id = s.event_id
             ORDER BY e.creation_date DESC
         `,
       {
