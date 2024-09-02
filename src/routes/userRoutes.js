@@ -9,8 +9,10 @@ router.get('/get-bookmarks/:userID', validation, controller.get_user_bookmarks);
 router.delete('/remove-bookmark/:userID/:contentType/:contentID', validation, controller.remove_bookmark);
 
 //PREFERENCES ROUTES
-router.patch('/update-user-preferences/:userID', validation, controller.update_user_preferences);
-router.post('/create-user-preferences/:userID', validation, controller.create_user_preferences);
+router.patch('/update-user-preferences', validation, controller.update_user_preferences);
+router.post('/create-user-preferences', validation, controller.create_user_preferences);
+router.patch('/update-user-preferences/:userID', validation, controller.update_user_preferences_id);
+router.post('/create-user-preferences/:userID', validation, controller.create_user_preferences_id);
 router.get('/get-user-preferences/', validation, controller.get_user_preferences);
 
 router.get('/get-user-role/:userID', validation, controller.get_user_role);

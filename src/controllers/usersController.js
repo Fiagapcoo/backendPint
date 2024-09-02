@@ -20,10 +20,10 @@ const validator = require("validator");
 const controllers = {};
 
 controllers.get_user_preferences = async (req, res) => {
-  const { userID } = req.params;
-
+  //const { userID } = req.params;
+  const user_id = req.user.id; // Extracted from JWT
   try {
-    const userPreferences = await getUserPreferences(userID);
+    const userPreferences = await getUserPreferences(user_id);
 
     if (userPreferences) {
       res.status(200).json({
@@ -47,6 +47,30 @@ controllers.get_user_preferences = async (req, res) => {
 };
 
 controllers.create_user_preferences = async (req, res) => {
+  //const { userID } = req.params;
+  const user_id = req.user.id; // Extracted from JWT
+  const {
+    notificationsTopic,  // New field to receive notifications topic as JSON
+    receiveNotifications = null,
+    languageID = null,
+    additionalPreferences = null,
+  } = req.body;
+
+  try {
+    await createUserPreferences(
+      user_id,
+      notificationsTopic,  // Pass the notifications topic JSON
+      receiveNotifications,
+      languageID,
+      additionalPreferences
+    );
+    res.status(201).send("User preferences created successfully.");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error creating user preferences: " + error.message);
+  }
+};
+controllers.create_user_preferences_id = async (req, res) => {
   const { userID } = req.params;
   const {
     notificationsTopic,  // New field to receive notifications topic as JSON
@@ -97,6 +121,28 @@ controllers.update_user_preferences = async (req, res) => {
 };
 */
 controllers.update_user_preferences = async (req, res) => {
+  //const { userID } = req.params;
+  const user_id = req.user.id; // Extracted from JWT
+  const {
+    preferredLanguageID = null,
+    receiveNotifications = null,
+    preferences = null
+  } = req.body;
+  
+  try {
+    await updateUserPreferences(
+      user_id,
+      preferredLanguageID,
+      receiveNotifications,
+      preferences
+    );
+    res.status(201).send("Updated User successfully.");
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send("Error updating user preferences: " + error.message);
+  }
+};
+controllers.update_user_preferences_id = async (req, res) => {
   const { userID } = req.params;
   const {
     preferredLanguageID = null,
