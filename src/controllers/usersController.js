@@ -1,6 +1,7 @@
 const {
   getUserPreferences,
   updateUserPreferences,
+  updateUserPreferencesv2,
   updateAccessOnLogin,
   createUserPreferencesv2,
   getUserRole,
@@ -129,10 +130,10 @@ controllers.update_user_preferences = async (req, res) => {
   } = req.body;
   
   try {
-    await updateUserPreferences(
+    await updateUserPreferencesv2(
       user_id,
-      preferredLanguageID,
-      receiveNotifications,
+      // preferredLanguageID,
+      // receiveNotifications,
       preferences
     );
     res.status(201).send("Updated User successfully.");

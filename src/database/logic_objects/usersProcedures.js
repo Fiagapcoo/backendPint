@@ -147,18 +147,19 @@ async function getUserPreferences(userID) {
     );
 
     if (userPreferences) {
+      // console.log(userPreferences);
       // Parse JSONB fields
-      if (userPreferences.notifications_topic) {
-        userPreferences.notifications_topic = JSON.parse(
-          userPreferences.notifications_topic
-        );
-      }
+      // if (userPreferences.notifications_topic) {
+      //   userPreferences.notifications_topic = JSON.parse(
+      //     userPreferences.notifications_topic
+      //   );
+      // }
 
-      if (userPreferences.additional_preferences) {
-        userPreferences.additional_preferences = JSON.parse(
-          userPreferences.additional_preferences
-        );
-      }
+      // if (userPreferences.additional_preferences) {
+      //   userPreferences.additional_preferences = JSON.parse(
+      //     userPreferences.additional_preferences
+      //   );
+      // }
 
       return userPreferences;
     } else {
@@ -385,6 +386,54 @@ async function updateUserPreferences(
         );
       }
 
+      await logUserAction(
+        userID,
+        "User Preferences",
+        "User changed preferences"
+      );
+    });
+  } catch (error) {
+    console.error("Error updating user preferences:", error);
+    throw error;
+  }
+}
+async function updateUserPreferencesv2(
+  userID,
+  notificationsTopic
+) {
+  try {
+    await db.sequelize.transaction(async (transaction) => {
+      if (preferredlanguage_id !== null) {
+        await db.sequelize.query(
+          `UPDATE "user_interactions"."user_pref"
+            SET "language_id" = :preferredlanguage_id
+            WHERE "user_id" = :userID`,
+          {
+            replacements: { userID, preferredlanguage_id },
+            type: QueryTypes.UPDATE,
+            transaction,
+          }
+        );
+      }
+
+
+        await db.sequelize.query(
+          `INSERT INTO "user_interactions"."user_pref" (
+            "user_id", "notifications_topic"
+          ) VALUES (
+            :userID, :notificationsTopic
+          )`,
+          {
+            replacements: {
+              userID,
+              notificationsTopic,
+            },
+            type: QueryTypes.INSERT,
+            transaction,
+          }
+        );
+
+    
       await logUserAction(
         userID,
         "User Preferences",
@@ -1218,4 +1267,5 @@ module.exports = {
   createUserPreferences,
   createUserPreferencesv2,
   updateUserPreferences,
+  updateUserPreferencesv2
 };
