@@ -320,8 +320,11 @@ const authenticateUser = async (email, password) => {
   if(!neverLogged && roleName=='CenterAdmin'){
     
     const token = generateTokenFor1stLog(user.user_id);
-    const redirectUrl = `/api/auth/change-password?token=${token}`;
-
+    console.log('encr ypted 1st token');
+    const stringtoken = JSON.stringify(token);
+    console.log(typeof stringtoken);
+    const redirectUrl = `/api/auth/change-password?token=${encodeURIComponent(stringtoken)}`;
+    console.log(`redirect url: ${redirectUrl}`);
     return {
       authenticated: true,
       redirect: redirectUrl, 
