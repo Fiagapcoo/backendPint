@@ -1,7 +1,7 @@
 //const { admin } = require('../server');
 var admin = require("firebase-admin");
 const serviceAccount = require("../../softshares-000515-firebase-adminsdk-ds8og-d6087d42e3.json");
-const getEventCreator = require("../database/logic_objects/eventProcedures");
+const {getEventCreator} = require("../database/logic_objects/eventProcedures");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
