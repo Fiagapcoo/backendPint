@@ -83,6 +83,7 @@ controllers.create_event = async (req, res) => {
       data: eventId,
     });
   } catch (error) {
+    console.log(error);
     //exit(-1);
     res.status(500).json({
       success: false,

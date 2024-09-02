@@ -8,7 +8,14 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         schema: 'dynamic_content',
         tableName: 'scores',
-        timestamps: false
+        timestamps: false,
+        indexes: [
+            {
+                unique: true,
+                fields: ['event_id', 'post_id'],
+                name: 'unique_event_post'
+            }
+        ]
     });
 
     Scores.associate = function(models) {

@@ -40,8 +40,8 @@ const createTriggerFunction_trg_moderate_event_content = async () => {
                     -- VALUES (pid, eid, CURRENT_TIMESTAMP);
 
                     RAISE NOTICE 'Inserting score for the new event';
-                    INSERT INTO dynamic_content.scores(event_id, score)
-                    VALUES (eid, 0);
+                    --INSERT INTO dynamic_content.scores(event_id, score)
+                    --VALUES (eid, 0);
 
                     --C
                 END IF;
