@@ -135,4 +135,19 @@ controllers.get_photos_of_areas_albums = async (req,res) => {
 }
 
 
+controllers.getter_area_album_id = async (req, res) => {
+    const { area_id } = req.params; 
+    console.log(req.query);
+
+    try {
+        const albumId = await getAlbumOfAreaID(area_id);
+       
+        res.status(201).json({success:true, message:'Fetched Album Id for given area ID.', data: albumId});
+    } catch (error) {
+        console.log(error);
+        console.log(error.message);
+        res.status(500).json({success:false, message:'Error fetching album id: ' + error.message});
+    }
+};
+
 module.exports = controllers;
