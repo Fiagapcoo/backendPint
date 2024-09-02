@@ -204,9 +204,9 @@ controllers.updatePassword = async (req, res) => {
 
     res
       .status(200)
-      .json({ success: true, message: "Password set up successfully." });
+      .json({ success: true, message: "Password changed successfully." });
   } catch (error) {
-    console.error("Error setting up password:", error);
+    console.error("Error changing password:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
