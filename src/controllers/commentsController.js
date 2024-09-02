@@ -15,10 +15,13 @@ const { getPostCreator } = require("../database/logic_objects/postProcedures");
 const {
   getForumCreator,
   checkIfForumBelongsToEvent,
-  getEventIdByForumId
+  getEventIdByForumId,
 } = require("../database/logic_objects/forumProcedures");
 
-const { getEventNameById } = require("../database/logic_objects/eventProcedures");
+const {
+  getEventNameById,
+  spGetParticipants
+} = require("../database/logic_objects/eventProcedures");
 
 const {
   getUserFullName,
@@ -89,20 +92,38 @@ controllers.add_comment = async (req, res) => {
     if (contentType == "Forum") {
       ownerID = await getForumCreator(contentID);
       var belongsToEvent = await checkIfForumBelongsToEvent(contentID);
-      if(belongsToEvent){
+      if (belongsToEvent) {
         flag = true;
       }
     }
 
     var username = await getUserFullName(userID);
-    var fullname = username.firstName + " " + username.lastName;
-    if (flag){
+    var fullname =
+      username.firstName.toString() + " " + username.lastName.toString();
+    if (flag) {
       var eventID = await getEventIdByForumId(contentID);
       const eventName = await getEventNameById(eventID);
       const contentString = "Forum of Event: " + eventName;
-      await sendNewCommentNotification(ownerID, contentID, contentString, fullname);
-    }else {
-      await sendNewCommentNotification(ownerID, contentID, contentType, fullname);
+      const eventparticipants = await spGetParticipants(eventID);
+
+      // Remove the owner ID from the participants list
+      const filteredParticipants = eventparticipants.filter(
+        participant => participant.user_id !== ownerID
+      );
+      
+      await sendNewCommentNotificationForEventsParticipants(
+        contentID,
+        filteredParticipants,
+        fullname,
+        eventName
+      );
+    } else {
+      await sendNewCommentNotification(
+        ownerID,
+        contentID,
+        contentType,
+        fullname
+      );
     }
     res
       .status(201)
@@ -236,7 +257,6 @@ controllers.likes_per_content = async (req, res) => {
       message: "Got comments likes succesfuly per user.",
     });
   } catch (error) {
-    
     res.status(500).json({
       success: false,
       message: "Error reporting comment: " + error.message,
@@ -260,7 +280,7 @@ controllers.delete_comment = async (req, res) => {
       message: "Error deleting comment: " + error.message,
     });
   }
-}
+};
 
 controllers.likes_per_user = async (req, res) => {
   const { userID } = req.params;
@@ -268,9 +288,7 @@ controllers.likes_per_user = async (req, res) => {
 
   // Validate inputs
   if (!validator.isInt(userID.toString())) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid user ID" });
+    return res.status(400).json({ success: false, message: "Invalid user ID" });
   }
 
   try {
@@ -286,6 +304,6 @@ controllers.likes_per_user = async (req, res) => {
       message: "Error getting likes per user: " + error.message,
     });
   }
-}
+};
 
 module.exports = controllers;
