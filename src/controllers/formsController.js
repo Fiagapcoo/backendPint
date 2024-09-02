@@ -22,6 +22,7 @@ const { getUserFullName } = require("../database/logic_objects/usersProcedures")
 
 const {
   sendEventAlterationNotificationForParticipants,
+  sendEventRegistrationNotification
 } = require("../utils/realTimeNotifications");
 
 const controllers = {};

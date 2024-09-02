@@ -427,6 +427,49 @@ const sendEventRegistrationNotification = async (
   console.log("sending notification");
   await admin.messaging().send(payload);
 };
+const sendEventUnregistrationNotification = async (
+  eventOwnerId,
+  eventId,
+  registrantName
+) => {
+  const user = await findUserById(eventOwnerId);
+  if (!user || !user.fcmToken) {
+    console.log("fcmToken is null");
+    return;
+  }
+  const fcmtoken = user.fcmToken;
+  const payload = {
+    notification: {
+      title: "Event Registration",
+      body: `${registrantName} unregistered for your event.`,
+    },
+    android: {
+      priority: "high",
+      notification: {
+        channel_id: "MESSAGE_CHANNEL", // *
+        icon: "message_icon", // *
+        tag: "message", // *
+        // image: imageUrl,
+      },
+    },
+    apns: {
+      payload: {
+        aps: {
+          //badge,
+          sound: "chime.caf",
+        },
+      },
+    },
+    data: {
+      click_action: "FLUTTER_NOTIFICATION_CLICK", // *
+      type: "MESSAGE", // *
+      eventId: String(eventId),
+    },
+    token: fcmtoken,
+  };
+  console.log("sending notification");
+  await admin.messaging().send(payload);
+};
 
 // Function to send a notification to everyone subscribed to a specific topic
 /*
@@ -517,6 +560,7 @@ module.exports = {
   sendNewCommentNotification,
 
   sendEventRegistrationNotification,
+  sendEventUnregistrationNotification,
 
   sendNewCommentNotificationForEventsParticipants,
   sendEventAlterationNotificationForParticipants,

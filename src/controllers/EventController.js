@@ -17,8 +17,8 @@ const {
 
 
 const { sendEventRegistrationNotification, 
-  sendEventAlterationNotificationForParticipants
-
+  sendEventAlterationNotificationForParticipants,
+  sendEventUnregistrationNotification
  } = require("../utils/realTimeNotifications");
 
 const {getUserFullName} = require("../database/logic_objects/usersProcedures");
@@ -134,6 +134,10 @@ controllers.unregister_user_from_event = async (req, res) => {
   console.log(req.params);
   try {
     await spUnregisterUserFromEvent(userId, eventId);
+    var creator_id = await getEventCreator(eventId);
+    var username = await getUserFullName(userId);
+    var fullname = username.firstName + ' ' +username.lastName;
+    await sendEventUnregistrationNotification(creator_id, eventId, fullname);
     res.status(201).json({
       success: true,
       message: "Unregistered from event successfully.",
