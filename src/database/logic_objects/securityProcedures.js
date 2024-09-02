@@ -41,14 +41,14 @@ const spCreatePassword = async (userId, Password) => {
 
     const user = await sp_findUserById(userId);
 
-    // await db.sequelize.query(
-    //   `INSERT INTO "security"."user_passwords_dictionary" ("user_id", "hashed_passwd", "salt")
-    //     VALUES (:userId, :hashedPassword, :salt)`,
-    //     {
-    //       replacements: { userId, hashedPassword, salt },
-    //       type: QueryTypes.INSERT
-    //     }
-    //   );
+    await db.sequelize.query(
+      `INSERT INTO "security"."user_passwords_dictionary" ("user_id", "hashed_password")
+        VALUES (:userId, :hashedPassword)`,
+        {
+          replacements: { userId, hashedPassword },
+          type: QueryTypes.INSERT
+        }
+      );
 
     await sendMail({
       to: user.email,
@@ -191,7 +191,7 @@ const spChangeUserPassword = async (userId, newPassword) => {
   try {
       // Retrieve previous salts
       const previousPasswords = await db.sequelize.query(
-          `SELECT hashed_passwd, salt FROM "security"."user_passwords_dictionary"
+          `SELECT hashed_password FROM "security"."user_passwords_dictionary"
            WHERE "user_id" = :userId`,
           {
               replacements: { userId },
@@ -204,13 +204,13 @@ const spChangeUserPassword = async (userId, newPassword) => {
 
       // Check if the new password is the same as any previous hashed passwords
       for (const prev of previousPasswords) {
-        const isMatch = await bcrypt.compare(newPassword, prev.hashed_passwd);
+        const isMatch = await bcrypt.compare(newPassword, prev.hashed_password);
         if (isMatch) {
             throw new Error('The new password must not be the same as any previously used passwords.');
         }
       }
 
-      const hashedPassword = await bcrypt.hash(Password, 12);
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
 
 
       // Update the current password table
@@ -223,20 +223,21 @@ const spChangeUserPassword = async (userId, newPassword) => {
       );
       // INSERT NEW PASSWD INTO THE DIC
       await db.sequelize.query(
-        `INSERT INTO "security"."user_passwords_dictionary" ("user_id", "hashed_password", "salt")
-          VALUES (:userId, :hashedPassword, :salt)`,
+        `INSERT INTO "security"."user_passwords_dictionary" ("user_id", "hashed_password")
+          VALUES (:userId, :hashedPassword)`,
           {
-            replacements: { userId, hashedPassword, salt },
+            replacements: { userId, hashedPassword },
             type: QueryTypes.INSERT
           }
         );
 
-      // Send email notification
-      await sendMail({
-          to: user.email,  // assuming user email is available
-          subject: 'SOFTSHARES - Account Action - Password Changes',
-          body: 'This email serves as a notification for successful account password modification. If you did not take this action, please inform your security team right away!'
-      });
+
+      // // Send email notification
+      // await sendMail({
+      //     to: user.email,  // assuming user email is available
+      //     subject: 'SOFTSHARES - Account Action - Password Changes',
+      //     body: 'This email serves as a notification for successful account password modification. If you did not take this action, please inform your security team right away!'
+      // });
 
       // Log the user action
       await logUserAction(userId, 'PASSWORD CHANGE', 'Changed account password', transaction);

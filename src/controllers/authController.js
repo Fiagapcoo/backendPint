@@ -177,7 +177,7 @@ controllers.setupPassword = async (req, res) => {
 // TODO to test
 controllers.updatePassword = async (req, res) => {
   const { password } = req.body;
-
+  
   if (!validator.isStrongPassword(password)) {
     return res
       .status(400)

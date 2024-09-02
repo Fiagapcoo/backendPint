@@ -6,9 +6,9 @@ const addMonths = (date, months) => {
 
 module.exports = (sequelize, DataTypes) => {
     const UserPasswordsDictionary = sequelize.define('UserPasswordsDictionary', {
-        user_id: { type: DataTypes.INTEGER, primaryKey: true },
-        hashed_passwd: { type: DataTypes.STRING(255), allowNull: false },
-        salt: { type: DataTypes.STRING(255), allowNull: false },
+        user_id: { type: DataTypes.INTEGER},
+        hashed_password: { type: DataTypes.STRING(255), allowNull: false },
+       // salt: { type: DataTypes.STRING(255), allowNull: true },
         valid_from: { type: DataTypes.DATE, allowNull: true, defaultValue: new Date() },
         valid_to: { type: DataTypes.DATE, allowNull:true, defaultValue: addMonths(new Date(), 6)}
     }, {
