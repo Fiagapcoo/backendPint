@@ -2,6 +2,7 @@ const {
   getUserPreferences,
   updateUserPreferences,
   updateAccessOnLogin,
+  createUserPreferencesv2,
   getUserRole,
   addBookmark,
   removeBookmark,
@@ -50,19 +51,17 @@ controllers.create_user_preferences = async (req, res) => {
   //const { userID } = req.params;
   const user_id = req.user.id; // Extracted from JWT
   const {
-    notificationsTopic,  // New field to receive notifications topic as JSON
+    notificationsTopic,  
     receiveNotifications = null,
     languageID = null,
     additionalPreferences = null,
   } = req.body;
-
+  console.log('inside notifications topic');
+  console.log(notificationsTopic);
   try {
-    await createUserPreferences(
+    await createUserPreferencesv2(
       user_id,
-      notificationsTopic,  // Pass the notifications topic JSON
-      receiveNotifications,
-      languageID,
-      additionalPreferences
+      notificationsTopic
     );
     res.status(201).send("User preferences created successfully.");
   } catch (error) {

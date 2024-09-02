@@ -24,9 +24,11 @@ async function createUserPreferences(
   userID,
   preferredLanguageID = null,
   receiveNotifications = null,
-  preferences = null
+  preferences 
 ) {
   try {
+    console.log('inside create preferences');
+  console.log(preferences);
     await db.sequelize.transaction(async (transaction) => {
       // Check if the user preferences already exist
       const [results] = await db.sequelize.query(
@@ -39,7 +41,7 @@ async function createUserPreferences(
       );
 
       if (!results) {
-        // Insert the new user preferences
+       
         await db.sequelize.query(
           `INSERT INTO "user_interactions"."user_pref" (
             "user_id", "language_id", "receive_notifications", "notifications_topic"
@@ -51,12 +53,64 @@ async function createUserPreferences(
               userID,
               preferredLanguageID,
               receiveNotifications,
-              preferences,
+              preferences: JSON.stringify(preferences),
             },
             type: QueryTypes.INSERT,
             transaction,
           }
         );
+
+        // Log the user action
+        await logUserAction(
+          userID,
+          "User Preferences",
+          "User Created preferences"
+        );
+
+      } else {
+        console.log("User preferences already exist.");
+      }
+    });
+  } catch (error) {
+    console.error("Error creating user preferences:", error);
+    throw error;
+  }
+}
+async function createUserPreferencesv2(
+  userID,
+  notificationsTopic 
+) {
+  try {
+    console.log('inside create preferences');
+  console.log(notificationsTopic);
+    await db.sequelize.transaction(async (transaction) => {
+      // Check if the user preferences already exist
+      const [results] = await db.sequelize.query(
+        `SELECT 1 FROM "user_interactions"."user_pref" WHERE "user_id" = :userID`,
+        {
+          replacements: { userID },
+          type: QueryTypes.SELECT,
+          transaction,
+        }
+      );
+
+      if (!results) {
+        await db.sequelize.query(
+          `INSERT INTO "user_interactions"."user_pref" (
+            "user_id", "notifications_topic"
+          ) VALUES (
+            :userID, :notificationsTopic
+          )`,
+          {
+            replacements: {
+              userID,
+              notificationsTopic,
+            },
+            type: QueryTypes.INSERT,
+            transaction,
+          }
+        );
+       
 
         // Log the user action
         await logUserAction(
@@ -1134,8 +1188,7 @@ async function __createUserPreferences(
 
 module.exports = {
   logUserAction,
-  getUserPreferences,
-  updateUserPreferences,
+  
   updateAccessOnLogin,
   getUserRole,
   getUserByRole,
@@ -1145,7 +1198,7 @@ module.exports = {
   sp_verifyUser,
   sp_updateLastAccess,
   updateAccStatus,
-  createUserPreferences,
+  
   getUsersToValidate,
   updateProfile,
   updateUserPassword,
@@ -1160,4 +1213,9 @@ module.exports = {
   getUserFullName,
   findUserById,
   isLastAccessNull,
+
+  getUserPreferences,
+  createUserPreferences,
+  createUserPreferencesv2,
+  updateUserPreferences,
 };
