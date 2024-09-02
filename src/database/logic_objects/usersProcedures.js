@@ -745,9 +745,11 @@ async function getUserRegisteredEvents(userID) {
         e."recurring",
         e."recurring_pattern",
         e."validated",
-        p."entry_date" AS "RegistrationDate"
+        p."entry_date" AS "RegistrationDate", 
+        s.score
       FROM "control"."participation" p
       JOIN "dynamic_content"."events" e ON p."event_id" = e."event_id"
+      JOIN "dynamic_content"."scores" s ON e."event_id" = s."event_id"
       WHERE p."user_id" = :userID
       ORDER BY e."event_date" DESC`,
       {

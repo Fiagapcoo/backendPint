@@ -498,7 +498,10 @@ controllers.getEventByDate = async (req, res) => {
 
     const events = await db.sequelize.query(
       `
-      SELECT * FROM "dynamic_content"."events" e, s.score
+      SELECT 
+        e.*,
+        s.score
+      FROM "dynamic_content"."events" e
       JOIN "dynamic_content"."scores" s ON e.event_id = s.event_id
       WHERE e."event_date" >= :startDate
       AND e."event_date" < :endDate
