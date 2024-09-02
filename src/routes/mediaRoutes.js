@@ -10,8 +10,8 @@ router.post('/add-photo-event/:eventID/:publisherId', validation, controller.add
 router.get('/get-albums', validation, controller.get_albums);
 router.get('/get-album-photo/:photo_id', validation, controller.get_album_photo);
 
-router.get('/get-album/:eventID', validation, controller.get_event_photos);
-router.get('/get-album/:area_id', validation, controller.get_area_photos);
+router.get('/get-album/event/:eventID', validation, controller.get_event_photos);
+router.get('/get-album/area/:area_id', validation, controller.get_area_photos);
 router.get('/get-areas-albums_IDS', validation, controller.get_albums_of_areas);
 router.get('/get-area-photos/:albumID', validation, controller.get_photos_of_areas_albums);
 module.exports = router;
