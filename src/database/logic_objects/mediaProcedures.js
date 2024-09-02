@@ -87,6 +87,30 @@ async function getAlbumIdByEventId(eventID) {
   }
 }
 
+async function getAlbumOfAreaID(area_id) {
+  try {
+    const result = await db.sequelize.query(
+      `SELECT 
+          a."album_id"
+       FROM "dynamic_content"."albuns" a
+       WHERE a."area_id" = :area_id`,
+      {
+        replacements: { area_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (result.length === 0) {
+      throw new Error("No album found for the event.");
+    }
+
+    return result[0].album_id;
+  } catch (error) {
+    console.error("Error retrieving albums for given area_id:", error.message);
+    throw error;
+  }
+}
+
 async function getPhotosByAlbumId(albumID) {
   try {
     const photos = await db.sequelize.query(
@@ -138,6 +162,7 @@ async function getAlbumsWithNonNullAreaId() {
   }
 }
 
+
 module.exports = {
   spCreateAlbum,
   spAddPhotograph,
@@ -146,5 +171,5 @@ module.exports = {
   getAlbumIdByEventId,
   getPhotosByAlbumId,
   getAlbumsWithNonNullAreaId,
-
+  getAlbumOfAreaID
 };

@@ -4,6 +4,8 @@ const { spCreateAlbum,
         spGetAlbumPhoto,
         getAlbumIdByEventId,
         getPhotosByAlbumId,
+        getAlbumsWithNonNullAreaId,
+        getAlbumOfAreaID
 
     } = require('../database/logic_objects/mediaProcedures');
 
@@ -73,6 +75,21 @@ controllers.get_event_photos = async (req, res) => {
     console.log(req.query);
     try {
         const albumID = await getAlbumIdByEventId(eventID);
+        const photos = await getPhotosByAlbumId(albumID);
+
+        res.status(200).json({success:true, message:'Photos fetched successfully.', data: photos});
+    } catch (error) {
+        console.log(error);
+        console.log(error.message);
+        res.status(500).json({success:false, message:'Error fetching photographs: ' + error.message});
+    }
+};
+
+controllers.get_area_photos = async (req, res) => {
+    const { area_id } = req.params; 
+    console.log(req.query);
+    try {
+        const albumID = await getAlbumOfAreaID(area_id);
         const photos = await getPhotosByAlbumId(albumID);
 
         res.status(200).json({success:true, message:'Photos fetched successfully.', data: photos});
