@@ -22,6 +22,18 @@ controllers.create_album = async (req, res) => {
     }
 };
 
+controllers.add_photograph_area_album = async (req, res) => {
+    const { area_id, publisherId } = req.params; 
+    const {filePath} = req.body;
+    console.log(req.query);
+    try {
+        const albumId = await getAlbumOfAreaID(area_id);
+        await spAddPhotograph(albumId, publisherId, filePath);
+        res.status(201).json({success:true, message:'Photograph added successfully.'});
+    } catch (error) {
+        res.status(500).json({success:false, message:'Error adding photograph: ' + error.message});
+    }
+};
 controllers.add_photograph = async (req, res) => {
     const { albumId, publisherId } = req.params; 
     const {filePath} = req.body;
@@ -135,19 +147,19 @@ controllers.get_photos_of_areas_albums = async (req,res) => {
 }
 
 
-controllers.getter_area_album_id = async (req, res) => {
-    const { area_id } = req.params; 
-    console.log(req.query);
+// controllers.getter_area_album_id = async (req, res) => {
+//     const { area_id } = req.params; 
+//     console.log(req.query);
 
-    try {
-        const albumId = await getAlbumOfAreaID(area_id);
+//     try {
+//         const albumId = await getAlbumOfAreaID(area_id);
        
-        res.status(201).json({success:true, message:'Fetched Album Id for given area ID.', data: albumId});
-    } catch (error) {
-        console.log(error);
-        console.log(error.message);
-        res.status(500).json({success:false, message:'Error fetching album id: ' + error.message});
-    }
-};
+//         res.status(201).json({success:true, message:'Fetched Album Id for given area ID.', data: albumId});
+//     } catch (error) {
+//         console.log(error);
+//         console.log(error.message);
+//         res.status(500).json({success:false, message:'Error fetching album id: ' + error.message});
+//     }
+// };
 
 module.exports = controllers;
