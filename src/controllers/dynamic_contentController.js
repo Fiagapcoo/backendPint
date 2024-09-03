@@ -64,7 +64,7 @@ controllers.getAllContentByCity = async (req, res) => {
     );
 
     const events = await db.sequelize.query(
-      ` SELECT .e.*, o.city, s.score  
+      ` SELECT e.*, o.city, s.score  
         FROM "dynamic_content"."events" e 
         JOIN "centers"."offices" o ON e.office_id = o.office_id
         JOIN "dynamic_content"."scores" s ON e.event_id = s.event_id
@@ -78,6 +78,8 @@ controllers.getAllContentByCity = async (req, res) => {
 
     res.status(200).json({ posts, forums, events });
   } catch (error) {
+    console.log (error);
+    console.log (error.message);
     res.status(500).json({
       success: false,
       message: "Error retrieving content: " + error.message,
