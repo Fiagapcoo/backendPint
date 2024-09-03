@@ -1,5 +1,7 @@
 const validator = require("validator");
 
+const {validateInput_register} = require("../utils/inputValidators");
+
 const {
   getUserEngagementMetrics,
   getContentValidationStatusByadmin,
