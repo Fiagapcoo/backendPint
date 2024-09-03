@@ -27,6 +27,8 @@ const {
   spSetCenterAdmin,
   spDeactivateUser,
   spActivateUser,
+  spRegisterNewUser,
+  spCreatePassword,
 } = require("../database/logic_objects/securityProcedures");
 const {
   spEventParticipationCleanup,
@@ -373,7 +375,8 @@ controllers.register_admin = async (req, res) => {
       .json({ success: false, message: validationResult.message });
   }
 
-  const user_role = getUserRole(user.user_id);
+  const user_role = await getUserRole(req.user.id);
+  console.log("user_role:", user_role);
   if ( user_role != 'ServerAdmin' ){
     return res
       .status(404) //could be a 404 for unforbidden but we dont want to let it know of this possibility to outsiders
