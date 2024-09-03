@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Albuns.associate = function(models) {
-        Albuns.belongsTo(models.Events, { foreignKey: 'event_id', targetKey: 'event_id', schema: 'dynamic_content' });
+        Albuns.belongsTo(models.Events, { foreignKey: 'event_id', targetKey: 'event_id', schema: 'dynamic_content', onDelete: 'CASCADE' });
         Albuns.belongsTo(models.SubArea, { foreignKey: 'sub_area_id', targetKey: 'sub_area_id', schema: 'static_content' });
     };
 

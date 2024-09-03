@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
 
     EventForumAccess.associate = function(models) {
         EventForumAccess.belongsTo(models.Users, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr' });
-        EventForumAccess.belongsTo(models.Forums, { foreignKey: 'forum_id', targetKey: 'forum_id', schema: 'dynamic_content' });
+        EventForumAccess.belongsTo(models.Forums, { foreignKey: 'forum_id', targetKey: 'forum_id', schema: 'dynamic_content', onDelete: 'CASCADE' });
     };
 
     return EventForumAccess;

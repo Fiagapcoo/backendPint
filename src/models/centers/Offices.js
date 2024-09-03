@@ -11,11 +11,11 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Offices.associate = function(models) {
-        Offices.belongsTo(models.OfficeAdmins, { foreignKey: 'office_id', targetKey: 'office_id', schema: 'centers' });
-        Offices.belongsTo(models.OfficeWorkers, { foreignKey: 'office_id', targetKey: 'office_id', schema: 'centers' });
-        Offices.hasMany(models.Posts, { as: 'Posts', foreignKey: 'office_id', targetKey: 'office_id', schema: 'dynamic_content' });
-        Offices.hasMany(models.Forums, { as: 'Forums', foreignKey: 'office_id', targetKey: 'office_id', schema: 'dynamic_content' });
-        Offices.hasMany(models.Events, { as: 'Events', foreignKey: 'office_id', targetKey: 'office_id', schema: 'centedynamic_contentrs' });
+        Offices.belongsTo(models.OfficeAdmins, { foreignKey: 'office_id', targetKey: 'office_id', schema: 'centers', onDelete: 'CASCADE' });
+        Offices.belongsTo(models.OfficeWorkers, { foreignKey: 'office_id', targetKey: 'office_id', schema: 'centers', onDelete: 'CASCADE' });
+        Offices.hasMany(models.Posts, { as: 'Posts', foreignKey: 'office_id', targetKey: 'office_id', schema: 'dynamic_content', onDelete: 'CASCADE' });
+        Offices.hasMany(models.Forums, { as: 'Forums', foreignKey: 'office_id', targetKey: 'office_id', schema: 'dynamic_content', onDelete: 'CASCADE' });
+        Offices.hasMany(models.Events, { as: 'Events', foreignKey: 'office_id', targetKey: 'office_id', schema: 'centedynamic_contentrs', onDelete: 'CASCADE' });
         
     };
 

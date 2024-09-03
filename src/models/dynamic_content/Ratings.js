@@ -45,8 +45,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Ratings.associate = function(models) {
-        Ratings.belongsTo(models.Posts, { foreignKey: 'post_id', targetKey: 'post_id', schema: 'dynamic_content' });
-        Ratings.belongsTo(models.Events, { foreignKey: 'event_id', targetKey: 'event_id', schema: 'dynamic_content' });
+        Ratings.belongsTo(models.Posts, { foreignKey: 'post_id', targetKey: 'post_id', schema: 'dynamic_content', onDelete: 'CASCADE' });
+        Ratings.belongsTo(models.Events, { foreignKey: 'event_id', targetKey: 'event_id', schema: 'dynamic_content', onDelete: 'CASCADE' });
         Ratings.belongsTo(models.Users, { foreignKey: 'critic_id', targetKey: 'user_id', schema: 'hr' });
     };
 
