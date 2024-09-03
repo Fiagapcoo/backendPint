@@ -431,7 +431,7 @@ controllers.login_web = async (req, res) => {
         .json({ success: false, message: authResult.message });
     }
     if (authResult.redirect) {
-      return res.redirect(authResult.redirect);
+      return res.status(302).json({ success: false, redirect: authResult.redirect });
     }
 
     await handleResponseBasedOnRole(authResult.user, res);
