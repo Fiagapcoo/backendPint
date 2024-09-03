@@ -7,6 +7,7 @@ const bcrypt = require("bcryptjs");
 //const crypto = require("crypto");
 const { verifyToken } = require("../utils/tokenUtils");
 const { sendMail } = require("./emailController");
+const PasswordReuseError = require('../errors/passwordReuseError');
 
 const {
   generateToken,
@@ -192,7 +193,16 @@ controllers.updatePassword = async (req, res) => {
     console.log("req.user:", req.user.id);
     const userId = req.user.id;
 
-    await spChangeUserPassword(userId, password);
+    try{
+      await spChangeUserPassword(userId, password);}
+    catch (error) {
+      if (error instanceof PasswordReuseError){
+        console.error("Password reuse error:", error.message);
+        res
+      .status(400)
+      .json({ success: false, message: "Password reuse detected." });
+      }
+    }
 
     const user = await sp_findUserById(userId);
     console.log("user:", user);
@@ -283,10 +293,16 @@ controllers.resetPassword = async (req, res) => {
     console.log('USER: '+ JSON.stringify(tokenID) );
  
     const userId = tokenID.id
+    
+    try{
+      await spChangeUserPassword(userId, password);}
+    catch (error) {
+      if (error instanceof PasswordReuseError){
+        return res
+          .status(400)
+          .json({ success: false, message: "Password reuse detected." });
+    }}
     const user = await sp_findUserById(userId);
-    await spChangeUserPassword(userId, password);
-
-    //const user = await sp_findUserById(userId);
     console.log("user:", user);
     await sendMail({
       to: user.email,
@@ -307,6 +323,7 @@ controllers.resetPassword = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
 
 //check cookie
 // app.get('/data', cookieParser(),  function(req, res) {

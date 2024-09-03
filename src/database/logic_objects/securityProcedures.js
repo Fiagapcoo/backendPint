@@ -2,6 +2,7 @@ const { QueryTypes } = require('sequelize');
 const { logError} = require('./generalHelpers');
 const { logUserAction} = require('./usersProcedures');
 const { sendMail } = require('../../controllers/emailController');
+const PasswordReuseError = require('../../errors/passwordReuseError');
 const bcrypt = require('bcryptjs');
 const db = require('../../models'); 
 
@@ -185,7 +186,7 @@ const spRegisterNewUser = async (firstName, lastName, email, centerId, profilePi
 };
 
 
-// TODO - totest
+
 const spChangeUserPassword = async (userId, newPassword) => {
   const transaction = await db.sequelize.transaction();
   try {
@@ -206,7 +207,7 @@ const spChangeUserPassword = async (userId, newPassword) => {
       for (const prev of previousPasswords) {
         const isMatch = await bcrypt.compare(newPassword, prev.hashed_password);
         if (isMatch) {
-            throw new Error('The new password must not be the same as any previously used passwords.');
+            throw new PasswordReuseError('The new password must not be the same as any previously used passwords.');
         }
       }
 
