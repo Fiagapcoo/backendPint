@@ -787,8 +787,10 @@ async function getUserPublications(userID) {
     const posts = await db.sequelize.query(
       `
       SELECT 
-        p.*
+        p.*, o.city, s.score 
       FROM "dynamic_content"."posts" p
+      JOIN "centers"."offices" o ON p.office_id = o.office_id
+      JOIN "dynamic_content"."scores" s ON p.post_id = s.post_id
       WHERE p."publisher_id" = :userID
       `,
       {
@@ -801,8 +803,9 @@ async function getUserPublications(userID) {
     const forums = await db.sequelize.query(
       `
       SELECT 
-        f.*
+        f.*, o.city
       FROM "dynamic_content"."forums" f
+      JOIN "centers"."offices" o ON f.office_id = o.office_id
       WHERE f."publisher_id" = :userID
       `,
       {
@@ -815,8 +818,10 @@ async function getUserPublications(userID) {
     const events = await db.sequelize.query(
       `
       SELECT 
-        e.*
+        e.* , o.city, s.score 
       FROM "dynamic_content"."events" e
+      JOIN "centers"."offices" o ON e.event_id = o.office_id
+      JOIN "dynamic_content"."scores" s ON e.event_id = s.event_id
       WHERE e."publisher_id" = :userID
       ORDER BY e."creation_date" DESC
       `,

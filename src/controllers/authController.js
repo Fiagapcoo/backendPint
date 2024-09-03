@@ -198,7 +198,8 @@ controllers.updatePassword = async (req, res) => {
     catch (error) {
       if (error instanceof PasswordReuseError){
         console.error("Password reuse error:", error.message);
-        res
+      
+      return   res
       .status(400)
       .json({ success: false, message: "Password reuse detected." });
       }

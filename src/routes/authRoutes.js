@@ -5,7 +5,6 @@ const {
 } = require("../controllers/jwt_middlewareController");
 const router = express.Router();
 const authController = require("../controllers/authController");
-//const passport = require("../config/passport-setup");
 
 router.post("/register", authController.register);
 router.post("/setup-password", validation, authController.setupPassword);
@@ -32,23 +31,5 @@ router.post("/password-reset", authController.resetPassword);
 
 router.patch("/store-fcm-token", validation ,authController.updateFcmToken);
 
-/*
-// Google Auth
-router.get('/google', passport.authenticate('google', {  //it knows it has to active the google strategy in passport-setup
-  scope: ['profile', 'email'] // what we want to retrieve from the user profile (in an array)
-}));
 
-router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
-  const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  res.redirect(`${process.env.CLIENT_URL}/?token=${token}`);
-});
-
-// Facebook Auth
-router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
-
-router.get('/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }), (req, res) => {
-  const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  res.redirect(`${process.env.CLIENT_URL}/?token=${token}`);
-});
-*/
 module.exports = router;
