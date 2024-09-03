@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const admin = require("firebase-admin");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+//const crypto = require("crypto");
+const { verifyToken } = require("../utils/tokenUtils");
 const { sendMail } = require("./emailController");
 
 const {
@@ -177,7 +179,7 @@ controllers.setupPassword = async (req, res) => {
   }
 };
 
-// TODO to test
+
 controllers.updatePassword = async (req, res) => {
   const { password } = req.body;
   
@@ -214,27 +216,22 @@ controllers.updatePassword = async (req, res) => {
   }
 };
 
-controllers.resetPassword = async (req, res) => {
+controllers.startRecoveryPassword = async (req, res) => {
   const { email } = req.body;
   try {
-    user = findUserByEmail(email);
+    user = await  findUserByEmail(email);
     if (user === null) {
       console.log("User not found");
-      res.status(200).json({
+      res.status(404).json({
         success: false,
         message: "Could not found corresponding account with that email.",
       });
     } else {
       console.log("User found:", user);
-      // Assegure que 'user' seja um objeto simples
-      // if (Array.isArray(user) && user.length > 0) {
-      //   const userPayload = {
-      //     id: user[0].user_id, // Acesse o primeiro elemento do array
-      //   };
-      // }
-      const token = generateTokenAccountCreation_resetpasword(user[0].user_id);
-      const random_sub_url = crypto.randomBytes(32).toString("hex");
-      const url = `${process.env.CLIENT_URL}/change-password/${random_sub_url}?token=${token}`;
+      const token = generateTokenAccountCreation_resetpasword(user.user_id);
+      const stringtoken = JSON.stringify(token);
+      //const random_sub_url = crypto.randomBytes(32).toString("hex");
+      const url = `${process.env.CLIENT_URL}/change-password/?token=${stringtoken}`;
       console.log("url:", url);
       console.log("user:", user);
 
@@ -249,7 +246,7 @@ controllers.resetPassword = async (req, res) => {
 
                 If you are accessing this request via our mobile app, please copy and paste the following token when prompted:
 
-                Token: ${token}
+                Token: ${stringtoken}
 
                 If you did not request a password reset, please notify your administrator or supervisor immediately and forward this email to them for further investigation.
 
@@ -269,6 +266,45 @@ controllers.resetPassword = async (req, res) => {
       success: false,
       message: "Server error. Please try again later.",
     });
+  }
+};
+
+controllers.resetPassword = async (req, res) => {
+  const { token, password } = req.body;
+  
+  if (!validator.isStrongPassword(password)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Password is not strong enough" });
+  }
+  try {
+    const decodedToken = decodeURIComponent(token);
+    const tokenID = verifyToken(decodedToken);
+    console.log('USER: '+ JSON.stringify(tokenID) );
+ 
+    const userId = tokenID.id
+    const user = await sp_findUserById(userId);
+    await spChangeUserPassword(userId, password);
+
+    //const user = await sp_findUserById(userId);
+    console.log("user:", user);
+    await sendMail({
+      to: user.email,
+      subject: "Password Reset Successful",
+      body: ` Dear ${user.name},
+      
+              Your password has been reset .
+              
+              Thank you,
+                The Softinsa Team`,
+    });
+    
+    res
+      .status(200)
+      .json({ success: true, message: "Password reset successfull." });
+  } catch (error) {
+    console.error("Error trying to reset password:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 

@@ -32,9 +32,13 @@ const encrypt = (text) => {
 const decrypt = (text) => {
   console.log("Decrypting:", text);
   try {
+    if (typeof text === 'string') {
+      text = JSON.parse(text);
+    }
     if (!text || !text.iv || !text.encryptedData) {
       throw new Error("Invalid input for decryption");
     }
+    
     let iv = Buffer.from(text.iv, "hex");
     let encryptedText = Buffer.from(text.encryptedData, "base64");
     let decipher = crypto.createDecipheriv(algorithm, key, iv);
@@ -80,7 +84,7 @@ const generateTokenAccountCreation_resetpasword = (id) => {
 
   const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn:  1300});
 
-  console.log('token account creation gerado: ' + token);   
+  console.log('token account creation/reset passwrd gerado: ' + token);   
   return encrypt(token);
 };
 

@@ -26,7 +26,8 @@ router.post("/refresh-token", authController.refreshToken);
 //router.put('/update-last-access', validation, authController.updateLastAccess);
 router.post("/change-password", validation, authController.updatePassword);
 
-router.post("request-password-reset", authController.resetPassword);
+router.post("/request-password-reset", authController.startRecoveryPassword);
+router.post("/password-reset", authController.resetPassword);
 
 
 router.patch("/store-fcm-token", validation ,authController.updateFcmToken);
