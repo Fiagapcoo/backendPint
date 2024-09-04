@@ -248,23 +248,27 @@ controllers.startRecoveryPassword = async (req, res) => {
 
       await sendMail({
         to: email,
-        subject: "Reset your password",
-        body: `Dear ${user.name},
-
-                We received a request to reset the password for your account. Please use the following link to reset your password:
-
-                ${url}
-
-                If you are accessing this request via our mobile app, please copy and paste the following token when prompted:
-
-                Token: ${stringtoken}
-
-                If you did not request a password reset, please notify your administrator or supervisor immediately and forward this email to them for further investigation.
-
-                Thank you,
-                The Softinsa Team
-    `,
+        subject: "SOFTINSA - Reset Your Password",
+        body: `
+          <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px;">
+            <h2 style="text-align: center; color: #00c2ff;">Reset Your Password</h2>
+           <p>Dear ${user.first_name} ${" "} ${user.last_name},</p>
+            <p>We received a request to reset the password for your account. Please use the following link to reset your password:</p>
+            <p style="text-align: center;">
+              <a href="${url}" style="display: inline-block; padding: 10px 20px; color: #fff; background-color: #00c2ff; text-decoration: none; border-radius: 5px;">Reset Password</a>
+            </p>
+            <p>If you are accessing this request via our mobile app, please copy and paste the following token when prompted:</p>
+            <p style="text-align: center; font-size: 18px; font-weight: bold; color: #00c2ff;">
+              ${stringtoken}
+            </p>
+            <p>If you did not request a password reset, please notify your administrator or supervisor immediately and forward this email to them for further investigation.</p>
+            <p>Thank you,<br>The Softinsa Team</p>
+          </div>
+        `,
       });
+      
+      
+      
 
       return res.status(201).json({
         success: true,
