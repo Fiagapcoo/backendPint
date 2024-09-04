@@ -221,6 +221,8 @@ controllers.edit_event = async (req, res) => {
       .status(201)
       .json({ success: true, message: "Forum edited successfully." });
   } catch (error) {
+    console.log(error)
+    console.log(error.message)
     res.status(500).json({
       success: false,
       message: "Error creating Forum: " + error.message,
