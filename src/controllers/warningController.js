@@ -1,4 +1,5 @@
 const db = require("../models");
+const { QueryTypes } = require("sequelize");
 
 // Function to get all warnings given an office ID
 async function getWarningsByOfficeID(officeID) {
@@ -16,7 +17,7 @@ async function getWarningsByOfficeID(officeID) {
           w.office_id 
         FROM "control"."warnings" w
         JOIN "hr"."users" u ON w.admin_id = u.user_id
-        WHERE w.office_id = :officeID
+        WHERE w.office_id = :officeID AND w."state" = TRUE
         ORDER BY w.creation_date DESC
         `,
         {
@@ -47,7 +48,7 @@ async function getWarningsByOfficeID(officeID) {
         console.log(error);
       res.status(500).json({
         success: false,
-        message: "Error reporting comment: " + error.message,
+        message: "Error getting warnings: " + error.message,
       });
     }
   };
