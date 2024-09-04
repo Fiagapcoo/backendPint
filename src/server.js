@@ -2,12 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const logger = require('morgan');
-
+const { Client } = require('pg');
 
 const app = express();
 //require('dotenv').config();
 
-
+const { sendNotificationToTopic } = require("./utils/realTimeNotifications");
 
 
 //por a correr 1 vez unica
@@ -77,7 +77,46 @@ app.use('/email', emailRoute);
 
 
 
+// Initialize PostgreSQL Client for LISTEN/NOTIFY
+// Initialize PostgreSQL Client for LISTEN/NOTIFY
+const pgClient = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false, // Disable SSL in non-production environments
+});
 
+// Connect to PostgreSQL
+pgClient.connect((err) => {
+  if (err) {
+      console.error('Error connecting to the database:', err.stack);
+  } else {
+      console.log('Successfully connected to the PostgreSQL database.');
+  }
+});
+
+// Listen for the 'content_validated' notifications from PostgreSQL
+pgClient.query('LISTEN content_validated', (err) => {
+  if (err) {
+      console.error('Error starting LISTEN on content_validated:', err.stack);
+  } else {
+      console.log('Listening for content_validated notifications...');
+  }
+});
+
+pgClient.on('notification', async (msg) => {
+    const payload = msg.payload.split(','); // Format: 'content_title,topic_name,content_type'
+    const contentTitle = payload[0];
+    const topicName = payload[1];
+    const contentType = payload[2];
+
+    console.log(`Content titled "${contentTitle}" validated in subarea "${topicName}" of type ${contentType}`);
+
+    // Send a notification to the relevant topic
+    //await sendNotificationToTopic(topicName, `New ${contentType} Available!`, `New content titled "${contentTitle}" has been validated.`);
+});
+
+pgClient.on('error', (err) => {
+    console.error('Error in PostgreSQL client:', err);
+});
 
 
 /*

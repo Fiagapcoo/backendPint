@@ -63,6 +63,14 @@ const {
   createTrigger_decrement_like_count,
 } = require("./commentsTriggers");
 
+const {
+  createTriggerFunction_notifs,
+  createTrigger_notifyServer,
+} = require("./notificationsTriggers");
+
+const {createTable_forDEBUG} = require("./debbuging");
+
+
 const set_triggers = async () => {
   await createFunction_logError();
   await createFunction_reverseRating();
@@ -113,7 +121,11 @@ const set_triggers = async () => {
   await createTriggerFunction_trg_decrement_like_comment();
   await createTrigger_decrement_like_count();
 
-  
+  // Notifications
+  await createTriggerFunction_notifs();
+  await createTrigger_notifyServer();
 
+
+  //await createTable_forDEBUG();
 };
 set_triggers();
