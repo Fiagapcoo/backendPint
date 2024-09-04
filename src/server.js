@@ -9,7 +9,6 @@ const app = express();
 
 const { sendNotificationToTopic } = require("./utils/realTimeNotifications");
 
-
 //por a correr 1 vez unica
 //const {server} = require('./websockets');
 
@@ -110,42 +109,20 @@ pgClient.on('notification', async (msg) => {
 
     console.log(`Content titled "${contentTitle}" validated in subarea "${topicName}" of type ${contentType}`);
 
-    // Send a notification to the relevant topic
-    //await sendNotificationToTopic(topicName, `New ${contentType} Available!`, `New content titled "${contentTitle}" has been validated.`);
+    await sendNotificationToTopic(
+      topicName,  // Topic name
+      `New ${contentType} in your subscriptions topics`, // Notification title
+      `${contentTitle}, was created in ${topicName}`, // Notification body
+    );
+
+    
+
+
 });
 
 pgClient.on('error', (err) => {
     console.error('Error in PostgreSQL client:', err);
 });
-
-
-/*
-  async function sendNotification(token, title, body) {
-    const message = {
-      notification: {
-        title: title,
-        body: body,
-      },
-      token: token,
-    };
-  
-    try {
-      const response = await admin.messaging().send(message);
-      console.log('Successfully sent message:', response);
-    } catch (error) {
-      console.error('Error sending message:', error);
-    }
-  }
-  
-  // Example route to trigger notifications
-  app.post('/api/notify', async (req, res) => {
-    const { token, title, body } = req.body;
-    await sendNotification(token, title, body);
-    res.status(200).send('Notification sent');
-  });
-
-*/
-
 
 
 app.listen(app.get('port'), () => {
