@@ -11,6 +11,7 @@ router.get('/event-form/:eventID', validation, controller.get_event_form);
 router.get('/event-json-form/:eventID', validation, controller.get_event_json_form);
 
 router.get('/get-event-answers/:eventID', validation, controller.get_event_answers);
+router.get('/get-event-answers-web/:eventID', validation, controller.get_event_answers_web);
 router.get('/get-event-answers-for-user/:eventID', validation, controller.get_event_answers_for_user);
 router.get('/get-event-answers-for-user/:eventID/:userID', validation, controller.get_event_answers_for_users);
 //router.post('/add-answer/:eventID/:userID', validation, controller.add_answer);
