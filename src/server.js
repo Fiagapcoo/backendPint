@@ -17,7 +17,6 @@ const { sendNotificationToTopic } = require("./utils/realTimeNotifications");
 
 
 
-const emailRoute = require('./routes/emailRoute');
 const uploadRoute = require('./routes/uploadRoute');
 
 const categoryRoutes = require('./routes/static_contentRoutes');
@@ -34,6 +33,7 @@ const dynamicRoutes = require('./routes/dynamic_contentRoutes');
 const notificationsRoutes = require('./routes/notificationRoutes');
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const warningsRoutes = require('./routes/warningsRoutes');
 
 
 
@@ -71,12 +71,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/upload', uploadRoute);
 app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/email', emailRoute);
+app.use('/api/warnings', warningsRoutes);
 
 
 
 
-// Initialize PostgreSQL Client for LISTEN/NOTIFY
+
+
 // Initialize PostgreSQL Client for LISTEN/NOTIFY
 const pgClient = new Client({
   connectionString: process.env.DATABASE_URL,
