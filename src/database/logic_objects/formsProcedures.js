@@ -130,7 +130,6 @@ async function createEventForm(eventID, customFieldsJson) {
   }
 }
 
-
 async function createEventFormWeb(event_id, customFieldsJson) {
   const t = await db.sequelize.transaction();
   try {
@@ -185,20 +184,20 @@ async function editEventFormField(eventID, customFieldsJson) {
   const t = await db.sequelize.transaction();
   try {
     // Check if the event is validated
-    const event = await db.sequelize.query(
-      `SELECT 1 FROM "dynamic_content"."events" WHERE "event_id" = :eventID AND "validated" = false`,
-      {
-        replacements: { eventID },
-        type: QueryTypes.SELECT,
-        transaction: t,
-      }
-    );
+    // const event = await db.sequelize.query(
+    //   `SELECT 1 FROM "dynamic_content"."events" WHERE "event_id" = :eventID AND "validated" = false`,
+    //   {
+    //     replacements: { eventID },
+    //     type: QueryTypes.SELECT,
+    //     transaction: t,
+    //   }
+    // );
 
-    if (event.length === 0) {
-      console.log("Event is already validated and cannot be edited.");
-      await t.rollback();
-      return;
-    }
+    // if (event.length === 0) {
+    //   console.log("Event is already validated and cannot be edited.");
+    //   await t.rollback();
+    //   return;
+    // }
     // Log the JSON string before parsing
     console.log("Original JSON string:", customFieldsJson);
     // Parse the JSON string twice for some reason...
@@ -461,7 +460,7 @@ async function getFormAnswersByEventAndUser(eventID, userID) {
 async function getAllEventsWithForms() {
   try {
     const events = await db.sequelize.query(
-      `SELECT DISTINCT e.event_id, e."name", e.office_id 
+      `SELECT DISTINCT e.event_id, e."name", e.office_id, e.validated 
 FROM forms.fields f 
 JOIN dynamic_content.events e 
 ON e.event_id = f.event_id
@@ -494,5 +493,5 @@ module.exports = {
   getFormAnswersByEvent,
   getFormAnswersByEventAndUser,
   getAllEventsWithForms,
-  createEventFormWeb
+  createEventFormWeb,
 };
