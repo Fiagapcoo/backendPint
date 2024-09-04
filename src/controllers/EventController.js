@@ -10,7 +10,7 @@ const {
   spEditEvent,
   spGetParticipants,
   spGetParticipants_adm,
-
+  getEventNameById,
   getEventCreator,
 } = require("../database/logic_objects/eventProcedures");
 
