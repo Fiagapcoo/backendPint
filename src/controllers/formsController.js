@@ -193,6 +193,8 @@ controllers.add_answers = async (req, res) => {
     const registrantName = await getUserFullName(userID);
     var fullname =
     registrantName.firstName.toString() + " " + registrantName.lastName.toString();
+    console.log('full anme notifications');
+    console.log(fullname);
     console.log('going to send notificationaaaaaaaaaaaaaaaaaa');
     await sendEventRegistrationNotification(eventOwner, eventID, fullname);
     console.log('going to send notification finishedaaaaaaaaaaaaaa');

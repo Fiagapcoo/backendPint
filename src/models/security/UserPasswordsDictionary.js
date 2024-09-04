@@ -15,30 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         schema: 'security',
         tableName: 'user_passwords_dictionary',
         timestamps: false,
-        // hooks: {
-        //     beforeUpdate: async (userPassword, options) => {
-        //         const historyModel = sequelize.models.UserPasswordsDictionaryHistory;
-        //         await historyModel.create({
-        //             user_id: userPassword.user_id,
-        //             hashed_passwd: userPassword.hashed_passwd,
-        //             salt: userPassword.salt,
-        //             valid_from: userPassword.valid_from,
-        //             valid_to: new Date()
-        //         });
-        //         userPassword.valid_from = new Date();
-        //         userPassword.valid_to = addMonths(new Date(), 6);;
-        //     },
-        //     beforeDestroy: async (userPassword, options) => {
-        //         const historyModel = sequelize.models.UserPasswordsDictionaryHistory;
-        //         await historyModel.create({
-        //             user_id: userPassword.user_id,
-        //             hashed_passwd: userPassword.hashed_passwd,
-        //             salt: userPassword.salt,
-        //             valid_from: userPassword.valid_from,
-        //             valid_to: new Date()
-        //         });
-        //     }
-        // }
+
     });
     UserPasswordsDictionary.associate = function(models) {
         UserPasswordsDictionary.belongsTo(models.Users, {as: 'User', foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr' });
