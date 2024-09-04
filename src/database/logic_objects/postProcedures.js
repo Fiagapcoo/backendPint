@@ -138,10 +138,10 @@ async function spEditPost(
         await db.sequelize.query(
           `UPDATE "dynamic_content"."ratings" 
             SET
-            "rating" = COALESCE(:rating, "rating")
-            WHERE "post_id" = :postId AND "critic_id" = :publisher_id` ,
+            "evaluation" = COALESCE(:rating, "rating")
+            WHERE "post_id" = :postId` ,
           {
-            replacements: { postId, publisher_id, rating },
+            replacements: { rating, postId },
             type: QueryTypes.UPDATE,
             transaction,
           }
