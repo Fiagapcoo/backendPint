@@ -1,7 +1,7 @@
 const db = require("../../models");
 const { QueryTypes } = require("sequelize");
 //const { parse } = require('json2sql'); /
-const {log_err} = require("../../utils/logError");
+const { log_err } = require("../../utils/logError");
 //to add more forms to a pendent event that is already created
 async function addCustomFieldsToEventForm(eventID, customFieldsJson) {
   const t = await db.sequelize.transaction();
@@ -284,7 +284,6 @@ async function insertFormAnswers(userID, eventID, answersJson) {
   const t = await db.sequelize.transaction();
   console.log(answersJson);
   try {
-
     const answers = JSON.parse(answersJson);
 
     for (const answer of answers) {
@@ -408,6 +407,30 @@ async function getFormAnswersByEventAndUser(eventID, userID) {
   }
 }
 
+async function getAllEventsWithForms() {
+  try {
+    const events = await db.sequelize.query(
+      `SELECT DISTINCT e.event_id, e."name", e.office_id 
+FROM forms.fields f 
+JOIN dynamic_content.events e 
+ON e.event_id = f.event_id
+`,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (events.length === 0) {
+      throw new Error("No events found with forms.");
+    }
+
+    return events;
+  } catch (error) {
+    console.error("Error retrieving events with forms:", error.message);
+    throw error;
+  }
+}
+
 module.exports = {
   addCustomFieldsToEventForm,
   createEventForm,
@@ -419,4 +442,5 @@ module.exports = {
   deleteEventFormField,
   getFormAnswersByEvent,
   getFormAnswersByEventAndUser,
+  getAllEventsWithForms,
 };

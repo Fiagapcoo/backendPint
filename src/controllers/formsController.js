@@ -9,6 +9,7 @@ const {
   deleteEventFormField,
   getFormAnswersByEvent,
   getFormAnswersByEventAndUser,
+  getAllEventsWithForms,
 } = require("../database/logic_objects/formsProcedures");
 
 const {
@@ -210,6 +211,23 @@ controllers.delete_field_from_form = async (req, res) => {
     });
   }
 };
+
+controllers.get_all_event_with_forms = async (req, res) => {
+  try {
+    var events = await getAllEventsWithForms();
+
+    res.status(201).json({
+      success: true,
+      data: events,
+      message: "Got all events with forms successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error getting events with forms: " + error.message,
+    });
+  }
+}
 
 controllers.get_event_answers = async (req, res) => {
   const { eventID } = req.params;

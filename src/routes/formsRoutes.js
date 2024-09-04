@@ -16,6 +16,8 @@ router.get('/get-event-answers-for-user/:eventID/:userID', validation, controlle
 router.post('/add-answers/:eventID/:userID', validation, controller.add_answers);
 router.delete('/delete-field/:eventID/:fieldID', validation, controller.delete_field_from_form);
 
+router.get('/get-all-event-with-forms', validation, controller.get_all_event_with_forms);
+
 module.exports = router;
 
 
