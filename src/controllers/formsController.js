@@ -191,8 +191,10 @@ controllers.add_answers = async (req, res) => {
     await spRegisterUserForEvent(userID, eventID);
     const eventOwner = await getEventCreator(eventID);
     const registrantName = await getUserFullName(userID);
+    var fullname =
+    registrantName.firstName.toString() + " " + registrantName.lastName.toString();
     console.log('going to send notificationaaaaaaaaaaaaaaaaaa');
-    await sendEventRegistrationNotification(eventOwner, eventID, registrantName);
+    await sendEventRegistrationNotification(eventOwner, eventID, fullname);
     console.log('going to send notification finishedaaaaaaaaaaaaaa');
     res.status(201).json({ success: true, message: "Added answers to form." });
   } catch (error) {

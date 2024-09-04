@@ -118,6 +118,12 @@ controllers.add_comment = async (req, res) => {
         fullname,
         eventName
       );
+      await sendNewCommentNotification(
+        ownerID,
+        contentID,
+        contentType,
+        fullname
+      );
     } else {
       await sendNewCommentNotification(
         ownerID,
