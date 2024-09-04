@@ -1,6 +1,7 @@
 const {
   addCustomFieldsToEventForm,
   createEventForm,
+  createEventFormWeb,
   editEventFormField,
   getFormSchema,
   getFormSchemaAsJson,
@@ -34,6 +35,23 @@ controllers.create_event_form = async (req, res) => {
   console.log(req.body);
   try {
     await createEventForm(eventID, customFieldsJson);
+
+    res
+      .status(201)
+      .json({ success: true, message: "Form for event created successfully." });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error creating form: " + error.message,
+    });
+  }
+};
+
+controllers.create_event_form_web = async (req, res) => {
+  const { eventID, customFieldsJson } = req.body;
+  console.log(req.body);
+  try {
+    await createEventFormWeb(eventID, customFieldsJson);
 
     res
       .status(201)

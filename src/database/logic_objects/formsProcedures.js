@@ -130,6 +130,57 @@ async function createEventForm(eventID, customFieldsJson) {
   }
 }
 
+
+async function createEventFormWeb(event_id, customFieldsJson) {
+  const t = await db.sequelize.transaction();
+  try {
+    // Parse the JSON string
+    const customFields = JSON.parse(customFieldsJson);
+
+    // Ensure the parsed data is an array
+    if (!Array.isArray(customFields)) {
+      throw new Error("Parsed customFields is not an array");
+    }
+
+    for (const field of customFields) {
+      // Check if field has all the necessary properties
+      if (
+        typeof field.field_name === "undefined" ||
+        typeof field.field_type === "undefined" ||
+        typeof field.field_value === "undefined"
+      ) {
+        console.error("Field is missing required properties:", field);
+        continue; // Skip this iteration if properties are missing
+      }
+
+      await db.sequelize.query(
+        `INSERT INTO "forms"."fields" ("event_id", "field_name", "field_type", "field_value", "max_value", "min_value")
+           VALUES (:eventID, :fieldName, :fieldType, :fieldValue, :maxValue, :minValue)`,
+        {
+          replacements: {
+            eventID: event_id,
+            fieldName: field.field_name,
+            fieldType: field.field_type,
+            fieldValue: field.field_value,
+            maxValue: field.max_value,
+            minValue: field.min_value,
+          },
+          type: QueryTypes.INSERT,
+          transaction: t,
+        }
+      );
+    }
+
+    await t.commit();
+    return { success: true, message: "Form created successfully" };
+  } catch (error) {
+    await t.rollback();
+    console.error("Error creating event form:", error);
+    log_err(error.message);
+    return { success: false, message: "Error creating form" };
+  }
+}
+
 async function editEventFormField(eventID, customFieldsJson) {
   const t = await db.sequelize.transaction();
   try {
@@ -443,4 +494,5 @@ module.exports = {
   getFormAnswersByEvent,
   getFormAnswersByEventAndUser,
   getAllEventsWithForms,
+  createEventFormWeb
 };

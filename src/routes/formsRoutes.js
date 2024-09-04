@@ -4,6 +4,7 @@ const controller = require('../controllers/formsController.js');
 const {validation} = require('../controllers/jwt_middlewareController.js');
 
 router.post('/create-form', controller.create_event_form);
+router.post('/create-form-web', controller.create_event_form_web);
 router.post('/add-fields-to-form/event/:eventID/fields/:customFieldsJson', validation, controller.add_fields_event_form);
 router.patch('/edit-form-fields/event/:eventID/', validation, controller.edit_fields_event_form); 
 router.get('/event-form/:eventID', validation, controller.get_event_form);
