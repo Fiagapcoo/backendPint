@@ -9,6 +9,7 @@ const {
   insertFormAnswers,
   deleteEventFormField,
   getFormAnswersByEvent,
+  getFormAnswersByEventWeb,
   getFormAnswersByEventAndUser,
   getAllEventsWithForms,
 } = require("../database/logic_objects/formsProcedures");
@@ -256,6 +257,24 @@ controllers.get_event_answers = async (req, res) => {
   console.log(req.params);
   try {
     var answers = await getFormAnswersByEvent(eventID);
+
+    res.status(201).json({
+      success: true,
+      data: answers,
+      message: "Got answers for event successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error getting answers from event: " + error.message,
+    });
+  }
+};
+controllers.get_event_answers_web = async (req, res) => {
+  const { eventID } = req.params;
+  console.log(req.params);
+  try {
+    var answers = await getFormAnswersByEventWeb(eventID);
 
     res.status(201).json({
       success: true,

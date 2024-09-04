@@ -429,6 +429,41 @@ async function getFormAnswersByEvent(eventID) {
   }
 }
 
+
+async function getFormAnswersByEventWeb(eventID) {
+  try {
+    const answersResult = await db.sequelize.query(
+      `SELECT 
+          fa."user_id",
+          fa."event_id",
+          fa."field_id",
+          fa."answer",
+          fa."entry_date",
+          f.field_name,
+          u.first_name ,
+          u.last_name 
+       FROM "forms"."answers" fa
+       join forms.fields f on fa.field_id = f.field_id
+       join hr.users u on fa.user_id = u.user_id 
+       WHERE fa."event_id" = :eventID`,
+      {
+        replacements: { eventID },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (answersResult.length === 0) {
+      throw new Error("No answers found for the event.");
+    }
+
+    return answersResult;
+  } catch (error) {
+    console.error("Error retrieving form answers:", error.message);
+    throw error;
+  }
+}
+
+
 async function getFormAnswersByEventAndUser(eventID, userID) {
   try {
     const answersResult = await db.sequelize.query(
@@ -494,4 +529,5 @@ module.exports = {
   getFormAnswersByEventAndUser,
   getAllEventsWithForms,
   createEventFormWeb,
+  getFormAnswersByEventWeb,
 };
