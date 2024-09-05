@@ -208,6 +208,8 @@ controllers.edit_event = async (req, res) => {
     );
 
     const state = fnGetEventState(eventId);
+    console.log("ESTADO DO EVENTO");
+      console.log(state);
     if (state == "Validated") {
       console.log("ESTADO DO EVENTO");
       console.log(state);
