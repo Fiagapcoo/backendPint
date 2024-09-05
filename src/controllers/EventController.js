@@ -209,25 +209,27 @@ controllers.edit_event = async (req, res) => {
 
     const state = fnGetEventState(eventId);
     if (state == "Validated") {
+      console.log("ESTADO DO EVENTO");
+      console.log(state);
       const participants = await spGetParticipants(eventId);
       const eventName = await getEventNameById(eventId);
       await sendEventAlterationNotificationForParticipants(
         eventId,
         participants,
         eventName,
-        "Form Fields were altered"
+        "Event details were altered"
       );
     }
 
     res
       .status(201)
-      .json({ success: true, message: "Forum edited successfully." });
+      .json({ success: true, message: "Event edited successfully." });
   } catch (error) {
     console.log(error);
     console.log(error.message);
     res.status(500).json({
       success: false,
-      message: "Error creating Forum: " + error.message,
+      message: "Error creating Event: " + error.message,
     });
   }
 };
