@@ -14,14 +14,15 @@ const {
   getEventCreator,
 } = require("../database/logic_objects/eventProcedures");
 
-
-
-const { sendEventRegistrationNotification, 
+const {
+  sendEventRegistrationNotification,
   sendEventAlterationNotificationForParticipants,
-  sendEventUnregistrationNotification
- } = require("../utils/realTimeNotifications");
+  sendEventUnregistrationNotification,
+} = require("../utils/realTimeNotifications");
 
-const {getUserFullName} = require("../database/logic_objects/usersProcedures");
+const {
+  getUserFullName,
+} = require("../database/logic_objects/usersProcedures");
 
 const validator = require("validator");
 const controllers = {};
@@ -112,10 +113,10 @@ controllers.register_user_for_event = async (req, res) => {
     await spRegisterUserForEvent(userId, eventId);
     var creator_id = await getEventCreator(eventId);
     var username = await getUserFullName(userId);
-    var fullname = username.firstName + ' ' +username.lastName;
-    console.log('going to send notification');
+    var fullname = username.firstName + " " + username.lastName;
+    console.log("going to send notification");
     await sendEventRegistrationNotification(creator_id, eventId, fullname);
-    console.log('going to send notification finished');
+    console.log("going to send notification finished");
     res
       .status(201)
       .json({ success: true, message: "Registered for event successfully." });
@@ -136,7 +137,7 @@ controllers.unregister_user_from_event = async (req, res) => {
     await spUnregisterUserFromEvent(userId, eventId);
     var creator_id = await getEventCreator(eventId);
     var username = await getUserFullName(userId);
-    var fullname = username.firstName + ' ' +username.lastName;
+    var fullname = username.firstName + " " + username.lastName;
     await sendEventUnregistrationNotification(creator_id, eventId, fullname);
     res.status(201).json({
       success: true,
@@ -205,24 +206,25 @@ controllers.edit_event = async (req, res) => {
       maxParticipants,
       currentParticipants
     );
-    
-    const participants = await spGetParticipants(eventId);
-    const eventName = await getEventNameById(eventId);
-    await sendEventAlterationNotificationForParticipants(
-      eventId,
-      participants,
-      eventName,
-      "Form Fields were altered"
-    );
 
-
+    const state = fnGetEventState(eventId);
+    if (state == "Validated") {
+      const participants = await spGetParticipants(eventId);
+      const eventName = await getEventNameById(eventId);
+      await sendEventAlterationNotificationForParticipants(
+        eventId,
+        participants,
+        eventName,
+        "Form Fields were altered"
+      );
+    }
 
     res
       .status(201)
       .json({ success: true, message: "Forum edited successfully." });
   } catch (error) {
-    console.log(error)
-    console.log(error.message)
+    console.log(error);
+    console.log(error.message);
     res.status(500).json({
       success: false,
       message: "Error creating Forum: " + error.message,
@@ -288,10 +290,9 @@ controllers.get_participants_adm = async (req, res) => {
   }
 };
 
-
 controllers.getEventScoreByID = async (req, res) => {
   const { event_id } = req.params;
-  
+
   try {
     const result = await db.sequelize.query(
       `
