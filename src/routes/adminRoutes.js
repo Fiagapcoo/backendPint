@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {validation} = require('../controllers/jwt_middlewareController.js');
+const {validation_server_admin,validation_admins  } = require('../controllers/jwt_middlewareController.js');
 const controller = require('../controllers/adminController.js');
 
 
