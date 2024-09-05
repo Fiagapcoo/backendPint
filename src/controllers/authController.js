@@ -242,7 +242,7 @@ controllers.startRecoveryPassword = async (req, res) => {
       const token = generateTokenAccountCreation_resetpasword(user.user_id);
       const stringtoken = JSON.stringify(token);
       //const random_sub_url = crypto.randomBytes(32).toString("hex");
-      const url = `${process.env.CLIENT_URL}/change-password/?token=${stringtoken}`;
+      const url = `${process.env.CLIENT_URL}/change-password/?token=${token}`;
       console.log("url:", url);
       console.log("user:", user);
 
