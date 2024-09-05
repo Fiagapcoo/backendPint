@@ -287,6 +287,32 @@ const spDeactivateUser = async (userId) => {
       throw error;
     }
 };
+
+const spDeleteUser = async (userId) => {
+  const transaction = await db.sequelize.transaction();
+  try {
+        // Delete the user by user_id
+        await db.sequelize.query(
+          `
+          DELETE FROM "hr"."users"
+          WHERE "user_id" = :userID
+          `,
+          {
+            replacements: { userID },
+            type: QueryTypes.DELETE,
+            transaction,
+          }
+        );
+    
+
+    await transaction.commit();
+    console.log(`User with ID ${userID} successfully deleted.`);
+  } catch (error) {
+    await transaction.rollback();
+    console.error('Error deleting user:', error.message);
+    throw error;
+  }
+};
   //to set route
 const spActivateUser = async (userId) => {
     const transaction = await db.sequelize.transaction();
@@ -459,4 +485,5 @@ module.exports = {
     spCheckPasswordExpiry,
     spSendPasswordExpiryNotification,
     spCreatePassword,
+    spDeleteUser
 }

@@ -27,6 +27,7 @@ const {
   spSetCenterAdmin,
   spDeactivateUser,
   spActivateUser,
+  spDeleteUser,
   spRegisterNewUser,
   spCreatePassword,
 } = require("../database/logic_objects/securityProcedures");
@@ -352,6 +353,31 @@ controllers.deactivate_user = async (req, res) => {
   try {
     await spDeactivateUser(user_id);
     await spEventParticipationCleanup();
+    res
+      .status(201)
+      .json({ success: true, message: "User deactivated successfully." });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deactivating user: " + error.message,
+    });
+  }
+};
+
+controllers.delete_user = async (req, res) => {
+  const { user_id } = req.body;
+  // Validate inputs
+  if (!validator.isInt(user_id.toString())) {
+    return res.status(400).json({ success: false, message: "Invalid User ID" });
+  }
+  if (validator.isEmpty(user_id.toString())) {
+    return res
+      .status(400)
+      .json({ success: false, message: "User ID is required" });
+  }
+
+  try {
+    await spDeleteUser(user_id);
     res
       .status(201)
       .json({ success: true, message: "User deactivated successfully." });
