@@ -61,7 +61,7 @@ controllers.validation_admins = async (req, res, next) => {
   if (user == null) {
     return res.status(403).json({ message: "Invalid token" });
   }
-  const user_role = await getUserRole(req.user.id);
+  const user_role = await getUserRole(user.id);
   if ( user_role != 'ServerAdmin' || user_role != 'CenterAdmin' ){
 
     return res
@@ -103,7 +103,7 @@ controllers.validation_server_admin = async (req, res, next) => {
   if (user == null) {
     return res.status(403).json({ message: "Invalid token" });
   }
-  const user_role = await getUserRole(req.user.id);
+  const user_role = await getUserRole(user.id);
   if ( user_role != 'ServerAdmin' ){
     return res
       .status(403) 

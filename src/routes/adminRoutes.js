@@ -19,7 +19,7 @@ router.get('/content-center-to-be-validated/:center_id', validation_admins, cont
 
 
 router.get('/get-all-centers', controller.getCenters);
-router.patch('/update-center/:center_id', validation_admins, controller.updateCenter);
+
 
 
 //validate operations for users
@@ -30,6 +30,7 @@ router.patch('/deactivate-user', validation_admins, controller.deactivate_user);
 router.post('/create-center-admin', validation_server_admin, controller.register_admin);
 router.post('/create-center', validation_server_admin, controller.createCenter);
 router.delete('/delete-center/:center_id', validation_server_admin, controller.deleteCenter);
+router.patch('/update-center/:center_id', validation_server_admin, controller.updateCenter);
 
 //reports
 router.get('/get-reports', validation_admins, controller.getReports);
