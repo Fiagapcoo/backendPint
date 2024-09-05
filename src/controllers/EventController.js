@@ -207,7 +207,7 @@ controllers.edit_event = async (req, res) => {
       currentParticipants
     );
 
-    const state = fnGetEventState(eventId);
+    const state = await fnGetEventState(eventId);
     console.log("ESTADO DO EVENTO");
       console.log(state);
     if (state == "Validated") {
