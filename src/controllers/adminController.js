@@ -365,15 +365,18 @@ controllers.deactivate_user = async (req, res) => {
 };
 
 controllers.delete_user = async (req, res) => {
-  const { user_id } = req.body;
-  // Validate inputs
-  if (!validator.isInt(user_id.toString())) {
-    return res.status(400).json({ success: false, message: "Invalid User ID" });
-  }
-  if (validator.isEmpty(user_id.toString())) {
+  const { user_id } = req.params;
+  console.log("req.params:", req.params);
+  // Check if user_id is provided and valid
+  if (user_id === undefined || user_id === null) {
     return res
       .status(400)
       .json({ success: false, message: "User ID is required" });
+  }
+
+  // Validate if user_id is a valid integer
+  if (!validator.isInt(user_id.toString())) {
+    return res.status(400).json({ success: false, message: "Invalid User ID" });
   }
 
   try {

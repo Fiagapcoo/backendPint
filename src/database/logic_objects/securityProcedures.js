@@ -295,10 +295,10 @@ const spDeleteUser = async (userId) => {
         await db.sequelize.query(
           `
           DELETE FROM "hr"."users"
-          WHERE "user_id" = :userID
+          WHERE "user_id" = :userId
           `,
           {
-            replacements: { userID },
+            replacements: { userId },
             type: QueryTypes.DELETE,
             transaction,
           }
@@ -306,7 +306,7 @@ const spDeleteUser = async (userId) => {
     
 
     await transaction.commit();
-    console.log(`User with ID ${userID} successfully deleted.`);
+    console.log(`User with ID ${userId} successfully deleted.`);
   } catch (error) {
     await transaction.rollback();
     console.error('Error deleting user:', error.message);

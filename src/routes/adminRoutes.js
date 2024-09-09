@@ -26,7 +26,7 @@ router.get('/get-all-centers', controller.getCenters);
 router.patch('/validate-user', validation_admins, controller.validate_user);
 router.patch('/deactivate-user', validation_admins, controller.deactivate_user);
 
-router.delete('/delete-admin', validation_server_admin, controller.delete_user)
+router.delete('/delete-admin/:user_id', validation_server_admin, controller.delete_user)
 
 //server admin only
 router.post('/create-center-admin', validation_server_admin, controller.register_admin);
