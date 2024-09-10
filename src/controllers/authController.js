@@ -98,8 +98,8 @@ controllers.register = async (req, res) => {
       const token = generateTokenAccountCreation_resetpasword(user[0].user_id);
       //await sp_insertUserAccDetails(user[0].user_id);
       const random_sub_url = mashupAndRandomize(email, firstName, lastName);
-
-      const url = `${process.env.CLIENT_URL}/setup-password/${random_sub_url}?token=${token}`;
+      const stringtoken = JSON.stringify(token);
+      const url = `${process.env.CLIENT_URL}/setup-password/${random_sub_url}?token=${stringtoken}`;
       console.log("url:", url);
       console.log("user:", user);
 
@@ -242,7 +242,7 @@ controllers.startRecoveryPassword = async (req, res) => {
       const token = generateTokenAccountCreation_resetpasword(user.user_id);
       const stringtoken = JSON.stringify(token);
       //const random_sub_url = crypto.randomBytes(32).toString("hex");
-      const url = `${process.env.CLIENT_URL}/change-password/?token=${token}`;
+      const url = `${process.env.CLIENT_URL}/change-password/?token=${stringtoken}`;
       console.log("url:", url);
       console.log("user:", user);
 
