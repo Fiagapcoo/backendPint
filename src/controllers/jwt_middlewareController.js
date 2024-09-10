@@ -56,13 +56,14 @@ controllers.validation_admins = async (req, res, next) => {
   console.log('Token received:', JSON.parse(token));
   const encryptedToken = JSON.parse(token); // Ensure token is parsed if sent as a stringified object
   const user = verifyToken(encryptedToken);
+  console.log("TESTEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEe")
   console.log('USER: '+ JSON.stringify(user) );
 
   if (user == null) {
     return res.status(403).json({ message: "Invalid token" });
   }
   const user_role = await getUserRole(user.id);
-  if ( user_role != 'ServerAdmin' || user_role != 'CenterAdmin' ){
+  if ( user_role != 'ServerAdmin' && user_role != 'CenterAdmin' ){
 
     return res
       .status(403) 
