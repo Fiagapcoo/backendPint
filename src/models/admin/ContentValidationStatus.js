@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     ContentValidationStatus.associate = function(models) {
-        ContentValidationStatus.belongsTo(models.Users, { foreignKey: 'validator_id', targetKey: 'user_id', schema: 'hr', onDelete: 'CASCADE' });
+        ContentValidationStatus.belongsTo(models.Users, { foreignKey: 'validator_id', targetKey: 'user_id', schema: 'hr', onDelete: 'SET NULL' });
     };
 
     return ContentValidationStatus;
