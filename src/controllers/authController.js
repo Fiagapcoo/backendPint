@@ -89,10 +89,10 @@ controllers.register = async (req, res) => {
     console.log("user:", user);
 
     // Assegure que 'user' seja um objeto simples
-    // if (Array.isArray(user) && user.length > 0) {
-    //   const userPayload = {
-    //     id: user[0].user_id, // Acesse o primeiro elemento do array
-    //   };
+    if (Array.isArray(user) && user.length > 0) {
+      const userPayload = {
+        id: user[0].user_id, // Acesse o primeiro elemento do array
+      };
       console.log("userPayload:", userPayload);
 
       const token = generateTokenAccountCreation_resetpasword(user[0].user_id);
@@ -124,7 +124,7 @@ controllers.register = async (req, res) => {
         success: true,
         message:
           "User registered successfully. Please check your email to set up your password.",
-      });
+      });}
     //}
   } catch (error) {
     console.error("CONSOLE LOG REGISTER:", error);

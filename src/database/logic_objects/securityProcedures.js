@@ -460,7 +460,7 @@ const sp_findUserByEmail = async (email) => {
                 type: QueryTypes.SELECT
             }
         );
-
+        console.log(user);
         return user;
     } catch (error) {
         throw error;
