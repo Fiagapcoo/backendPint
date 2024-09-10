@@ -136,7 +136,8 @@ controllers.register = async (req, res) => {
 
 
 controllers.setupPassword = async (req, res) => {
-  const {token} = req.params;
+  const {password,token} = req.body;
+  try {
   if (!token) {
     return res.status(401).json({ message: "Not authorized, no token" });
   }
@@ -148,25 +149,24 @@ controllers.setupPassword = async (req, res) => {
   if (user == null) {
     return res.status(403).json({ message: "Invalid token" });
   }
-  const { password } = req.body;
 
   if (!validator.isStrongPassword(password)) {
     return res
       .status(400)
       .json({ success: false, message: "Password is not strong enough" });
   }
-  try {
+
     const userId = user.id;
 
     await spCreatePassword(userId, password);
 
-    const user = await sp_findUserById(userId);
-    console.log("user:", user);
-    console.log("user:", user);
+    const user2 = await sp_findUserById(userId);
+    console.log("user:", user2);
+    console.log("user:", user2);
     await sendMail({
-      to: user.email,
+      to: user2.email,
       subject: "Password Setup Successful",
-      body: `Dear ${user.name},
+      body: `Dear ${user2.name},
       
               Your password has been set up successfully.
 
