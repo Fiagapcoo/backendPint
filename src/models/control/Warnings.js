@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Warnings.associate = function(models) {
-        Warnings.belongsTo(models.Users, { foreignKey: 'admin_id', targetKey: 'user_id', schema: 'hr' });
+        Warnings.belongsTo(models.Users, { foreignKey: 'admin_id', targetKey: 'user_id', schema: 'hr', onDelete: 'CASCADE' });
         Warnings.belongsTo(models.OfficeAdmins, { foreignKey: 'office_id', targetKey: 'office_id', schema: 'centers' });
     };
 

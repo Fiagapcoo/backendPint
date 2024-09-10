@@ -9,7 +9,8 @@
     "sync": "node src/start/syncModels.js",
     "insert": "node src/start/insertFakeData.js",
     "admin": "node src/start/insertAdmins.js",
-    "testdata": "node src/start/TESTING.js"
+    "testdata": "node src/start/TESTING.js",
+    "postclean": "npm run sync && npm run insert"
   },
   "keywords": [],
   "author": "",

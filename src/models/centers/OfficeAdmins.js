@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
 
     OfficeAdmins.associate = function(models) {
         OfficeAdmins.belongsTo(models.Offices, { foreignKey: 'office_id', targetKey: 'office_id', schema: 'centers', onDelete: 'CASCADE' });
-        OfficeAdmins.belongsTo(models.Users, { foreignKey: 'manager_id', targetKey: 'user_id', schema: 'hr' });
+        OfficeAdmins.belongsTo(models.Users, { foreignKey: 'manager_id', targetKey: 'user_id', schema: 'hr', onDelete: 'CASCADE' });
     };
 
     return OfficeAdmins;

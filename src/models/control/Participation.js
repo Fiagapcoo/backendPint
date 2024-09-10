@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Participation.associate = function(models) {
-        Participation.belongsTo(models.Users, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr' });
+        Participation.belongsTo(models.Users, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr', onDelete: 'CASCADE' });
         Participation.belongsTo(models.Events, { foreignKey: 'event_id', targetKey: 'event_id', schema: 'dynamic_content', onDelete: 'CASCADE' });
     };
 

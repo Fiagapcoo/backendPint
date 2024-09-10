@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Bookmarks.associate = function(models) {
-        Bookmarks.belongsTo(models.Users, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr' });
+        Bookmarks.belongsTo(models.Users, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr', onDelete: 'CASCADE' });
     };
 
     return Bookmarks;

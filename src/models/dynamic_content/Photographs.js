@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
 
     Photographs.associate = function(models) {
         Photographs.belongsTo(models.Albuns, { foreignKey: 'album_id', targetKey: 'album_id', schema: 'dynamic_content' });
-        Photographs.belongsTo(models.Users, { foreignKey: 'publisher_id', targetKey: 'user_id', schema: 'hr' });
+        Photographs.belongsTo(models.Users, { foreignKey: 'publisher_id', targetKey: 'user_id', schema: 'hr', onDelete: 'CASCADE' });
     };
 
     return Photographs;

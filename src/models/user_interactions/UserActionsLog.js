@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     UserActionsLog.associate = function(models) {
-        UserActionsLog.belongsTo(models.Users, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr' });
+        UserActionsLog.belongsTo(models.Users, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr', onDelete: 'CASCADE' });
     };
 
     return UserActionsLog;

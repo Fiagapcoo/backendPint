@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     PasswdExpiringNotifications.associate = function(models) {
-        PasswdExpiringNotifications.belongsTo(models.Users, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr' });
+        PasswdExpiringNotifications.belongsTo(models.Users, { foreignKey: 'user_id', targetKey: 'user_id', schema: 'hr', onDelete: 'CASCADE' });
     };
 
     return PasswdExpiringNotifications;

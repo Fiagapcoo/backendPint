@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Reports.associate = function(models) {
-        Reports.belongsTo(models.Users, { foreignKey: 'reporter_id', targetKey: 'user_id', schema: 'hr' });
+        Reports.belongsTo(models.Users, { foreignKey: 'reporter_id', targetKey: 'user_id', schema: 'hr', onDelete: 'CASCADE' });
         Reports.belongsTo(models.Comments, { foreignKey: 'comment_id', targetKey: 'comment_id', schema: 'communication' });
     };
 
