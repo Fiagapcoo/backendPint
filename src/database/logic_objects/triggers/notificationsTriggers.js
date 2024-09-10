@@ -13,9 +13,6 @@ const createTriggerFunction_notifs = async () => {
         -- Log a message when the trigger fires
         RAISE NOTICE 'Trigger notify_content_validated fired for content_type: %, content_real_id: %', NEW.content_type, NEW.content_real_id;
 
-        -- Insert a record into the audit table when the trigger fires
-        --INSERT INTO admin.trigger_audit (content_type, content_real_id, operation)
-        --VALUES (NEW.content_type, NEW.content_real_id, TG_OP);
 
         -- Determine the content type and fetch the relevant details
         IF NEW.content_type = 'Event' THEN
