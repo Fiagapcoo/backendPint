@@ -7,7 +7,7 @@ const router = express.Router();
 const authController = require("../controllers/authController");
 
 router.post("/register", authController.register);
-router.post("/setup-password", validation, authController.setupPassword);
+router.post("/setup-password/:token", authController.setupPassword);
 router.patch(
   "/change-password",
   validation,
